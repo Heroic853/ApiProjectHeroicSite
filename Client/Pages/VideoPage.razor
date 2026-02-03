@@ -1,0 +1,99 @@
+﻿@page "/videopage"
+
+    <style>
+        body {
+            background-image: url('images/SfondoClasifications.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: top center;
+            background-attachment: fixed;
+            background-color: black; 
+            min-height: 100vh; 
+        }
+    </style>
+
+    <style>
+        .TitleVideo {
+            text-align: center;
+            color: gold;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            margin: 2rem 0;
+        }
+
+        .subtitleVideo {
+            text-align: center;
+            color: ghostwhite;
+            font-family: 'Cinzel', serif;
+            font-weight: 80;
+            font-size: 3rem; /* circa 48px */
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        @@media (max-width: 480px) {
+           
+            body{
+                background-size: cover;
+            }
+            .TitleVideo {
+                font-size: 3rem;
+            }
+
+            .subtitleVideo {
+            font-size: 1.5rem; 
+            }
+            
+            .video-container {
+            width: 45%; /* ← Larghezza responsive */
+            height: 25%;
+            margin: 20px auto;
+            border-width: 2px;
+        }
+    </style>
+
+    <p class="TitleVideo">Video</p>
+
+    <style>
+            .video-container {
+                position: relative;
+                width: 100%;
+                max-width: 1300px; /* ← Larghezza massima, non fissa */
+                padding-bottom: 56.25%; /* ← Mantiene ratio 16:9 */
+                margin: 40px auto;
+                background: #000;
+                border: 3px solid gold;
+                border-radius: 10px;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+                overflow: hidden;
+           }
+
+            .video-container iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%; /* riempie il contenitore */
+                height: 100%; /* mantiene proporzioni */
+                display: block;
+            }
+
+    </style>
+
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/FxDkoGhdFZc?si=SyFrD8CRXVihDT1R" 
+                title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+        </iframe>
+    </div>
+
+     <div class="subtitleVideo">
+        <p style="text-align: center; color: white;">
+            Special video of my best 20 mods!
+        </p>
+     </div>

@@ -1,0 +1,47 @@
+﻿@page "/newHunter/{parameter1}"
+@page "/existingHunter/{parameter1}/{parameter2}"
+
+
+<h1 style="font-family: Arial, sans-serif; font-weight: bold; background: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red); -webkit-background-clip: text; color: transparent;">
+    Hunter Guild
+</h1>
+
+<PageTitle>Hunter Guild</PageTitle>
+
+<h4> @Parameter1</h4>
+<h4> @Parameter2</h4>
+
+<style>
+    body {
+        background-image: url('images/img4.png');
+        background-size: cover;
+        background-position: center;
+    }
+</style>
+
+
+<p style="color: white;">
+   Hey! You are a new Hunter or a registred Hunter? Good Luck
+</p>
+
+
+<img src="images/Img3.png" alt="Ufficial Logo" width="170" height="170">
+
+<NavLink class="btn btn-secondary" href="newHunter?Param1=Blazzing&Param2=Blazor">
+    <span class="oi oi-list-rich" aria-hidden="true"  style="background-color:red"></span> New Hunter
+</NavLink>
+
+<NavLink class="btn btn-secondary" href="existingHunter?Param2=Blazzing&Param2=Blazor">
+    <span class="oi oi-list-rich" aria-hidden="true" style="background-color:greenyellow"></span> Existing Hunter
+</NavLink>
+
+<img src="images/Img0.png" alt="Ufficial Logo" width="560" height="520">
+
+@code 
+{
+    [Parameter]
+    public string Parameter1 { get; set; }
+    [Parameter]
+    public string Parameter2 { get; set; }
+
+}

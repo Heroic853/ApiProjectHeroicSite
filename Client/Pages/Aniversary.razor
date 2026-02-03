@@ -1,0 +1,302 @@
+﻿@page "/"
+
+<style>
+    body {
+        background-image: url('images/SfondoClasifications.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
+    }
+
+    .buttonVideo:hover img {
+        transform: scale(1.02);
+        box-shadow: 0 0 25px rgba(255, 215, 0, 1);
+    }
+
+    .section-title {
+        text-align: center;
+        color: gold;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        font-size: 3rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        margin: 2rem 0;
+    }
+
+    .topClasifications {
+        box-shadow: 0 0 25px rgba(255, 215, 0, 1);
+        padding: 10px;
+        margin: 30px auto;
+        width: fit-content;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .topClasifications img {
+        display: block;
+        transition: transform 0.3s;
+    }
+
+    .topClasifications:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
+    }
+
+    .topClasifications:hover img {
+        transform: scale(1.02);
+    }
+
+    .monster-number {
+        text-align: center;
+        color: gold;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        font-size: 3rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        margin: 2rem 0;
+    }
+
+    /* DESKTOP - Grid con 4 colonne */
+    .monster-gallery {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2.5rem;
+        padding: 1rem;
+        justify-items: center;
+    }
+
+    .monster-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 5px solid #8b0000;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        text-align: center;
+        padding: 10px;
+        background: rgba(26, 26, 26, 0.5);
+        color: white;
+        transition: transform 0.3s, box-shadow 0.3s;
+        width: 100%;
+    }
+
+    .monster-card img {
+        width: 100%;
+        height: auto;
+    }
+
+    .monster-card p {
+        font-family: 'Cinzel', serif;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 0.5rem;
+        text-align: center;
+    }
+
+    /* MOBILE - Grid con 2 colonne */
+    @@media (max-width: 480px) {
+        body {
+            background-size: cover;
+        }
+
+        .monster-gallery {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .monster-number {
+            font-size: 1.2rem;
+        }
+
+        .monster-card {
+            padding: 5px;
+        }
+
+        .monster-card img {
+            width: 100%;
+            max-width: none;
+        }
+
+        .monster-card p {
+            font-size: 0.7rem;
+            margin-top: 0.25rem;
+        }
+
+        .topClasifications img {
+            width: 100%;
+            height: auto;
+        }
+
+        .buttonVideo img {
+            max-width: 150px;
+            max-height: 70px;
+        }
+    }
+</style>
+
+@* @if (ApplicationManager.IsLoggedIn())
+{ *@
+
+<p class="section-title">Rank</p>
+
+<p style="text-align: center; color: white;">
+    The votes are now in for the most popular moded monster of Monster Hunter!
+</p>
+
+<div class="topClasifications">
+    <a href="https://www.nexusmods.com/monsterhunterworld/mods/5721">
+        <img src="images/img1th.png" width="800" height="500">
+    </a>
+</div>
+
+<div class="topClasifications">
+    <a href="https://www.nexusmods.com/monsterhunterworld/mods/5565">
+        <img src="images/2th.png" width="800" height="500">
+    </a>
+</div>
+
+<div class="topClasifications">
+    <a href="https://www.nexusmods.com/monsterhunterworld/mods/6285">
+        <img src="images/Img3th.png" width="800" height="500">
+    </a>
+</div>
+
+<div class="monster-gallery">
+    <div class="monster-card">
+        <span class="monster-number">No.4</span>
+        <img src="images/4th.png">
+        <p>Destroid Tigrex</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.5</span>
+        <img src="images/5th.png">
+        <p>God Alatreon</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.6</span>
+        <img src="images/6th.png">
+        <p>Shara Ishava demon</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.7</span>
+        <img src="images/7th.png">
+        <p>Destruction Rathalos</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.8</span>
+        <img src="images/8th.png">
+        <p>Blinking Nargacuga</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.9</span>
+        <img src="images/9th.png">
+        <p>UNKNOWN</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.10</span>
+        <img src="images/10th.png">
+        <p>Primordial Risen Alatreon</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.11</span>
+        <img src="images/11thgl.png">
+        <p>Configuration Glavenus</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.12</span>
+        <img src="images/12th.png">
+        <p>Zenith Gore Magala</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.13</span>
+        <img src="images/13th.png">
+        <p>Beast of Berserk</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.14</span>
+        <img src="images/14th.png">
+        <p>True Symbol of Fatalis Velkhana</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.15</span>
+        <img src="images/15th.png">
+        <p>Thunderlord Zinogre</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.16</span>
+        <img src="images/16th.png">
+        <p>A52-Galaxy Nergigante</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.17</span>
+        <img src="images/17th.png">
+        <p>Thunder Emperor Kirin</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.18</span>
+        <img src="images/18th.png">
+        <p>Zenith Shagaru Magala</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.19</span>
+        <img src="images/19th.png">
+        <p>Viking Khusala Doara</p>
+    </div>
+
+    <div class="monster-card">
+        <span class="monster-number">No.20</span>
+        <img src="images/20th.png">
+        <p>Ebony khusala Doara</p>
+    </div>
+</div>
+
+<div class="buttonVideo">
+    <div style="justify-content: space-between; align-items: center; text-align: center;">
+        <div>
+            <a href="videopage">
+                <img src="images/buttonvideo.png" width="400" height="100">
+            </a>
+        </div>
+    </div>
+</div>
+
+@* }
+else
+{
+    <p style="color: white;">
+        You want to vote the moded monsters and see what monster win? Go hier and login
+        for voting you favourite monster
+    </p>
+    <NavLink class="btn btn-secondary" href="existingHunter?Param2=Blazzing&Param2=Blazor">
+        <span class="oi oi-list-rich" aria-hidden="true" style="background-color:greenyellow"></span> Login Hunter
+    </NavLink>
+} *@

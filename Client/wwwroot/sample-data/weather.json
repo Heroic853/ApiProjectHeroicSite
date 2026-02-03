@@ -1,0 +1,27 @@
+﻿[
+  {
+    "Name": "Fatalis",
+    "Elelent": Dragon,
+    "Class": "Elder Dragon"
+  },
+  {
+    "Name": "Lagiacrus",
+    "Element": Water,
+    "Class": "Leviathan"
+  },
+  {
+    "Name": "Elzelion",
+    "Element": Fire, Water,
+    "Class": "Unknown"
+  },
+  {
+    "date": "Rathalos",
+    "Element": Fire,
+    "Class": "Wyvern"
+  },
+  {
+    "Name": "Seregios",
+    "temperatureC": Blood,
+    "Class": "Wyvern"
+  }
+]

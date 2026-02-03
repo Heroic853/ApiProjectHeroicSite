@@ -1,0 +1,69 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Client</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+       @*  <div class="nav-item px-3">
+            <NavLink class="nav-link" href="index">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Hunter Guild
+            </NavLink>
+        </div> *@
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="monsterData">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Monster Datas
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="dragonList">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Monster Create & Feedbacks
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="UserTable">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Resistred Users
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Aniversary
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="aniversarytable">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Aniversary Table
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="MessageOfGratitude">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Message of Gratitude
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="videopage">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Video Page
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="forbiddenMonsters">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Forbidden Icons
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

@@ -1,0 +1,89 @@
+﻿@page "/UserTable"
+@using SharedLibrary.Dto
+@inject HttpClient Http
+
+<style>
+    body {
+        background-image: url('images/sfondoadmin.png');
+        background-size: cover;
+        background-position: center;
+        background-size: 100% auto; /* si adatta in larghezza, mantenendo proporzioni */
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed; /* effetto scorrimento parallax */
+        background-color: black; /* per riempire eventuali bordi */
+        min-height: 100vh; /* copre almeno l'altezza visibile */
+    }
+
+    .title-users {
+        text-align: center;
+        color: gold;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        font-size: 3rem; /* circa 48px */
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        margin: 2rem 0;
+    }
+
+    .not-auth {
+        text-align: center;
+        color: ghostwhite;
+        font-family: 'Cinzel', serif;
+        font-weight: 80;
+        font-size: 3rem; /* circa 48px */
+        text-transform: uppercase;
+        letter-spacing: 4px;
+    }
+
+    @@media (max-width: 480px) {
+
+        body {
+            background-size: cover;
+        }
+    }
+</style>
+
+
+@if (ApplicationManager.IsLoggedIn())
+{
+    <p class="title-users">Registred Users</p>
+
+    <p style="text-align: center; color: white;">
+        Hier is only for Admins to see how much Hunters was registred to this site of Guild Enjoy!
+    </p>
+
+    @if (UsersList == null)
+    {
+        <p style="color: white;"><em>Loading please...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="color: yellow;">Username</th>
+                    <th style="color: yellow;">Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var forecast in UsersList)
+                {
+                    <tr>
+                        <td style="color: lightgrey;">@forecast.Username</td>
+                        <td style="color: lightgrey;">@forecast.Password</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+else
+{
+    <div class="not-auth">
+        <p style="text-align: center; color: white;">
+           Sorry you are not authorized
+        </p>
+    </div>
+}

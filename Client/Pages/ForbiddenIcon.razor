@@ -1,0 +1,208 @@
+﻿@page "/forbiddenMonsters"
+
+<style>
+    body {
+        background-image: url('images/ObscureSfondo.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
+    }
+
+    .section-title {
+        text-align: center;
+        color: gold;
+        font-family: 'Creepster', serif;
+        font-weight: 700;
+        font-size: 3rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        margin: 2rem 0;
+    }
+
+    .forbidden-monster {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2.5rem;
+        padding: 1rem;
+        justify-items: center;
+    }
+
+    .monster-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 5px solid #8b0000;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        text-align: center;
+        padding: 10px;
+        background: rgba(26, 26, 26, 0.5);
+        color: white;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .monster-card img {
+        width: 400px;
+        height: auto;
+    }
+
+    .monster-card p {
+        font-family: 'Cinzel', serif;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 0.5rem;
+        text-align: center;
+    }
+
+    /* Mobile */
+    @@media (max-width: 480px) {
+        body {
+            background-size: cover;
+        }
+
+        .forbidden-monster {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .monster-card {
+            padding: 5px;
+        }
+
+        .monster-card img {
+            width: 100%;
+            max-width: none;
+        }
+
+        .monster-card p {
+            font-size: 0.7rem;
+            margin-top: 0.25rem;
+        }
+    }
+</style>
+
+<p class="section-title">Forbidden Monsters</p>
+
+<p style="text-align: center; color: white;">
+    The Forbidden monsters that were never seen in the game!
+</p>
+
+<div class="forbidden-monster">
+
+        <div class="monster-card">
+        <img src="images/Forb9.png">
+            <p>
+                ???
+            </p>
+        </div>
+
+        <div class="monster-card">
+        <img src="images/Forb12.png">
+            <p>
+                Demon Flame Legiana
+            </p>
+        </div>
+
+        <div class="monster-card">
+        <img src="images/Forb15.png">
+            <p>
+                Thunderbubble Rey Dau
+            </p>
+        </div>
+
+        <div class="monster-card">
+        <img src="images/Forb16.png">
+            <p>
+                Expo 2025 Osaka Abomination Rathalos
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb18.png">
+            <p>
+                Allfather Ibushy
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb19.png">
+            <p>
+                Stygian Zinogre
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb20.png">
+            <p>
+                Risen Devil King Raum
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb22.png">
+            <p>
+                UNCKNOWN Phase 1
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb23.png">
+            <p>
+                UNCKNOWN Phase 2
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb24.png">
+            <p>
+                UNCKNOWN Phase 3
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb25.png">
+            <p>
+                Rukodiora
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb26.png">
+            <p>
+                Rebidiora
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb28.png">
+            <p>
+                Eruzerion Thunder & Nature
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb36.png">
+            <p>
+                Destruction Rathalos
+            </p>
+        </div>
+
+        <div class="monster-card">
+            <img src="images/Forb37.png">
+            <p>
+                Ice Zinogre
+            </p>
+        </div>
+</div>

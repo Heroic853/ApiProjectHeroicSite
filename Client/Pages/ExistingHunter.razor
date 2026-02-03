@@ -1,0 +1,75 @@
+﻿@page "/existingHunter"
+@inject NavigationManager NavigationManager
+
+    <style>
+        body {
+            background-image: url('images/img4.png');
+            background-size: cover;
+            background-position: center;
+        }
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* centra orizzontalmente */
+            min-height: 100vh; /* occupa tutta l'altezza della finestra */
+            gap: 15px; /* spazio tra gli elementi */
+            padding: 20px;
+        }
+
+        .login-container label {
+            color: white;
+            font-weight: bold;
+        }
+
+        .login-container input {
+            width: 250px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .login-container button, .login-container .btn {
+            width: 150px; /* uniforma i bottoni */
+            margin-top: 10px;
+        }
+
+        .loginTitle{
+            text-align: center;
+            color: gold;
+            font-family: 'Pirata One', serif;
+            font-weight: 700;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            margin: 2rem 0;
+        }
+
+        @@media (max-width: 480px) {
+        .loginTitle {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+
+    <h4 @Param1 </h4>
+    <h4 @Param2 </h4>
+
+    <p class="loginTitle">Login</p>
+    <div class="login-container">
+
+        <label for="username">Username</label>
+        <input type="text" @bind="User.Username" class="form-control" maxlength="20" />
+
+        <label for="User-Password">Password</label>
+        <input type="password" @bind="User.Password" class="form-control" />
+
+        <NavLink href="" class="btn btn-secondary">Back to Home</NavLink>
+          
+        <button type="button" class="btn btn-success" @onclick="Login">Login</button>
+
+       @*  <img src="images/Img2.png" alt="Ufficial Logo" width="400" height="400"> *@
+
+        <p style="color: white;"><b>@messageText</b></p>
+
+    </div>

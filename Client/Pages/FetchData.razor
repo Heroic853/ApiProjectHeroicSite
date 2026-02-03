@@ -1,0 +1,66 @@
+﻿@page "/fetchdata"
+@using SharedLibrary.Dto
+@inject HttpClient Http
+
+<PageTitle>Monster List</PageTitle>
+
+    <style>
+        body {
+            background-image: url('images/img4.png');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+
+@if (ApplicationManager.IsLoggedIn())
+{
+    <h1 style="font-family: Arial, sans-serif; font-weight: bold; background: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red); -webkit-background-clip: text; color: transparent;">
+        Monster List
+    </h1>
+
+    <p style="color: white;">
+        Hier is the monster list of Monster Hunter, is not ufficial
+        site but is a true monster list. Enjoy Hier
+    </p>
+
+    @if (dragonList == null)
+    {
+        <p style="color: white;"><em>Loading please...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="color: yellow;">Name</th>
+                    <th style="color: yellow;">Element</th>
+                    <th style="color: yellow;">Defence</th>
+                    <th style="color: yellow;">Class</th>
+                    <th style="color: yellow;">Map</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var forecast in dragonList)
+                {
+                    <tr>
+                        <td style="color: lightgrey;">@forecast.Name</td>
+                        <td style="color: lightgrey;">@forecast.Element</td>
+                        <td style="color: lightgrey;">@forecast.Defence</td>
+                        <td style="color: lightgrey;">@forecast.Class</td>
+                        <td style="color: lightgrey;">@forecast.Map</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+else
+{
+    <p style="color: white;">
+        You need to Login to see this...
+    </p>
+
+    <NavLink class="btn btn-secondary" href="existingHunter?Param2=Blazzing&Param2=Blazor">
+        <span class="oi oi-list-rich" aria-hidden="true" style="background-color:greenyellow"></span> Login Hunter
+    </NavLink>
+}
