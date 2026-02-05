@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<!-- Disattiva la compressione Brotli e Gzip -->
+		<!-- Disattiva la compresione Brotli e Gzip -->
 		<BlazorWebAssemblyEnableCompression>false</BlazorWebAssemblyEnableCompression>
 
 		<!-- Non usare AOT / trimming se vuoi le DLL visibili -->
