@@ -11,10 +11,3 @@ FROM base AS final
 WORKDIR /app
 COPY --from=build /app/out .
 ENTRYPOINT ["dotnet", "WebApi.dll"]
-```
-
-**3. Salvalo nella cartella dove hai `Foren.sln`** (la root del progetto)
-
-**4. IMPORTANTE: quando salvi, dai il nome esatto:**
-```
-Dockerfile
