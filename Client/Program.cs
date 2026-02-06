@@ -9,8 +9,9 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 //builder.Services.AddHttpClient();
 
-builder.Services.AddScoped(sp => new HttpClient { 
-    BaseAddress = new Uri("https://heroic853sitev1-production.up.railway.app/")
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("https://heroic853api-production.up.railway.app/")
 });
 builder.Services.AddSingleton(new ApplicationManager());
 
