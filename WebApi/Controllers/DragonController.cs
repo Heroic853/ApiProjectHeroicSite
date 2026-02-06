@@ -8,7 +8,7 @@ namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/dragon")]
-    [EnableCors("AllowAll")]
+    //[EnableCors("AllowAll")]
     public class DragonController : ControllerBase
     {
 

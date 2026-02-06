@@ -22,13 +22,15 @@ namespace Client.Pages
 
         private string messageTextMonsterChoise = "";
         private string messageTextFeedbacks = "";
-        private HttpClient httpClient;
+        
+        [Inject]
+        public HttpClient HttpClient { get; set; }
 
         private async Task Saves()
         {
             try
             {
-                var response = await httpClient.PostAsJsonAsync("api/dragon", Dragon);
+                var response = await HttpClient.PostAsJsonAsync("api/dragon", Dragon);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -50,7 +52,7 @@ namespace Client.Pages
         {
             try
             {
-                var response = await httpClient.PostAsJsonAsync("api/dragon/Clasification", Clasification);
+                var response = await HttpClient.PostAsJsonAsync("api/dragon/Clasification", Clasification);
 
                 if (response.IsSuccessStatusCode)
                 {
