@@ -19,7 +19,7 @@ namespace Client.Pages
             try
             {
                 var dbUser = await HttpClient.GetFromJsonAsync<User>(
-                    $"api/dragon/get-user?username={User.Username}"
+                    $"api/dragon/get-user?account={User.Account}"
                 );
 
                 if (dbUser == null)
@@ -30,8 +30,8 @@ namespace Client.Pages
 
                 if (User.Password.Equals(dbUser.Password))
                 {
-                    ApplicationManager.Username = dbUser.Username;
-                    NavManager.NavigateTo("/");
+                    ApplicationManager.Username = dbUser.Username;  // Salva il USERNAME (nome visualizzato)
+                    NavManager.NavigateTo("");
                 }
                 else
                 {

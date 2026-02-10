@@ -16,7 +16,7 @@
 
     .title-feedbacks {
         text-align: center;
-        color: darkblue;
+        color: gold;
         font-family: 'Cinzel', serif;
         font-weight: 700;
         font-size: 3rem; /* circa 48px */
@@ -44,7 +44,8 @@
     }
 </style>
 
-@if (ApplicationManager.IsLoggedIn())
+@* @if (ApplicationManager.IsLoggedIn()) se ha fatto il login mostra le tabelle *@ 
+@if (ApplicationManager.Username == "Admin") // se e admin mostra la tabella
 {
     <p class="title-feedbacks">Selected Monsters from Users & Feedbacks</p>
 

@@ -1,24 +1,22 @@
-﻿@page "/newHunter"
+﻿@page "/registrationHeroic"
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components
 
+<style>
+    body {
+        background-image: url('images/img4.png');
+        background-size: cover;
+        background-position: center;
+    }
 
-    <style>
-        body {
-            background-image: url('images/img4.png');
-            background-size: cover;
-            background-position: center;
-            .login-container
-        }
-        
-        .registred-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* centra orizzontalmente */
-            min-height: 100vh; /* occupa tutta l'altezza della finestra */
-            gap: 15px; /* spazio tra gli elementi */
-            padding: 20px;
-        }
+    .registred-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        gap: 15px;
+        padding: 20px;
+    }
 
         .registred-container label {
             color: white;
@@ -26,54 +24,69 @@
         }
 
         .registred-container input {
-                width: 250px; /* larghezza controllata */
-                padding: 8px;
-                border-radius: 8px;
-                border: 1px solid #ccc;
+            width: 250px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
         }
 
         .registred-container button, .registred-container .btn {
-                width: 150px; /* uniforma i bottoni */
-                margin-top: 10px;
+            width: 150px;
+            margin-top: 10px;
         }
 
-        .regTitle {
-            text-align: center;serif;
-            color: gold;
-            font-family: 'Pirata One', serif;
-            font-weight: 700;
-            font-size: 3rem; /* circa 48px */
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-            margin: 2rem 0;
+    .registerTitle {
+        text-align: center;
+        color: gold;
+        font-family: 'Pirata One', serif;
+        font-weight: 700;
+        font-size: 3rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        margin: 2rem 0;
+    }
+
+    .error-message {
+        color: #ff6b6b;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 8px 15px;
+        border-radius: 5px;
+    }
+
+    .success-message {
+        color: #51cf66;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 8px 15px;
+        border-radius: 5px;
+    }
+
+    @@media (max-width: 480px) {
+        .registerTitle {
+            font-size: 1.5rem;
         }
+    }
+</style>
 
-         @@media (max-width: 480px) {
-            .regTitle{
-                font-size: 1.5rem;
-            }
-         }
+<p class="registerTitle">Register</p>
 
-    </style>  
+<div class="registred-container">
+    <label for="username">Username</label>
+    <input type="text" @bind="User.Username" class="form-control" maxlength="20" placeholder="Your name" />
 
-    <h4 @Param1 </h4>
-    <h4 @Param2 </h4>
+    <label for="account">Account</label>
+    <input type="email" @bind="User.Account" class="form-control" placeholder="example@email.com" />
 
-    <p class="regTitle">Register</p>
+    <label for="password">Password</label>
+    <input type="password" @bind="User.Password" class="form-control" />
 
-    <div class="registred-container">
+    <NavLink href="" class="btn btn-secondary">Back to Home</NavLink>
+    <button type="button" class="btn btn-success" @onclick="Registred">Register</button>
 
-        @* <img src="images/Img1.png" alt="Ufficial Logo" width="400" height="400"> *@
-
-        <label for="username">Username</label>
-        <input type="text" @bind="User.Username" class="form-control" maxlength="20" />
-
-        <label for="User-Password">Password</label>
-        <input type="password" @bind="User.Password" class="form-control" />
-
-        <NavLink href="" class="btn btn-secondary">Back to Home</NavLink>
-        <button type="button" class="btn btn-success" @onclick="Registred">Register</button>
-
-        <p style="color: white;"><b>@messageText</b></p>
-    </div>
+    @if (!string.IsNullOrEmpty(messageText))
+    {
+        <p class="@(messageText.Contains("Success") ? "success-message" : "error-message")">
+            <b>@messageText</b>
+        </p>
+    }
+</div>

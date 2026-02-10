@@ -1,15 +1,11 @@
 ﻿@inherits LayoutComponentBase
-
+@inject Client.Service.ApplicationManager ApplicationManager
 
 <div style="text-align: center;">
     <img src="images/Heroic853Icon.png" width="150" height="150">
 </div>
 
-
 <div class="page">
-    @* <div class="sidebar">
-        <NavMenu />
-    </div> *@
     <div class="page">
         <main>
             <button class="menu-button" @onclick="ToggleMenu">☰</button>
@@ -17,34 +13,9 @@
                 @Body
             </div>
 
-            @*  <style>
-                  .menu-bottom-buttons {
-                    display: flex;
-                    justify-content: space-between; /* i due bottoni ai lati */
-                    gap: 10px;
-                    padding: 20px;
-                    margin-top: auto;
-                  }
-
-                .menu-btn {
-                    padding: 10px 20px;
-                    border: none;
-                    border-radius: 10px;
-                    font-family: 'Cinzel', serif;
-                    font-weight: bold;
-                    text-decoration: none;
-                    color: white;
-                    background: #8b0000;
-                    text-align: center;
-                    transition: all 0.3s;
-                }
-
-                    .menu-btn:hover {
-                        background: #ff0000;
-                        box-shadow: 0 0 15px rgba(255,0,0,0.7);
-                    }
-             </style> *@
             <style>
+                /* ... tutto il CSS che hai già ... */
+
                 /* Fix viewport e overflow */
                 html, body {
                     width: 100%;
@@ -78,20 +49,20 @@
                     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
                 }
 
-                    .menu-destro a:hover {
-                        color: #ffd700 !important;
-                        background: rgba(139, 0, 0, 0.5);
-                        border-color: #ff0000;
-                        box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
-                        transform: translateX(5px);
-                    }
+                .menu-destro a:hover {
+                    color: #ffd700 !important;
+                    background: rgba(139, 0, 0, 0.5);
+                    border-color: #ff0000;
+                    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+                    transform: translateX(5px);
+                }
 
-                    .menu-destro a.active {
-                        color: #ffd700 !important;
-                        background: rgba(139, 0, 0, 0.7);
-                        border-color: #ffd700;
-                        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-                    }
+                .menu-destro a.active {
+                    color: #ffd700 !important;
+                    background: rgba(139, 0, 0, 0.7);
+                    border-color: #ffd700;
+                    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+                }
 
                 /* Bottoni Sign In/Up argentati affiancati - CORRETTO */
                 .menu-bottom-buttons {
@@ -143,14 +114,55 @@
                     transition: all 0.3s;
                 }
 
-                    .menu-button:hover {
-                        background: #a01010;
-                        box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
-                        transform: scale(1.05);
-                    }
+                .menu-button:hover {
+                    background: #a01010;
+                    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+                    transform: scale(1.05);
+                }
 
                 .close-button {
                     display: none !important;
+                }
+
+                .welcome-message {
+                    padding: 15px;
+                    margin: 15px 0;
+                    text-align: center;
+                    color: #ffd700;
+                    font-family: 'Cinzel', serif;
+                    font-size: 1.1rem;
+                    font-weight: bold;
+                    background: rgba(139, 0, 0, 0.3);
+                    border: 2px solid #d4af37;
+                    border-radius: 8px;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+                }
+
+                .sign-out-btn {
+                    width: 100%;
+                    padding: 10px 15px;
+                    border: 2px solid #8b0000;
+                    border-radius: 5px;
+                    font-family: 'Cinzel', serif;
+                    font-weight: bold;
+                    font-size: 0.9rem;
+                    text-decoration: none !important;
+                    color: #ff6b6b !important;
+                    background: rgba(139, 0, 0, 0.3);
+                    text-align: center;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    transition: all 0.3s;
+                    cursor: pointer;
+                    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+                    margin-top: 10px;
+                }
+
+                .sign-out-btn:hover {
+                    background: rgba(139, 0, 0, 0.6);
+                    border-color: #ff0000;
+                    color: #ffffff !important;
+                    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
                 }
 
                 @@media (max-width: 480px) {
@@ -161,23 +173,23 @@
                         height: 100vh !important;
                         padding: 15px 10px !important;
                     }
-                        /* Logo più piccolo nel menu */
-                        .menu-destro img {
-                            width: 120px !important;
-                            height: 120px !important;
-                            margin: 10px auto;
-                        }
-                        /* Link del menu più compatti */
-                        .menu-destro a {
-                            padding: 8px 10px !important;
-                            font-size: 0.75rem !important;
-                            letter-spacing: 0.5px !important;
-                        }
-                        /* Spazio tra i link ridotto */
-                        .menu-destro ul {
-                            gap: 5px !important;
-                            margin: 10px 0 !important;
-                        }
+                    /* Logo più piccolo nel menu */
+                    .menu-destro img {
+                        width: 120px !important;
+                        height: 120px !important;
+                        margin: 10px auto;
+                    }
+                    /* Link del menu più compatti */
+                    .menu-destro a {
+                        padding: 8px 10px !important;
+                        font-size: 0.75rem !important;
+                        letter-spacing: 0.5px !important;
+                    }
+                    /* Spazio tra i link ridotto */
+                    .menu-destro ul {
+                        gap: 5px !important;
+                        margin: 10px 0 !important;
+                    }
                     /* Bottoni Sign In/Up più piccoli */
                     .menu-bottom-buttons {
                         flex-direction: row !important;
@@ -193,6 +205,7 @@
                         padding: 8px 10px !important;
                         font-size: 0.7rem !important;
                     }
+
                     .menu-button {
                         top: 12px !important;
                         right: 12px !important;
@@ -213,10 +226,52 @@
                         border-radius: 5px;
                     }
 
-                        .menu-destro::-webkit-scrollbar-thumb:hover {
-                            background: rgba(212, 175, 55, 0.8);
-                        }
+                    .menu-destro::-webkit-scrollbar-thumb:hover {
+                        background: rgba(212, 175, 55, 0.8);
+                    }
                 }
+
+                /* Aggiungi questo nuovo CSS per il messaggio di benvenuto */
+                .welcome-message {
+                    padding: 15px;
+                    margin: 15px 0;
+                    text-align: center;
+                    color: #ffd700;
+                    font-family: 'Cinzel', serif;
+                    font-size: 1.1rem;
+                    font-weight: bold;
+                    background: rgba(139, 0, 0, 0.3);
+                    border: 2px solid #d4af37;
+                    border-radius: 8px;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+                }
+
+                .sign-out-btn {
+                    width: 100%;
+                    padding: 10px 15px;
+                    border: 2px solid #8b0000;
+                    border-radius: 5px;
+                    font-family: 'Cinzel', serif;
+                    font-weight: bold;
+                    font-size: 0.9rem;
+                    text-decoration: none !important;
+                    color: #ff6b6b !important;
+                    background: rgba(139, 0, 0, 0.3);
+                    text-align: center;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    transition: all 0.3s;
+                    cursor: pointer;
+                    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+                    margin-top: 10px;
+                }
+
+                    .sign-out-btn:hover {
+                        background: rgba(139, 0, 0, 0.6);
+                        border-color: #ff0000;
+                        color: #ffffff !important;
+                        box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+                    }
             </style>
 
         </main>
@@ -226,20 +281,47 @@
             <div class="menu-destro">
                 <button class="close-button" @onclick="ToggleMenu"></button>
                 <img src="images/Heroic853Icon.png" width="200" height="200">
+
+                @* Messaggio di benvenuto se loggato *@
+                @if (!string.IsNullOrEmpty(ApplicationManager.Username))
+                {
+                    <div class="welcome-message">
+                        Welcome, @ApplicationManager.Username!
+                    </div>
+                }
+
                 <ul>
                     <NavLink href="" Match="NavLinkMatch.All">Introduction</NavLink>
                     <NavLink href="MessageOfGratitude">Message of Gratitude</NavLink>
                     <NavLink href="videopage">Video</NavLink>
-                    <NavLink href="dragonList">Monster Choise & Feedbacks</NavLink>
                     <NavLink href="forbiddenMonsters">Forbidden Monsters</NavLink>
-                    <NavLink href="aniversarytable">Admin Data Table</NavLink>
-                    <NavLink href="UserTable">Users</NavLink>
+
+                    @if (ApplicationManager.Username == "Admin") // Mostra solo se sei Admin
+                    {
+                        <NavLink href="aniversarytable">Admin Data Table</NavLink>
+                        <NavLink href="UserTable">Users</NavLink>
+                    }
+
+                    @if (ApplicationManager.IsLoggedIn())
+                    {
+                        <NavLink href="dragonList">Monster Choise & Feedbacks</NavLink>
+                    }
+
                 </ul>
 
-                <div class="menu-bottom-buttons">
-                    <NavLink class="menu-btn login-btn" href="existingHunter?Param2=Blazzing&Param2=Blazor">Sign In</NavLink>
-                    <NavLink class="menu-btn register-btn" href="newHunter?Param1=Blazzing&Param2=Blazor">Sign Up</NavLink>
-                </div>
+                @* Mostra Sign In/Up solo se NON sei loggato *@
+                @if (string.IsNullOrEmpty(ApplicationManager.Username))
+                {
+                    <div class="menu-bottom-buttons">
+                        <NavLink class="menu-btn login-btn" href="loginHeroic">Sign In</NavLink>
+                        <NavLink class="menu-btn register-btn" href="registrationHeroic">Sign Up</NavLink>
+                    </div>
+                }
+                else
+                {
+                    @* Mostra Sign Out se SEI loggato *@
+                    <button class="sign-out-btn" @onclick="SignOut">Sign Out</button>
+                }
             </div>
         }
     </div>
@@ -255,11 +337,17 @@
         {
             menuOpen = !menuOpen;
         }
+
+        void SignOut()
+        {
+            ApplicationManager.Username = null;
+            menuOpen = false;
+            StateHasChanged(); // Forza l'aggiornamento della UI
+        }
     }
 </div>
 
 <script>
-    // Fix per il problema desktop/mobile
     window.addEventListener('resize', function() {
         setTimeout(function() {
             window.dispatchEvent(new Event('resize'));

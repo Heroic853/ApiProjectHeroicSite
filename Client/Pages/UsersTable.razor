@@ -46,7 +46,8 @@
 </style>
 
 
-@if (ApplicationManager.IsLoggedIn())
+@* @if (ApplicationManager.IsLoggedIn()) //se è loggato mostra la tabella *@  
+@if (ApplicationManager.Username == "Admin") // se e admin mostra la tabella, altrimenti messaggio di non autorizzazione
 {
     <p class="title-users">Registred Users</p>
 

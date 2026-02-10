@@ -7,12 +7,11 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-//builder.Services.AddHttpClient();
-
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://heroic853api-production.up.railway.app/")
+    BaseAddress = new Uri("https://apiprojectheroicsite.onrender.com/")
 });
+
 builder.Services.AddSingleton(new ApplicationManager());
 
 await builder.Build().RunAsync();

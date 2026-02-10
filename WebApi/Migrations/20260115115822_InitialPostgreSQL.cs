@@ -49,7 +49,8 @@ namespace WebApi.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Username = table.Column<string>(type: "text", nullable: true),
-                    Password = table.Column<string>(type: "text", nullable: true)
+                    Account = table.Column<string>(type: "text", nullable: true),
+                    Password = table.Column<string>(type: "text", nullable: true),
                 },
                 constraints: table =>
                 {
