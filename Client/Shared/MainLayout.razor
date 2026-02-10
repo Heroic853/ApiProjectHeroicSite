@@ -332,6 +332,7 @@
 
     @code {
         bool menuOpen = false;
+        [Inject] private NavigationManager NavManager { get; set; }
 
         void ToggleMenu()
         {
@@ -342,6 +343,7 @@
         {
             ApplicationManager.Username = null;
             menuOpen = false;
+            NavManager.NavigateTo("/", forceLoad: true);
             StateHasChanged(); // Forza l'aggiornamento della UI
         }
     }
