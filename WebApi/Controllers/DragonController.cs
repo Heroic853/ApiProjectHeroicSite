@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Dto;
 using WebApi.Data;
+using System.Text.RegularExpressions;
 
 namespace WebApi.Controllers
 {
@@ -81,10 +82,27 @@ namespace WebApi.Controllers
         }
 
 
-        [HttpGet("register")]
-        public async Task<IEnumerable<User>> GetUsers()
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers() 
         {
-            return await _dragonListDbContext.User.ToListAsync();
+            try
+            {
+                var users = await _dragonListDbContext.User
+                    .Select(u => new {
+                        u.Id,
+                        u.Username,
+                        u.Account,
+                        u.Password
+                    })
+                    .ToListAsync();
+
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error fetching users: {ex.Message}");
+                return StatusCode(500, new { message = "Failed to load users" });
+            }
         }
 
         [HttpGet("get-user")]
@@ -99,6 +117,131 @@ namespace WebApi.Controllers
 
             return Ok(user);
         }
+
+        [HttpGet("user-profile")]
+        public async Task<IActionResult> GetUserProfile([FromQuery] string username)
+        {
+            try
+            {
+                var user = await _dragonListDbContext.User
+                    .Where(u => u.Username == username)
+                    .Select(u => new {
+                        u.Username,
+                        u.Account,
+                        u.RegistrationDate
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
+                    return NotFound(new { message = "User not found" });
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error fetching user profile: {ex.Message}");
+                return StatusCode(500, new { message = "Failed to load user profile" });
+            }
+        }
+
+        // API per cambiare email
+        [HttpPost("change-email")]
+        public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailRequest request)
+        {
+            try
+            {
+                var user = await _dragonListDbContext.User
+                    .FirstOrDefaultAsync(u => u.Username == request.Username);
+
+                if (user == null)
+                    return NotFound(new { message = "User not found" });
+
+                // Verifica se la nuova email esiste già
+                var emailExists = await _dragonListDbContext.User
+                    .AnyAsync(u => u.Account == request.NewEmail && u.Username != request.Username);
+
+                if (emailExists)
+                    return BadRequest(new { message = "Email already in use" });
+
+                user.Account = request.NewEmail;
+                await _dragonListDbContext.SaveChangesAsync();
+
+                return Ok(new { message = "Email updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error changing email: {ex.Message}");
+                return StatusCode(500, new { message = "Failed to update email" });
+            }
+        }
+
+        // API per cambiare password con validazione
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            try
+            {
+                // Trova l'utente
+                var user = await _dragonListDbContext.User
+                    .FirstOrDefaultAsync(u => u.Username == request.Username);
+
+                if (user == null)
+                    return NotFound(new { message = "User not found" });
+
+                // Verifica password attuale
+                if (user.Password != request.CurrentPassword)
+                    return BadRequest(new { message = "Current password is incorrect" });
+
+                // VALIDAZIONE NUOVA PASSWORD
+                if (string.IsNullOrWhiteSpace(request.NewPassword))
+                    return BadRequest(new { message = "Password is required" });
+
+                if (request.NewPassword.Length < 8)
+                    return BadRequest(new { message = "Password must be at least 8 characters" });
+
+                if (!Regex.IsMatch(request.NewPassword, @"[A-Z]"))
+                    return BadRequest(new { message = "Password must contain at least one uppercase letter" });
+
+                if (!Regex.IsMatch(request.NewPassword, @"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?]"))
+                    return BadRequest(new { message = "Password must contain at least one special character" });
+
+                // Aggiorna password
+                user.Password = request.NewPassword;
+                await _dragonListDbContext.SaveChangesAsync();
+
+                return Ok(new { message = "Password updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error changing password: {ex.Message}");
+                return StatusCode(500, new { message = "Failed to update password" });
+            }
+        }
+
+        // API per eliminare account
+        [HttpDelete("delete-account")]
+        public async Task<IActionResult> DeleteAccount([FromQuery] string username)
+        {
+            try
+            {
+                var user = await _dragonListDbContext.User
+                    .FirstOrDefaultAsync(u => u.Username == username);
+
+                if (user == null)
+                    return NotFound(new { message = "User not found" });
+
+                _dragonListDbContext.User.Remove(user);
+                await _dragonListDbContext.SaveChangesAsync();
+
+                return Ok(new { message = "Account deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error deleting account: {ex.Message}");
+                return StatusCode(500, new { message = "Failed to delete account" });
+            }
+        }
+
 
         [HttpPost("Clasification")]
         public async Task Clasification([FromBody] Clasification clasification)

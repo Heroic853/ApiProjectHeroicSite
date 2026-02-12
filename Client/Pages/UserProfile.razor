@@ -1,0 +1,406 @@
+﻿@page "/UserProfile"
+@using SharedLibrary.Dto
+@using System.Text.RegularExpressions
+@inject Client.Service.ApplicationManager ApplicationManager
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+
+<style>
+    body {
+        background-image: url('images/SfondoClasifications.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
+    }
+
+    .profile-container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 30px;
+        background: rgba(26, 15, 10, 0.95);
+        border: 3px solid #d4af37;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #8b0000;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid #d4af37;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, #8b0000, #d4af37);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        margin-left: auto;
+        margin-right: auto;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        font-weight: bold;
+    }
+
+    .profile-username {
+        font-family: 'Cinzel', serif;
+        font-size: 2rem;
+        color: #ffd700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .profile-role {
+        color: #c0c0c0;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .section-title {
+        font-family: 'Cinzel', serif;
+        font-size: 1.3rem;
+        color: #d4af37;
+        margin: 30px 0 15px 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #8b0000;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .danger-title {
+        color: #ff6b6b !important;
+    }
+
+    .info-row {
+        background: rgba(139, 0, 0, 0.3);
+        border: 2px solid #8b0000;
+        border-radius: 10px;
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .info-label {
+        color: #c0c0c0;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .info-value {
+        color: #ffd700;
+        font-size: 1.1rem;
+        font-weight: bold;
+        font-family: 'Cinzel', serif;
+    }
+
+    .status-active {
+        color: #00ff00 !important;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        color: #d4af37;
+        font-family: 'Cinzel', serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 15px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 2px solid #8b0000;
+        border-radius: 8px;
+        color: #ffd700;
+        font-size: 1rem;
+        transition: all 0.3s;
+        box-sizing: border-box;
+    }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .form-input::placeholder {
+            color: rgba(212, 175, 55, 0.5);
+        }
+
+    .password-hint {
+        color: #c0c0c0;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #8b0000, #a01010);
+        border: 2px solid #d4af37;
+        border-radius: 8px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #a01010, #c01818);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #660000, #8b0000) !important;
+        border-color: #ff0000 !important;
+    }
+
+        .btn-danger:hover:not(:disabled) {
+            background: linear-gradient(135deg, #8b0000, #a00000) !important;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5) !important;
+        }
+
+    .success-message {
+        background: rgba(0, 139, 0, 0.3);
+        border: 2px solid #00ff00;
+        border-radius: 8px;
+        padding: 15px;
+        color: #00ff00;
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: bold;
+        animation: fadeIn 0.3s;
+    }
+
+    .error-message {
+        background: rgba(139, 0, 0, 0.5);
+        border: 2px solid #ff0000;
+        border-radius: 8px;
+        padding: 15px;
+        color: #ff6b6b;
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: bold;
+        animation: fadeIn 0.3s;
+    }
+
+    .loading-container {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .loading-spinner {
+        border: 3px solid rgba(212, 175, 55, 0.3);
+        border-top: 3px solid #d4af37;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+    }
+
+    .loading-text {
+        color: #d4af37;
+        margin-left: 10px;
+    }
+
+    .login-prompt {
+        text-align: center;
+        padding: 50px;
+    }
+
+    .login-title {
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        margin-bottom: 20px;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .profile-container {
+            margin: 20px 10px;
+            padding: 20px 15px;
+        }
+
+        .profile-username {
+            font-size: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            font-size: 2.5rem;
+        }
+
+        .info-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    @if (!string.IsNullOrEmpty(ApplicationManager.Username))
+    {
+        <!-- HEADER PROFILO -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                @ApplicationManager.Username.Substring(0, 1).ToUpper()
+            </div>
+            <h1 class="profile-username">@ApplicationManager.Username</h1>
+            <p class="profile-role">@(ApplicationManager.Username == "Admin" ? "Administrator" : "Heroic Member")</p>
+        </div>
+
+        <!-- MESSAGGI -->
+        @if (showSuccessMessage)
+        {
+            <div class="success-message">✓ @successMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="error-message">⚠️ @errorMessage</div>
+        }
+
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <span class="loading-text">Loading...</span>
+            </div>
+        }
+        else
+        {
+            <!-- INFORMAZIONI ACCOUNT -->
+            <h2 class="section-title">📋 Account Information</h2>
+
+            <div class="info-row">
+                <span class="info-label">Username</span>
+                <span class="info-value">@ApplicationManager.Username</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value">@(string.IsNullOrEmpty(currentEmail) ? "Not set" : currentEmail)</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Member Since</span>
+                <span class="info-value">@registrationDate</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Account Status</span>
+                <span class="info-value status-active">✓ Active</span>
+            </div>
+
+            <!-- CAMBIO EMAIL -->
+            <h2 class="section-title">✉️ Change Email</h2>
+            <div class="form-group">
+                <label class="form-label">New Email Address</label>
+                <input type="email" class="form-input" @bind="newEmail" placeholder="your.new.email@example.com" />
+            </div>
+            <button class="btn-primary" @onclick="ChangeEmail" disabled="@isProcessing">
+                @if (isProcessing)
+                {
+                    <div class="loading-spinner"></div>
+                }
+                Update Email
+            </button>
+
+            <!-- CAMBIO PASSWORD -->
+            <h2 class="section-title">🔒 Change Password</h2>
+            <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <input type="password" class="form-input" @bind="currentPassword" placeholder="••••••••" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-input" @bind="newPassword" placeholder="••••••••" />
+                <small class="password-hint">
+                    Must be 8+ characters with uppercase and special character
+                </small>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" class="form-input" @bind="confirmPassword" placeholder="••••••••" />
+            </div>
+            <button class="btn-primary" @onclick="ChangePassword" disabled="@isProcessing">
+                @if (isProcessing)
+                {
+                    <div class="loading-spinner"></div>
+                }
+                Update Password
+            </button>
+
+            <!-- ZONA PERICOLOSA -->
+            <h2 class="section-title danger-title">⚠️ Danger Zone</h2>
+            <button class="btn-primary btn-danger" @onclick="DeleteAccount" disabled="@isProcessing">🗑️ Delete Account</button>
+        }
+    }
+    else
+    {
+        <div class="login-prompt">
+            <h2 class="login-title">Please log in to view your profile</h2>
+            <button class="btn-primary" @onclick='() => NavManager.NavigateTo("loginHeroic")'>Sign In</button>
+        </div>
+    }
+</div>

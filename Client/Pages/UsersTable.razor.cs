@@ -16,7 +16,7 @@ namespace Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            UsersList = await Http.GetFromJsonAsync<User[]>("api/dragon/register");
+            UsersList = await Http.GetFromJsonAsync<User[]>("api/dragon/users");
         }
     }
 }

@@ -19,5 +19,6 @@ namespace SharedLibrary.Dto
         [RegularExpression(@"^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?]).{8,}$",
             ErrorMessage = "Password must contain at least one uppercase letter and one special character")]
         public string? Password { get; set; }
+        public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
     }
 }
