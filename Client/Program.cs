@@ -9,7 +9,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://apiprojectheroicsite.onrender.com/")
+    BaseAddress = new Uri("https://apiprojectheroicsite.onrender.com/") // url del server
 });
 
 builder.Services.AddSingleton(new ApplicationManager());

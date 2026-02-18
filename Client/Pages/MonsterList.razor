@@ -1,26 +1,26 @@
-﻿@page "/dragonList"
-@using static Client.Pages.FetchData
-@inject HttpClient Http
-@using static Client.Pages.MonsterList
-@using static SharedLibrary.Dto.DragonsInfo;
+﻿    @page "/dragonList"
+    @using static Client.Pages.FetchData
+    @inject HttpClient Http
+    @using static Client.Pages.MonsterList
+    @using static SharedLibrary.Dto.DragonsInfo;
 
-<style>
-    body {
-        background-image: url('images/img4.png');
-        background-size: 100% auto;
-        background-position: top center;
-        background-attachment: fixed;
-        min-height: 100vh;
-    }
+    <style>
+        body {
+            background-image: url('images/img4.png');
+            background-size: 100% auto;
+            background-position: top center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
 
-    .monster-section {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 20px;
-    }
+        .monster-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
         .monster-section select,
         .monster-section input {
@@ -32,14 +32,14 @@
             margin-top: 10px;
         }
 
-    .feedback-labels {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        max-width: 400px;
-        margin: 30px auto 0;
-        padding: 20px;
-    }
+        .feedback-labels {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 30px auto 0;
+            padding: 20px;
+        }
 
         .feedback-labels select {
             width: 100%;
@@ -51,103 +51,102 @@
             margin-top: 10px;
         }
 
-    .title {
-        text-align: center;
-        color: gold;
-        font-family: 'Cinzel', serif;
-        font-weight: 700;
-        font-size: 3rem;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-        margin: 2rem 0;
-    }
-
-    @@media (max-width: 480px) {
-     body
-
-        {
-            background-size: 100% 100%;
-        }
-
         .title {
-            font-size: 1.5rem;
+            text-align: center;
+            color: gold;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            margin: 2rem 0;
         }
 
-        .monster-section,
-        .feedback-labels {
-            max-width: 90%; /* su mobile occupa il 90% dello schermo */
-        }
+        @@media (max-width: 480px) {
+         body
+            {
+                background-size: 100% 100%;
+            }
 
-     }
-</style>
+            .title {
+                font-size: 1.5rem;
+            }
 
-<p class="title">Creator Mod's & Feedbacks</p>
+            .monster-section,
+            .feedback-labels {
+                max-width: 90%; /* su mobile occupa il 90% dello schermo */
+            }
 
-<p style="text-align: center; color: white;">
-    Create a new Mod Monster and give me a feedback about my mods!
-</p>
+         }
+    </style>
 
-@* Monster Label *@
-<div class="monster-section">
-    <select @bind="Dragon.Name" @attributes="InputAttributes" class="form-control">
-        <option value="">Name</option>
-        @foreach (var name in Names)
-        {
-            <option value="@name">@name</option>
-        }
-    </select>
+    <p class="title">Creator Mod's & Feedbacks</p>
 
-    <select @bind="Dragon.Element" @attributes="InputAttributes" class="form-control">
-        <option value="">Element</option>
-        @foreach (var element in Elements)
-        {
-            <option value="@element">@element</option>
-        }
-    </select>
+    <p style="text-align: center; color: white;">
+        Create a new Mod Monster and give me a feedback about my mods!
+    </p>
 
-    <select @bind="Dragon.Class" @attributes="InputAttributes" class="form-control">
-        <option value="">Class</option>
-        @foreach (var classo in Class)
-        {
-            <option value="@classo">@classo</option>
-        }
-    </select>
+    @* Monster Label *@
+    <div class="monster-section">
+        <select @bind="Dragon.Name" @attributes="InputAttributes" class="form-control">
+            <option value="">Name</option>
+            @foreach (var name in Names)
+            {
+                <option value="@name">@name</option>
+            }
+        </select>
 
-    <input type="number" @bind-value="Dragon.Defence" @attributes="InputAttributes" placeholder="Defence" class="form-control" min="-200" max="1000" />
+        <select @bind="Dragon.Element" @attributes="InputAttributes" class="form-control">
+            <option value="">Element</option>
+            @foreach (var element in Elements)
+            {
+                <option value="@element">@element</option>
+            }
+        </select>
 
-    <select @bind="Dragon.Map" @attributes="InputAttributes" class="form-control">
-        <option value="">Map</option>
-        @foreach (var map in Map)
-        {
-            <option value="@map">@map</option>
-        }
-    </select>
+        <select @bind="Dragon.Class" @attributes="InputAttributes" class="form-control">
+            <option value="">Class</option>
+            @foreach (var classo in Class)
+            {
+                <option value="@classo">@classo</option>
+            }
+        </select>
 
-    <button type="button" class="btn btn-success" @onclick="Saves">Save</button>
+        <input type="number" @bind-value="Dragon.Defence" @attributes="InputAttributes" placeholder="Defence" class="form-control" min="-200" max="1000" />
 
-    <p style="color: white;"><b>@messageTextMonsterChoise</b></p>
-</div>
+        <select @bind="Dragon.Map" @attributes="InputAttributes" class="form-control">
+            <option value="">Map</option>
+            @foreach (var map in Map)
+            {
+                <option value="@map">@map</option>
+            }
+        </select>
 
-@* Classification Label *@
-<div class="feedback-labels">
-    <select @bind="Clasification.Monster" @attributes="InputAttributes" class="form-control">
-        <option value="">Monster Choice</option>
-        @foreach (var monster in Moded)
-        {
-            <option value="@monster">@monster</option>
-        }
-    </select>
+        <button type="button" class="btn btn-success" @onclick="Saves">Save</button>
 
-    <select @bind="Clasification.Feedback" @attributes="InputAttributes" class="form-control">
-        <option value="">Feedback</option>
-        @foreach (var feedback in Feedbacks)
-        {
-            <option value="@feedback">@feedback</option>
-        }
-    </select>
+        <p style="color: white;"><b>@messageTextMonsterChoise</b></p>
+    </div>
 
-    <button class="btn btn-success" @onclick="Saved">Confirm Save</button>
+    @* Classification Label *@
+    <div class="feedback-labels">
+        <select @bind="Clasification.Monster" @attributes="InputAttributes" class="form-control">
+            <option value="">Monster Choice</option>
+            @foreach (var monster in Moded)
+            {
+                <option value="@monster">@monster</option>
+            }
+        </select>
 
-    <p style="color: white;"><b>@messageTextFeedbacks</b></p>
-</div>
+        <select @bind="Clasification.Feedback" @attributes="InputAttributes" class="form-control">
+            <option value="">Feedback</option>
+            @foreach (var feedback in Feedbacks)
+            {
+                <option value="@feedback">@feedback</option>
+            }
+        </select>
+
+        <button class="btn btn-success" @onclick="Saved">Confirm Save</button>
+
+        <p style="color: white;"><b>@messageTextFeedbacks</b></p>
+    </div>

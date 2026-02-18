@@ -144,7 +144,7 @@ namespace Client.Pages
                 return;
             }
 
-            if (!Regex.IsMatch(newPassword, @"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?]"))
+            if (!Regex.IsMatch(newPassword, @"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?]")) // Regex
             {
                 errorMessage = "Password must contain at least one special character";
                 return;
@@ -196,9 +196,11 @@ namespace Client.Pages
 
         private async Task DeleteAccount()
         {
+            // Primo tentativo
             bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm",
                 "⚠️ Are you sure you want to delete your account?\n\nThis action CANNOT be undone!\nAll your data will be permanently lost.");
 
+            // Secondo tentativo
             if (!confirmed) return;
 
             bool doubleConfirm = await JSRuntime.InvokeAsync<bool>("confirm",

@@ -15,7 +15,7 @@ namespace WebApi.Data
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
-        //    optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS01;Database=DragonList;Trusted_Connection=True;TrustServerCertificate=True;"); //Databese istanza che e DragonList
+        //    optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS01;Database=DragonList;Trusted_Connection=True;TrustServerCertificate=True;"); //Databese istanza che e DragonList LOCALHOST
         //}
     }
 }

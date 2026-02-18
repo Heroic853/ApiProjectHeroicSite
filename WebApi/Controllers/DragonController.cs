@@ -9,7 +9,7 @@ namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/dragon")]
-    //[EnableCors("AllowAll")]
+
     public class DragonController : ControllerBase
     {
 
@@ -25,17 +25,6 @@ namespace WebApi.Controllers
         [HttpGet] // leggere
         public async Task<IEnumerable<Dragon>> Get()
         {
-            /*return Enumerable.Range(1, 43).Select(index => new Dragon
-            {
-                Name = Names[Random.Shared.Next(Names.Length)],
-                Element = Elements[Random.Shared.Next(Elements.Length)],
-                Class = Class[Random.Shared.Next(Class.Length)],
-                Defence = Random.Shared.Next(-0, 1000),
-                Map = Map[Random.Shared.Next(Map.Length)]
-            })
-           .ToArray();
-            e il random dei dati
-           */
             return await _dragonListDbContext.DragonSet.ToListAsync();
         }
 
@@ -51,7 +40,7 @@ namespace WebApi.Controllers
         {
             try
             {
-                // Verifica se l'account (email) esiste già
+                // Verifica se l'account esiste già
                 var existingUser = await _dragonListDbContext.User
                     .FirstOrDefaultAsync(u => u.Account == user.Account);
 

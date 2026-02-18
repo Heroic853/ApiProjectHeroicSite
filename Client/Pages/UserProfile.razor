@@ -139,15 +139,15 @@
         box-sizing: border-box;
     }
 
-        .form-input:focus {
-            outline: none;
-            border-color: #d4af37;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-        }
+    .form-input:focus {
+        outline: none;
+        border-color: #d4af37;
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    }
 
-        .form-input::placeholder {
-            color: rgba(212, 175, 55, 0.5);
-        }
+    .form-input::placeholder {
+        color: rgba(212, 175, 55, 0.5);
+    }
 
     .password-hint {
         color: #c0c0c0;
@@ -178,26 +178,26 @@
         gap: 10px;
     }
 
-        .btn-primary:hover:not(:disabled) {
-            background: linear-gradient(135deg, #a01010, #c01818);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-            transform: translateY(-2px);
-        }
+    .btn-primary:hover:not(:disabled) {
+        background: linear-gradient(135deg, #a01010, #c01818);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        transform: translateY(-2px);
+    }
 
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+    .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
     .btn-danger {
         background: linear-gradient(135deg, #660000, #8b0000) !important;
         border-color: #ff0000 !important;
     }
 
-        .btn-danger:hover:not(:disabled) {
-            background: linear-gradient(135deg, #8b0000, #a00000) !important;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5) !important;
-        }
+    .btn-danger:hover:not(:disabled) {
+        background: linear-gradient(135deg, #8b0000, #a00000) !important;
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.5) !important;
+    }
 
     .success-message {
         background: rgba(0, 139, 0, 0.3);
@@ -299,8 +299,8 @@
 </style>
 
 <div class="profile-container">
-    @if (!string.IsNullOrEmpty(ApplicationManager.Username))
-    {
+        @if (!string.IsNullOrEmpty(ApplicationManager.Username))
+        {
         <!-- HEADER PROFILO -->
         <div class="profile-header">
             <div class="profile-avatar">
@@ -391,8 +391,8 @@
                 Update Password
             </button>
 
-            <!-- ZONA PERICOLOSA -->
-            <h2 class="section-title danger-title">⚠️ Danger Zone</h2>
+            <!-- CANCELLA ACCOUNT-->
+            <h2 class="section-title danger-title">⚠️ Deleting Account</h2>
             <button class="btn-primary btn-danger" @onclick="DeleteAccount" disabled="@isProcessing">🗑️ Delete Account</button>
         }
     }
