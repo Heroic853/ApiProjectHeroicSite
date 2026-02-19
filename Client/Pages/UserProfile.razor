@@ -5,6 +5,7 @@
 @inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
+@using Microsoft.AspNetCore.Components.Authorization
 
 <style>
     body {
@@ -299,108 +300,59 @@
 </style>
 
 <div class="profile-container">
-        @if (!string.IsNullOrEmpty(ApplicationManager.Username))
-        {
-        <!-- HEADER PROFILO -->
-        <div class="profile-header">
-            <div class="profile-avatar">
-                @ApplicationManager.Username.Substring(0, 1).ToUpper()
-            </div>
-            <h1 class="profile-username">@ApplicationManager.Username</h1>
-            <p class="profile-role">@(ApplicationManager.Username == "Admin" ? "Administrator" : "Heroic Member")</p>
-        </div>
-
-        <!-- MESSAGGI -->
-        @if (showSuccessMessage)
-        {
-            <div class="success-message">✓ @successMessage</div>
-        }
-        @if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="error-message">⚠️ @errorMessage</div>
-        }
-
-        @if (isLoading)
-        {
-            <div class="loading-container">
-                <div class="loading-spinner"></div>
-                <span class="loading-text">Loading...</span>
-            </div>
-        }
-        else
-        {
-            <!-- INFORMAZIONI ACCOUNT -->
-            <h2 class="section-title">📋 Account Information</h2>
-
-            <div class="info-row">
-                <span class="info-label">Username</span>
-                <span class="info-value">@ApplicationManager.Username</span>
+    <AuthorizeView>
+        <Authorized>
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    @context.User.Identity?.Name?.Substring(0, 1).ToUpper()
+                </div>
+                <h1 class="profile-username">@context.User.Identity?.Name</h1>
+                <p class="profile-role">Heroic Member</p>
             </div>
 
-            <div class="info-row">
-                <span class="info-label">Email</span>
-                <span class="info-value">@(string.IsNullOrEmpty(currentEmail) ? "Not set" : currentEmail)</span>
-            </div>
+            @if (showSuccessMessage)
+            {
+                <div class="success-message">✓ @successMessage</div>
+            }
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="error-message">⚠️ @errorMessage</div>
+            }
 
-            <div class="info-row">
-                <span class="info-label">Member Since</span>
-                <span class="info-value">@registrationDate</span>
-            </div>
-
-            <div class="info-row">
-                <span class="info-label">Account Status</span>
-                <span class="info-value status-active">✓ Active</span>
-            </div>
-
-            <!-- CAMBIO EMAIL -->
-            <h2 class="section-title">✉️ Change Email</h2>
-            <div class="form-group">
-                <label class="form-label">New Email Address</label>
-                <input type="email" class="form-input" @bind="newEmail" placeholder="your.new.email@example.com" />
-            </div>
-            <button class="btn-primary" @onclick="ChangeEmail" disabled="@isProcessing">
-                @if (isProcessing)
-                {
+            @if (isLoading)
+            {
+                <div class="loading-container">
                     <div class="loading-spinner"></div>
-                }
-                Update Email
-            </button>
+                    <span class="loading-text">Loading...</span>
+                </div>
+            }
+            else
+            {
+                <h2 class="section-title">📋 Account Information</h2>
+                <div class="info-row">
+                    <span class="info-label">Username</span>
+                    <span class="info-value">@context.User.Identity?.Name</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">@(string.IsNullOrEmpty(currentEmail) ? "Not set" : currentEmail)</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Account Status</span>
+                    <span class="info-value status-active">✓ Active</span>
+                </div>
 
-            <!-- CAMBIO PASSWORD -->
-            <h2 class="section-title">🔒 Change Password</h2>
-            <div class="form-group">
-                <label class="form-label">Current Password</label>
-                <input type="password" class="form-input" @bind="currentPassword" placeholder="••••••••" />
+                <h2 class="section-title danger-title">⚠️ Deleting Account</h2>
+                <button class="btn-primary btn-danger" @onclick="DeleteAccount" disabled="@isProcessing">
+                    🗑️ Delete Account
+                </button>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <div class="login-prompt">
+                <h2 class="login-title">Please log in to view your profile</h2>
+                <a href="authentication/login" class="btn-primary">Sign In</a>
             </div>
-            <div class="form-group">
-                <label class="form-label">New Password</label>
-                <input type="password" class="form-input" @bind="newPassword" placeholder="••••••••" />
-                <small class="password-hint">
-                    Must be 8+ characters with uppercase and special character
-                </small>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Confirm New Password</label>
-                <input type="password" class="form-input" @bind="confirmPassword" placeholder="••••••••" />
-            </div>
-            <button class="btn-primary" @onclick="ChangePassword" disabled="@isProcessing">
-                @if (isProcessing)
-                {
-                    <div class="loading-spinner"></div>
-                }
-                Update Password
-            </button>
-
-            <!-- CANCELLA ACCOUNT-->
-            <h2 class="section-title danger-title">⚠️ Deleting Account</h2>
-            <button class="btn-primary btn-danger" @onclick="DeleteAccount" disabled="@isProcessing">🗑️ Delete Account</button>
-        }
-    }
-    else
-    {
-        <div class="login-prompt">
-            <h2 class="login-title">Please log in to view your profile</h2>
-            <button class="btn-primary" @onclick='() => NavManager.NavigateTo("loginHeroic")'>Sign In</button>
-        </div>
-    }
+        </NotAuthorized>
+    </AuthorizeView>
 </div>

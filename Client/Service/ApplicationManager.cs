@@ -2,8 +2,9 @@
 {
     public class ApplicationManager
     {
-        public string Username { get; set; }
+        // Le config le gestisce tutto Auth0 percio niente Token
 
+        public string Username { get; set; }
         public string Account { get; set; }
 
         public bool IsLoggedIn()

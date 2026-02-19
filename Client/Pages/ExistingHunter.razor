@@ -1,5 +1,5 @@
 ﻿@page "/loginHeroic"
-@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Authorization
 
 <style>
     body {
@@ -17,23 +17,6 @@
         padding: 20px;
     }
 
-    .login-container label {
-        color: white;
-        font-weight: bold;
-    }
-
-    .login-container input {
-        width: 250px;
-        padding: 8px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-    }
-
-    .login-container button, .login-container .btn {
-        width: 150px;
-        margin-top: 10px;
-    }
-
     .loginTitle {
         text-align: center;
         color: gold;
@@ -45,28 +28,22 @@
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
         margin: 2rem 0;
     }
-
-    @@media (max-width: 480px) {
-        .loginTitle {
-            font-size: 1.5rem;
-        }
-    }
 </style>
 
 <p class="loginTitle">Login</p>
-
 <div class="login-container">
-    <label for="username">Username</label>
-    <input type="text" @bind="User.Username" class="form-control" maxlength="20" placeholder="Your name" />
-
-    <label for="account">Account</label>
-    <input type="email" @bind="User.Account" class="form-control" placeholder="example@email.com" />
-
-    <label for="password">Password</label>
-    <input type="password" @bind="User.Password" class="form-control" />
-
-    <NavLink href="" class="btn btn-secondary">Back to Home</NavLink>
-    <button type="button" class="btn btn-success" @onclick="Login">Login</button>
-
-    <p style="color: white;"><b>@messageText</b></p>
+    <AuthorizeView>
+        <Authorized>
+            <p style="color:lightgreen; font-size:1.2rem;">
+                ✅ Welcome, @context.User.Identity?.Name!
+            </p>
+            <NavLink href="" class="btn btn-primary">Go to Home</NavLink>
+            <a href="authentication/logout" class="btn btn-danger">Logout</a>
+        </Authorized>
+        <NotAuthorized>
+            <p style="color:white;">Login securely to access HeroicSite</p>
+            <a href="authentication/login" class="btn btn-success">Login / Register</a>
+            <NavLink href="" class="btn btn-secondary">Back to Home</NavLink>
+        </NotAuthorized>
+    </AuthorizeView>
 </div>

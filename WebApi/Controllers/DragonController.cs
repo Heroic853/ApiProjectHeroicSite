@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Dto;
-using WebApi.Data;
 using System.Text.RegularExpressions;
+using WebApi.Data;
 
 namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/dragon")]
+   // [Authorize]
 
     public class DragonController : ControllerBase
     {
