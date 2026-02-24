@@ -20,6 +20,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include="wwwroot/appsettings.json" CopyToOutputDirectory="Always" />
+	</ItemGroup>
+	
+	<ItemGroup>
 		<ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj" />
 	</ItemGroup>
 </Project>

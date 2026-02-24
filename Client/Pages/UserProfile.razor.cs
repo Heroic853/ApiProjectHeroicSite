@@ -44,24 +44,21 @@ namespace Client.Pages
         {
             bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm",
                 "⚠️ Are you sure you want to delete your account?\nThis action CANNOT be undone!");
-
             if (!confirmed) return;
 
             bool doubleConfirm = await JSRuntime.InvokeAsync<bool>("confirm",
                 "⚠️ FINAL WARNING!\nAre you ABSOLUTELY sure?");
-
             if (!doubleConfirm) return;
 
             try
             {
                 isProcessing = true;
-                var response = await Http.DeleteAsync(
-                    $"api/dragon/delete-account?username={currentUsername}");
+                var response = await Http.DeleteAsync("api/dragon/delete-account");
 
                 if (response.IsSuccessStatusCode)
                     NavManager.NavigateTo("authentication/logout", forceLoad: true);
                 else
-                    errorMessage = "Failed to delete account";
+                    errorMessage = "Failed to delete account. Try again later.";
             }
             catch (Exception ex)
             {

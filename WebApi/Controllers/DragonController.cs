@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Dto;
+using System.Security.Claims;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using WebApi.Data;
 
@@ -211,25 +213,52 @@ namespace WebApi.Controllers
 
         // API per eliminare account
         [HttpDelete("delete-account")]
-        public async Task<IActionResult> DeleteAccount([FromQuery] string username)
+        public async Task<IActionResult> DeleteAccount()
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                         ?? User.FindFirst("sub")?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
             try
             {
-                var user = await _dragonListDbContext.User
-                    .FirstOrDefaultAsync(u => u.Username == username);
+                var domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN");
+                var clientId = Environment.GetEnvironmentVariable("AUTH0_M2M_CLIENT_ID");
+                var clientSecret = Environment.GetEnvironmentVariable("AUTH0_M2M_CLIENT_SECRET");
 
-                if (user == null)
-                    return NotFound(new { message = "User not found" });
+                // Ottieni token M2M
+                var tokenClient = new HttpClient();
+                var tokenResponse = await tokenClient.PostAsJsonAsync(
+                    $"https://{domain}/oauth/token",
+                    new
+                    {
+                        client_id = clientId,
+                        client_secret = clientSecret,
+                        audience = $"https://{domain}/api/v2/",
+                        grant_type = "client_credentials"
+                    });
 
-                _dragonListDbContext.User.Remove(user);
-                await _dragonListDbContext.SaveChangesAsync();
+                var tokenData = await tokenResponse.Content.ReadFromJsonAsync<JsonElement>();
+                var accessToken = tokenData.GetProperty("access_token").GetString();
 
-                return Ok(new { message = "Account deleted successfully" });
+                // Elimina utente da Auth0
+                var mgmtClient = new HttpClient();
+                mgmtClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+                var deleteResponse = await mgmtClient.DeleteAsync(
+                    $"https://{domain}/api/v2/users/{Uri.EscapeDataString(userId)}");
+
+                if (deleteResponse.IsSuccessStatusCode)
+                    return Ok();
+                else
+                    return StatusCode(500, "Failed to delete user from Auth0");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error deleting account: {ex.Message}");
-                return StatusCode(500, new { message = "Failed to delete account" });
+                Console.WriteLine($"Delete error: {ex.Message}");
+                return StatusCode(500, "Error deleting account");
             }
         }
 
