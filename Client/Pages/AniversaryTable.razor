@@ -6,8 +6,6 @@
     body {
         background-image: url('images/sfondoadmin.png');
         background-size: cover;
-        background-position: center;
-        background-size: 100% auto;
         background-repeat: no-repeat;
         background-position: top center;
         background-attachment: fixed;
@@ -15,105 +13,299 @@
         min-height: 100vh;
     }
 
-    .title-feedbacks {
+    .admin-container {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .page-title {
         text-align: center;
-        color: gold;
+        color: #ffd700;
         font-family: 'Cinzel', serif;
         font-weight: 700;
-        font-size: 3rem;
+        font-size: 2.5rem;
         text-transform: uppercase;
         letter-spacing: 4px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-        margin: 2rem 0;
+        text-shadow: 2px 2px 8px rgba(255, 100, 0, 0.8);
+        margin: 2rem 0 0.5rem 0;
+    }
+
+    .page-subtitle {
+        text-align: center;
+        color: #c0c0c0;
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+        margin-bottom: 2rem;
+    }
+
+    .tables-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    .table-card {
+        background: rgba(13, 5, 0, 0.9);
+        border: 2px solid #8b0000;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(139, 0, 0, 0.4);
+    }
+
+    .table-card-header {
+        background: linear-gradient(to right, #2a0000, #1a0800);
+        padding: 15px 20px;
+        border-bottom: 2px solid #8b0000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-card-title {
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 0;
+    }
+
+    .badge {
+        background: rgba(139, 0, 0, 0.6);
+        border: 1px solid #d4af37;
+        border-radius: 20px;
+        padding: 3px 10px;
+        color: #d4af37;
+        font-size: 0.75rem;
+        font-family: 'Cinzel', serif;
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .admin-table thead tr {
+        background: rgba(139, 0, 0, 0.4);
+    }
+
+    .admin-table th {
+        color: #d4af37;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #8b0000;
+    }
+
+    .admin-table td {
+        color: #c0c0c0;
+        padding: 10px 15px;
+        border-bottom: 1px solid rgba(139, 0, 0, 0.3);
+        font-size: 0.9rem;
+        vertical-align: middle;
+    }
+
+    .admin-table tbody tr:hover {
+        background: rgba(139, 0, 0, 0.2);
+        transition: background 0.2s;
+    }
+
+    .admin-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .email-cell {
+        color: #888 !important;
+        font-size: 0.8rem !important;
+        font-style: italic;
+    }
+
+    .defence-badge {
+        background: rgba(0, 100, 0, 0.3);
+        border: 1px solid #004400;
+        border-radius: 5px;
+        padding: 2px 8px;
+        color: #00cc00;
+        font-size: 0.85rem;
+    }
+
+    .element-badge {
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .loading-box {
+        padding: 30px;
+        text-align: center;
+        color: #d4af37;
+        font-family: 'Cinzel', serif;
+    }
+
+    .loading-spinner {
+        border: 3px solid rgba(212, 175, 55, 0.3);
+        border-top: 3px solid #d4af37;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-bottom: 10px;
     }
 
     .not-auth {
         text-align: center;
-        color: ghostwhite;
-        font-family: 'Cinzel', serif;
-        font-weight: 80;
-        font-size: 3rem;
-        text-transform: uppercase;
-        letter-spacing: 4px;
+        padding: 100px 20px;
     }
 
-    @@media (max-width: 480px) {
-        body {
-            background-size: cover;
+    .not-auth-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+
+    .not-auth-title {
+        color: #ff6b6b;
+        font-family: 'Cinzel', serif;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-bottom: 10px;
+    }
+
+    .not-auth-text {
+        color: #888;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @@media (max-width: 900px) {
+        .tables-grid {
+            grid-template-columns: 1fr;
+        }
+        .page-title {
+            font-size: 1.8rem;
         }
     }
 </style>
 
 <AuthorizeView Roles="Admin">
     <Authorized>
-        <p class="title-feedbacks">Selected Monsters from Users & Feedbacks</p>
-        <p style="text-align: center; color: white;">
-            Hier you can see all monster what was voted
-        </p>
+        <div class="admin-container">
+            <h1 class="page-title">⚔️ Admin Dashboard ⚔️</h1>
+            <p class="page-subtitle">Monitor all user activity and monster data</p>
 
-        @if (ClasificationList == null)
-        {
-            <p style="color: white;"><em>Loading please...</em></p>
-        }
-        else
-        {
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th style="color: yellow;">Monster</th>
-                        <th style="color: yellow;">Feedback</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in ClasificationList)
-                    {
-                        <tr>
-                            <td style="color: lightgrey;">@item.Monster</td>
-                            <td style="color: lightgrey;">@item.Feedback</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+            <div class="tables-grid">
 
-        @if (dragonList == null)
-        {
-            <p style="color: white;"><em>Loading please...</em></p>
-        }
-        else
-        {
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th style="color: yellow;">Name</th>
-                        <th style="color: yellow;">Element</th>
-                        <th style="color: yellow;">Defence</th>
-                        <th style="color: yellow;">Class</th>
-                        <th style="color: yellow;">Map</th>
-                        <th style="color: yellow;">User</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in dragonList)
+                <!-- TABELLA FEEDBACKS -->
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h2 class="table-card-title">📋 User Feedbacks</h2>
+                        @if (ClasificationList != null)
+                        {
+                            <span class="badge">@ClasificationList.Length entries</span>
+                        }
+                    </div>
+
+                    @if (ClasificationList == null)
                     {
-                        <tr>
-                            <td style="color: lightgrey;">@item.Name</td>
-                            <td style="color: lightgrey;">@item.Element</td>
-                            <td style="color: lightgrey;">@item.Defence</td>
-                            <td style="color: lightgrey;">@item.Class</td>
-                            <td style="color: lightgrey;">@item.Map</td>
-                            <td style="color: lightgrey;">@item.UserEmail</td>
-                        </tr>
+                        <div class="loading-box">
+                            <div class="loading-spinner"></div>
+                            <p>Loading feedbacks...</p>
+                        </div>
                     }
-                </tbody>
-            </table>
-        }
+                    else
+                    {
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Monster</th>
+                                    <th>Feedback</th>
+                                    <th>User</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ClasificationList)
+                                {
+                                    <tr>
+                                        <td>@item.Monster</td>
+                                        <td>@item.Feedback</td>
+                                        <td class="email-cell">@(item.UserEmail ?? "—")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+
+                <!-- TABELLA DRAGON SET -->
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h2 class="table-card-title">🐉 Monster Choices</h2>
+                        @if (dragonList != null)
+                        {
+                            <span class="badge">@dragonList.Length entries</span>
+                        }
+                    </div>
+
+                    @if (dragonList == null)
+                    {
+                        <div class="loading-box">
+                            <div class="loading-spinner"></div>
+                            <p>Loading monsters...</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Element</th>
+                                    <th>Class</th>
+                                    <th>Def</th>
+                                    <th>Map</th>
+                                    <th>User</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in dragonList)
+                                {
+                                    <tr>
+                                        <td>@item.Name</td>
+                                        <td>@item.Element</td>
+                                        <td>@item.Class</td>
+                                        <td><span class="defence-badge">@item.Defence</span></td>
+                                        <td>@item.Map</td>
+                                        <td class="email-cell">@(item.UserEmail ?? "—")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+
+            </div>
+        </div>
     </Authorized>
+
     <NotAuthorized>
         <div class="not-auth">
-            <p style="text-align: center; color: white;">
-                Sorry you are not authorized
-            </p>
+            <div class="not-auth-icon">🚫</div>
+            <p class="not-auth-title">Access Denied</p>
+            <p class="not-auth-text">You don't have permission to view this page</p>
         </div>
     </NotAuthorized>
 </AuthorizeView>

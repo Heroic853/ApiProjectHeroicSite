@@ -11,7 +11,7 @@ namespace SharedLibrary.Dto
         public int Id { get; set; }
         public string Monster { get; set; } = string.Empty;
         public string Feedback { get; set; } = string.Empty;
-        public string UserEmail { get; set; } = string.Empty;
+        public string? UserEmail { get; set; }
 
     }
 }
