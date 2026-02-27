@@ -12,8 +12,8 @@ using WebApi.Data;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(DragonListDbContext))]
-    [Migration("20260212142515_AddRegistrationDateToUser")]
-    partial class AddRegistrationDateToUser
+    [Migration("20260227182801_AddUserEmail")]
+    partial class AddUserEmail
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,6 +38,10 @@ namespace WebApi.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Monster")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserEmail")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -70,6 +74,10 @@ namespace WebApi.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserEmail")
                         .IsRequired()
                         .HasColumnType("text");
 

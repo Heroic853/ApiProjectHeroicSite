@@ -46,9 +46,9 @@ namespace Client.Pages
                 "⚠️ Are you sure you want to delete your account?\nThis action CANNOT be undone!");
             if (!confirmed) return;
 
-            bool doubleConfirm = await JSRuntime.InvokeAsync<bool>("confirm",
-                "⚠️ FINAL WARNING!\nAre you ABSOLUTELY sure?");
-            if (!doubleConfirm) return;
+            //bool doubleConfirm = await JSRuntime.InvokeAsync<bool>("confirm",
+            //    "⚠️ FINAL WARNING!\nAre you ABSOLUTELY sure?");
+            //if (!doubleConfirm) return;
 
             try
             {

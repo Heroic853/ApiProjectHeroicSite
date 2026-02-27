@@ -138,78 +138,78 @@ namespace WebApi.Controllers
         }
 
         // API per cambiare email
-        [HttpPost("change-email")]
-        public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailRequest request)
-        {
-            try
-            {
-                var user = await _dragonListDbContext.User
-                    .FirstOrDefaultAsync(u => u.Username == request.Username);
+        //[HttpPost("change-email")]
+        //public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailRequest request)
+        //{
+        //    try
+        //    {
+        //        var user = await _dragonListDbContext.User
+        //            .FirstOrDefaultAsync(u => u.Username == request.Username);
 
-                if (user == null)
-                    return NotFound(new { message = "User not found" });
+        //        if (user == null)
+        //            return NotFound(new { message = "User not found" });
 
-                // Verifica se la nuova email esiste già
-                var emailExists = await _dragonListDbContext.User
-                    .AnyAsync(u => u.Account == request.NewEmail && u.Username != request.Username);
+        //        // Verifica se la nuova email esiste già
+        //        var emailExists = await _dragonListDbContext.User
+        //            .AnyAsync(u => u.Account == request.NewEmail && u.Username != request.Username);
 
-                if (emailExists)
-                    return BadRequest(new { message = "Email already in use" });
+        //        if (emailExists)
+        //            return BadRequest(new { message = "Email already in use" });
 
-                user.Account = request.NewEmail;
-                await _dragonListDbContext.SaveChangesAsync();
+        //        user.Account = request.NewEmail;
+        //        await _dragonListDbContext.SaveChangesAsync();
 
-                return Ok(new { message = "Email updated successfully" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error changing email: {ex.Message}");
-                return StatusCode(500, new { message = "Failed to update email" });
-            }
-        }
+        //        return Ok(new { message = "Email updated successfully" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError($"Error changing email: {ex.Message}");
+        //        return StatusCode(500, new { message = "Failed to update email" });
+        //    }
+        //}
 
         // API per cambiare password con validazione
-        [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
-        {
-            try
-            {
-                // Trova l'utente
-                var user = await _dragonListDbContext.User
-                    .FirstOrDefaultAsync(u => u.Username == request.Username);
+        //[HttpPost("change-password")]
+        //public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        //{
+        //    try
+        //    {
+        //        // Trova l'utente
+        //        var user = await _dragonListDbContext.User
+        //            .FirstOrDefaultAsync(u => u.Username == request.Username);
 
-                if (user == null)
-                    return NotFound(new { message = "User not found" });
+        //        if (user == null)
+        //            return NotFound(new { message = "User not found" });
 
-                // Verifica password attuale
-                if (user.Password != request.CurrentPassword)
-                    return BadRequest(new { message = "Current password is incorrect" });
+        //        // Verifica password attuale
+        //        if (user.Password != request.CurrentPassword)
+        //            return BadRequest(new { message = "Current password is incorrect" });
 
-                // VALIDAZIONE NUOVA PASSWORD
-                if (string.IsNullOrWhiteSpace(request.NewPassword))
-                    return BadRequest(new { message = "Password is required" });
+        //        // VALIDAZIONE NUOVA PASSWORD
+        //        if (string.IsNullOrWhiteSpace(request.NewPassword))
+        //            return BadRequest(new { message = "Password is required" });
 
-                if (request.NewPassword.Length < 8)
-                    return BadRequest(new { message = "Password must be at least 8 characters" });
+        //        if (request.NewPassword.Length < 8)
+        //            return BadRequest(new { message = "Password must be at least 8 characters" });
 
-                if (!Regex.IsMatch(request.NewPassword, @"[A-Z]"))
-                    return BadRequest(new { message = "Password must contain at least one uppercase letter" });
+        //        if (!Regex.IsMatch(request.NewPassword, @"[A-Z]"))
+        //            return BadRequest(new { message = "Password must contain at least one uppercase letter" });
 
-                if (!Regex.IsMatch(request.NewPassword, @"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?]"))
-                    return BadRequest(new { message = "Password must contain at least one special character" });
+        //        if (!Regex.IsMatch(request.NewPassword, @"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?]"))
+        //            return BadRequest(new { message = "Password must contain at least one special character" });
 
-                // Aggiorna password
-                user.Password = request.NewPassword;
-                await _dragonListDbContext.SaveChangesAsync();
+        //        // Aggiorna password
+        //        user.Password = request.NewPassword;
+        //        await _dragonListDbContext.SaveChangesAsync();
 
-                return Ok(new { message = "Password updated successfully" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error changing password: {ex.Message}");
-                return StatusCode(500, new { message = "Failed to update password" });
-            }
-        }
+        //        return Ok(new { message = "Password updated successfully" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError($"Error changing password: {ex.Message}");
+        //        return StatusCode(500, new { message = "Failed to update password" });
+        //    }
+        //}
 
         // API per eliminare account
         [HttpDelete("delete-account")]

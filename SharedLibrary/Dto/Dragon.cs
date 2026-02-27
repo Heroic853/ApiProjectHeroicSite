@@ -14,5 +14,7 @@ namespace SharedLibrary.Dto
         public string Class { get; set; } = string.Empty;
         public int Defence { get; set; }
         public string Map { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
+
     }
 }

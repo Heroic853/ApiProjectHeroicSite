@@ -34,7 +34,7 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.DefaultScopes.Add("email");
     options.ProviderOptions.PostLogoutRedirectUri =
         "https://heroic853.github.io/Heroic853SiteV1";
-});
+}).AddAccountClaimsPrincipalFactory<CustomUserFactory>();
 
 builder.Services.AddSingleton(new ApplicationManager());
 await builder.Build().RunAsync();

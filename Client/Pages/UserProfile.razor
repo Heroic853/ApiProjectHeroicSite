@@ -307,7 +307,16 @@
                     @context.User.Identity?.Name?.Substring(0, 1).ToUpper()
                 </div>
                 <h1 class="profile-username">@context.User.Identity?.Name</h1>
-                <p class="profile-role">Heroic Member</p>
+                <p class="profile-role">
+                    @if (context.User.IsInRole("Admin"))
+                    {
+                        <span style="color:#ffd700;">⚔️ Admin</span>
+                    }
+                    else
+                    {
+                        <span>Heroic Member</span>
+                    }
+                </p>
             </div>
 
             @if (showSuccessMessage)
@@ -329,10 +338,10 @@
             else
             {
                 <h2 class="section-title">📋 Account Information</h2>
-                <div class="info-row">
+               @*  <div class="info-row">
                     <span class="info-label">Username</span>
                     <span class="info-value">@context.User.Identity?.Name</span>
-                </div>
+                </div> *@
                 <div class="info-row">
                     <span class="info-label">Email</span>
                     <span class="info-value">@(string.IsNullOrEmpty(currentEmail) ? "Not set" : currentEmail)</span>

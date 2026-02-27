@@ -1,17 +1,18 @@
 ﻿@page "/aniversarytable"
 @inject HttpClient Http
+@using Microsoft.AspNetCore.Components.Authorization
 
 <style>
     body {
         background-image: url('images/sfondoadmin.png');
         background-size: cover;
         background-position: center;
-        background-size: 100% auto; /* si adatta in larghezza, mantenendo proporzioni */
+        background-size: 100% auto;
         background-repeat: no-repeat;
         background-position: top center;
-        background-attachment: fixed; /* effetto scorrimento parallax */
-        background-color: black; /* per riempire eventuali bordi */
-        min-height: 100vh; /* copre almeno l'altezza visibile */
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
     }
 
     .title-feedbacks {
@@ -19,7 +20,7 @@
         color: gold;
         font-family: 'Cinzel', serif;
         font-weight: 700;
-        font-size: 3rem; /* circa 48px */
+        font-size: 3rem;
         text-transform: uppercase;
         letter-spacing: 4px;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
@@ -31,89 +32,88 @@
         color: ghostwhite;
         font-family: 'Cinzel', serif;
         font-weight: 80;
-        font-size: 3rem; /* circa 48px */
+        font-size: 3rem;
         text-transform: uppercase;
         letter-spacing: 4px;
     }
 
     @@media (max-width: 480px) {
-
         body {
             background-size: cover;
         }
     }
 </style>
 
-@* @if (ApplicationManager.IsLoggedIn()) se ha fatto il login mostra le tabelle *@ 
-@if (ApplicationManager.Username == "Admin") // se e admin mostra la tabella
-{
-    <p class="title-feedbacks">Selected Monsters from Users & Feedbacks</p>
-
-    <p style="text-align: center; color: white;">
-       Hier you can see all monster what was voted
-    </p>
-
-    @if (ClasificationList == null)
-    {
-        <p style="color: white;"><em>Loading please...</em></p>
-    }
-    else
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th style="color: yellow;">Monster</th>
-                    <th style="color: yellow;">Feedback</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var forecast in ClasificationList)
-                {
-                    <tr>
-                        <td style="color: lightgrey;">@forecast.Monster</td>
-                        <td style="color: lightgrey;">@forecast.Feedback</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-
-    @if (dragonList == null)
-    {
-        <p style="color: white;"><em>Loading please...</em></p>
-    }
-    else
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th style="color: yellow;">Name</th>
-                    <th style="color: yellow;">Element</th>
-                    <th style="color: yellow;">Defence</th>
-                    <th style="color: yellow;">Class</th>
-                    <th style="color: yellow;">Map</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var forecast in dragonList)
-                {
-                    <tr>
-                        <td style="color: lightgrey;">@forecast.Name</td>
-                        <td style="color: lightgrey;">@forecast.Element</td>
-                        <td style="color: lightgrey;">@forecast.Defence</td>
-                        <td style="color: lightgrey;">@forecast.Class</td>
-                        <td style="color: lightgrey;">@forecast.Map</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-}
-else
-{
-    <div class="not-auth">
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <p class="title-feedbacks">Selected Monsters from Users & Feedbacks</p>
         <p style="text-align: center; color: white;">
-            Sorry you are not authorized
+            Hier you can see all monster what was voted
         </p>
-    </div>
-}
+
+        @if (ClasificationList == null)
+        {
+            <p style="color: white;"><em>Loading please...</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="color: yellow;">Monster</th>
+                        <th style="color: yellow;">Feedback</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ClasificationList)
+                    {
+                        <tr>
+                            <td style="color: lightgrey;">@item.Monster</td>
+                            <td style="color: lightgrey;">@item.Feedback</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (dragonList == null)
+        {
+            <p style="color: white;"><em>Loading please...</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="color: yellow;">Name</th>
+                        <th style="color: yellow;">Element</th>
+                        <th style="color: yellow;">Defence</th>
+                        <th style="color: yellow;">Class</th>
+                        <th style="color: yellow;">Map</th>
+                        <th style="color: yellow;">User</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in dragonList)
+                    {
+                        <tr>
+                            <td style="color: lightgrey;">@item.Name</td>
+                            <td style="color: lightgrey;">@item.Element</td>
+                            <td style="color: lightgrey;">@item.Defence</td>
+                            <td style="color: lightgrey;">@item.Class</td>
+                            <td style="color: lightgrey;">@item.Map</td>
+                            <td style="color: lightgrey;">@item.UserEmail</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <div class="not-auth">
+            <p style="text-align: center; color: white;">
+                Sorry you are not authorized
+            </p>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
