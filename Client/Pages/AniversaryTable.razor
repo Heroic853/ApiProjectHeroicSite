@@ -1,6 +1,8 @@
 ﻿@page "/aniversarytable"
 @inject HttpClient Http
 @using Microsoft.AspNetCore.Components.Authorization
+@using ApexCharts
+@using SharedLibrary.Dto
 
 <style>
     body {
@@ -67,7 +69,7 @@
     .table-card-title {
         color: #ffd700;
         font-family: 'Cinzel', serif;
-        font-size: 1.1rem;
+        font-size: 1.3rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 2px;
@@ -96,19 +98,19 @@
     .admin-table th {
         color: #d4af37;
         font-family: 'Cinzel', serif;
-        font-size: 0.8rem;
+        font-size: 0.95rem;
         text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 12px 15px;
+        padding: 14px 18px;
         text-align: left;
         border-bottom: 1px solid #8b0000;
     }
 
     .admin-table td {
         color: #c0c0c0;
-        padding: 10px 15px;
+        padding: 12px 18px;
         border-bottom: 1px solid rgba(139, 0, 0, 0.3);
-        font-size: 0.9rem;
+        font-size: 1rem;
         vertical-align: middle;
     }
 
@@ -123,7 +125,7 @@
 
     .email-cell {
         color: #888 !important;
-        font-size: 0.8rem !important;
+        font-size: 0.9rem !important;
         font-style: italic;
     }
 
@@ -212,7 +214,7 @@
                 <!-- TABELLA FEEDBACKS -->
                 <div class="table-card">
                     <div class="table-card-header">
-                        <h2 class="table-card-title">📋 User Feedbacks</h2>
+                        <h2 class="table-card-title">User Feedbacks</h2>
                         @if (ClasificationList != null)
                         {
                             <span class="badge">@ClasificationList.Length entries</span>
@@ -253,7 +255,7 @@
                 <!-- TABELLA DRAGON SET -->
                 <div class="table-card">
                     <div class="table-card-header">
-                        <h2 class="table-card-title">🐉 Monster Choices</h2>
+                        <h2 class="table-card-title">Monster Choices</h2>
                         @if (dragonList != null)
                         {
                             <span class="badge">@dragonList.Length entries</span>
@@ -297,8 +299,28 @@
                     }
                 </div>
 
+                <div class="table-card" style="margin-top: 30px; grid-column: span 2; padding: 20px;">
+                    <div class="table-card-header" style="margin-bottom: 20px;">
+                        <h2 class="table-card-title">📈 Website Traffic Analytics</h2>
+                    </div>
+
+                    <ApexChart TItem="VisitStat" 
+                               Title="Daily Visitors" 
+                               Options="ChartOptions">
+        
+                        <ApexPointSeries TItem="VisitStat"
+                                        Items="VisitStats"
+                                        Name="Visits"
+                                        SeriesType="SeriesType.Line"
+                                        XValue="@(e => e.Date.ToShortDateString())"
+                                        YValue="@(e => e.Count)"
+                                        Stroke="@(new SeriesStroke { Color = "#ffd700", Width = 3 })" />
+                    </ApexChart>
+                </div>
+
             </div>
         </div>
+
     </Authorized>
 
     <NotAuthorized>

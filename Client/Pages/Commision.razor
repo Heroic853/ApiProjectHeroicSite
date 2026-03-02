@@ -1,0 +1,370 @@
+﻿@page "/commissions"
+
+<style>
+    body {
+        background-image: url('images/SfondoClasifications.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
+    }
+
+    .commissions-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .page-title {
+        text-align: center;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 2.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 8px rgba(255, 100, 0, 0.8);
+        margin-bottom: 10px;
+    }
+
+    .page-subtitle {
+        text-align: center;
+        color: #c0c0c0;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+        letter-spacing: 2px;
+        margin-bottom: 50px;
+    }
+
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+        align-items: start;
+    }
+
+    .commission-card {
+        background: rgba(13, 5, 0, 0.95);
+        border: 2px solid #8b0000;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(139, 0, 0, 0.3);
+        transition: all 0.3s;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .commission-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+            border-color: #d4af37;
+        }
+
+        .commission-card.featured {
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+            transform: scale(1.03);
+        }
+
+            .commission-card.featured:hover {
+                transform: scale(1.03) translateY(-8px);
+            }
+
+    .featured-badge {
+        background: linear-gradient(to right, #8b0000, #d4af37, #8b0000);
+        color: #000;
+        text-align: center;
+        padding: 8px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .card-image {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        background: linear-gradient(135deg, #1a0000, #2a1000);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+    }
+
+        .card-image img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+    .card-body {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .card-price {
+        color: #ffffff;
+        font-size: 2rem;
+        font-weight: 700;
+        font-family: 'Cinzel', serif;
+        margin-bottom: 5px;
+    }
+
+        .card-price span {
+            color: #c0c0c0;
+            font-size: 0.85rem;
+            font-weight: normal;
+        }
+
+    .slots-badge {
+        display: inline-block;
+        background: rgba(139, 0, 0, 0.4);
+        border: 1px solid #8b0000;
+        border-radius: 20px;
+        padding: 4px 12px;
+        color: #ff9999;
+        font-size: 0.8rem;
+        font-family: 'Cinzel', serif;
+        margin-bottom: 15px;
+    }
+
+    .commission-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #8b0000, #a01010);
+        border: 2px solid #d4af37;
+        border-radius: 8px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 15px;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+    }
+
+        .commission-btn:hover {
+            background: linear-gradient(135deg, #a01010, #c01818);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .commission-btn.featured-btn {
+            background: linear-gradient(135deg, #b8860b, #d4af37);
+            color: #000;
+            border-color: #ffd700;
+        }
+
+            .commission-btn.featured-btn:hover {
+                background: linear-gradient(135deg, #d4af37, #ffd700);
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+            }
+
+    .support-text {
+        color: #d4af37;
+        font-style: italic;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .features-title {
+        color: #c0c0c0;
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+        font-style: italic;
+    }
+
+    .features-premium {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 15px 0;
+    }
+
+        .features-premium li {
+            color: #d4af37;
+            font-size: 0.85rem;
+            padding: 2px 0;
+            font-style: italic;
+        }
+
+            .features-premium li::before {
+                content: "• ";
+                color: #ffd700;
+            }
+
+    .features-standard {
+        list-style: disc;
+        padding-left: 20px;
+        margin: 0;
+    }
+
+        .features-standard li {
+            color: #c0c0c0;
+            font-size: 0.85rem;
+            padding: 2px 0;
+        }
+
+    .divider {
+        border: none;
+        border-top: 1px solid rgba(139, 0, 0, 0.4);
+        margin: 15px 0;
+    }
+
+    .contact-note {
+        text-align: center;
+        color: #888;
+        font-family: 'Cinzel', serif;
+        font-size: 0.85rem;
+        margin-top: 40px;
+        padding: 20px;
+        border: 1px solid rgba(139, 0, 0, 0.3);
+        border-radius: 10px;
+        background: rgba(13, 5, 0, 0.5);
+    }
+
+        .contact-note a {
+            color: #d4af37;
+            text-decoration: none;
+        }
+
+            .contact-note a:hover {
+                color: #ffd700;
+            }
+
+    @@media (max-width: 1100px) {
+        .cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .commission-card.featured {
+            transform: scale(1);
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .cards-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<div class="commissions-container">
+    <h1 class="page-title">⚔️ Commission Your Dragon ⚔️</h1>
+    <p class="page-subtitle">Choose your plan and get your custom Monster Hunter mod</p>
+
+    <div class="cards-grid">
+
+        <!-- PIANO 1 -->
+        <div class="commission-card">
+            <div class="card-image">
+                <img src="images/IconBronze.png" alt="Raum's First Faction" />
+            </div>
+            <div class="card-body">
+                <h2 class="card-title">Raum's First Faction</h2>
+                <div class="card-price">3 € <span>/ one time (+ VAT)</span></div>
+                <button class="commission-btn" disabled>Coming Soon</button>
+                <p class="support-text">Support the mod creator, site and my meltal stability</p>
+            </div>
+        </div>
+
+        <!-- PIANO 2 - FEATURED -->
+        <div class="commission-card featured">
+            <div class="featured-badge">⭐ Most Popular ⭐</div>
+            <div class="card-image">
+                <img src="images/IconSilver.png" alt="Raum's First Faction" />
+            </div>
+            <div class="card-body">
+                <h2 class="card-title">Raum's Second Faction</h2>
+                <div class="card-price">10 € <span>/ one time (+ VAT)</span></div>
+                <button class="commission-btn featured-btn" disabled>Coming Soon</button>
+                <div class="slots-badge">⚠️ Limited (5 slots remaining)</div>
+                <p class="features-title">Custom mods for Monster Hunter Rise Sunbreak and Monster Hunter World Iceborne and i can:</p>
+                <ul class="features-premium">
+                    <li>Custom textures 4k/2K/HD</li>
+                    <li>Custom quest's</li>
+                    <li>Custom Monster Icon</li>
+                    <li>Custom efx</li>
+                    <li>Custom video montage</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PIANO 3 -->
+        <div class="commission-card">
+            <div class="card-image">
+                <img src="images/IconGold.png" alt="Raum's First Faction" />
+            </div>
+            <div class="card-body">
+                <h2 class="card-title">Raum's Thirty Faction</h2>
+                <div class="card-price">15 € <span>/ one time (+ VAT)</span></div>
+                <button class="commission-btn" disabled>Coming Soon</button>
+                <div class="slots-badge">⚠️ Limited (3 slots remaining)</div>
+                <p class="features-title">Custom mods for Monster Hunter Rise Sunbreak and Monster Hunter World Iceborne and i can:</p>
+                <ul class="features-premium">
+                    <li>Custom textures 4k/2K/HD</li>
+                    <li>Custom quest's</li>
+                    <li>Custom Monster Icon</li>
+                    <li>Custom Monster model modified from original</li>
+                    <li>Custom lore</li>
+                    <li>Custom efx</li>
+                    <li>Custom video montage</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PIANO 4 -->
+        <div class="commission-card">
+            <div class="card-image">
+                <img src="images/IconDiamond.png" alt="Raum's First Faction" />
+            </div>
+            <div class="card-body">
+                <h2 class="card-title">Raum's Fourth Faction</h2>
+                <div class="card-price">50 € <span>/ one time (+ VAT)</span></div>
+                <button class="commission-btn" disabled>Coming Soon</button>
+                <div class="slots-badge">⚠️ Limited (1 slot remaining)</div>
+                <p class="features-title">Custom mods for Monster Hunter Rise Sunbreak and Monster Hunter World Iceborne and i can:</p>
+                <ul class="features-premium">
+                    <li>Custom textures 4k/2K/HD</li>
+                    <li>Custom quest's</li>
+                    <li>Custom Monster Icon</li>
+                    <li>Custom Monster model modified from original</li>
+                    <li>Custom efx</li>
+                    <li>Custom name</li>
+                    <li>Custom lore for monster and in game</li>
+                    <li>Custom map modified in game</li>
+                    <li>Custom ost</li>
+                    <li>Custom name item's</li>
+                    <li>Custom video montage</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="contact-note">
+        ⚔️ Stripe payment integration coming soon — for now contact me on
+        <a href="#">Discord</a> to arrange your commission!
+    </div>
+</div>

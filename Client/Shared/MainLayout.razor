@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
+@inject HttpClient Http
 
 <div style="text-align: center;">
     <img src="images/Heroic853Icon.png" width="150" height="150">
@@ -232,7 +233,8 @@
                         <ul>
                             <NavLink href="" Match="NavLinkMatch.All">Introduction</NavLink>
                             <NavLink href="MessageOfGratitude">Message of Gratitude</NavLink>
-                            <NavLink href="videopage">Video</NavLink>
+                            <NavLink href="videopage">Special Videos</NavLink>
+                            <NavLink href="commissions">Commisions</NavLink>
                             <NavLink href="forbiddenMonsters">Forbidden Monsters</NavLink>
                             <NavLink href="dragonList">Monster Choise & Feedbacks</NavLink>
                             <NavLink href="UserProfile">User Settings</NavLink>
@@ -252,7 +254,8 @@
                         <ul>
                             <NavLink href="" Match="NavLinkMatch.All">Introduction</NavLink>
                             <NavLink href="MessageOfGratitude">Message of Gratitude</NavLink>
-                            <NavLink href="videopage">Video</NavLink>
+                            <NavLink href="videopage">Special Videos</NavLink>
+                            <NavLink href="commissions">Commisions</NavLink>
                             <NavLink href="forbiddenMonsters">Forbidden Monsters</NavLink>
                         </ul>
 
@@ -277,6 +280,19 @@
         {
             menuOpen = false;
             await JSRuntime.InvokeVoidAsync("forceLogout");
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                // Questo "avvisa" il controller che qualcuno è entrato nel sito
+                await Http.PostAsync("api/dragon/log-visit", null);
+            }
+            catch
+            {
+               // nothinggg
+            }
         }
     }
 </div>

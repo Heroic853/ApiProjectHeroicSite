@@ -7,7 +7,8 @@ namespace WebApi.Data
     {
         public DbSet<Dragon> DragonSet { get; set; } // prima tabella
         public DbSet<User> User { get; set; } // seconda tabella
-        public DbSet<Clasification> Clasification { get; set; } 
+        public DbSet<Clasification> Clasification { get; set; }
+        public DbSet<PageVisit> PageVisits { get; set; }
 
         public DragonListDbContext(DbContextOptions options):base(options)
         {

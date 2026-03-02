@@ -74,7 +74,6 @@ namespace WebApi.Controllers
             }
         }
 
-
         [HttpGet("users")]
         public async Task<IActionResult> GetUsers() 
         {
@@ -262,7 +261,6 @@ namespace WebApi.Controllers
             }
         }
 
-
         [HttpPost("Clasification")]
         public async Task Clasification([FromBody] Clasification clasification)
         {
@@ -274,6 +272,41 @@ namespace WebApi.Controllers
         public async Task<IEnumerable<Clasification>> GetAniversary()
         {
             return await _dragonListDbContext.Clasification.ToListAsync();
+        }
+
+        // 1. Questo metodo salva la visita nel database
+        [HttpPost("log-visit")]
+        public async Task<IActionResult> LogVisit()
+        {
+            try
+            {
+                var visit = new PageVisit { VisitedAt = DateTime.Now };
+                await _dragonListDbContext.PageVisits.AddAsync(visit);
+                await _dragonListDbContext.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Errore log visita: {ex.Message}");
+                return StatusCode(500);
+            }
+        }
+
+        // 2. Questo metodo conta le visite reali raggruppate per giorno
+        [HttpGet("daily-stats")]
+        public async Task<IActionResult> GetDailyStats()
+        {
+            var stats = await _dragonListDbContext.PageVisits
+                .GroupBy(v => v.VisitedAt.Date) // Raggruppa per giorno
+                .Select(g => new VisitStat
+                {
+                    Date = g.Key,
+                    Count = g.Count() // Conta quante visite in quel giorno
+                })
+                .OrderBy(s => s.Date)
+                .ToListAsync();
+
+            return Ok(stats);
         }
     }
 }

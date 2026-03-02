@@ -1,99 +1,282 @@
 ﻿@page "/videopage"
 
-    <style>
-        body {
-            background-image: url('images/SfondoClasifications.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: top center;
-            background-attachment: fixed;
-            background-color: black; 
-            min-height: 100vh; 
-        }
-    </style>
+<style>
+    body {
+        background-image: url('images/SfondoClasifications.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
+    }
 
-    <style>
+    .TitleVideo {
+        text-align: center;
+        color: gold;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        font-size: 3rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        margin: 2rem 0;
+    }
+
+    .videos-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        max-width: 1300px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .video-card {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .video-thumbnail {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%;
+        background: #000;
+        border: 3px solid gold;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        overflow: hidden;
+    }
+
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .play-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s;
+    }
+
+    .video-card:hover .play-overlay {
+        background: rgba(139, 0, 0, 0.5);
+    }
+
+    .play-btn {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 215, 0, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        transition: transform 0.3s;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+
+    .video-card:hover .play-btn {
+        transform: scale(1.15);
+    }
+
+    .video-label {
+        text-align: center;
+        color: white;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    /* MODALE */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.92);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s;
+    }
+
+    .modal-content {
+        position: relative;
+        width: 90%;
+        max-width: 1000px;
+        animation: scaleIn 0.3s;
+    }
+
+    .modal-video {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%;
+        background: #000;
+        border: 3px solid gold;
+        border-radius: 10px;
+        box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+        overflow: hidden;
+    }
+
+        .modal-video iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+    .modal-close {
+        position: absolute;
+        top: -45px;
+        right: 0;
+        background: #8b0000;
+        border: 2px solid gold;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        color: gold;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+    }
+
+        .modal-close:hover {
+            background: #ff0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+            transform: scale(1.1);
+        }
+
+    .modal-title {
+        text-align: center;
+        color: black;
+        font-family: 'Cinzel', serif;
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-top: 15px;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes scaleIn {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .videos-grid {
+            grid-template-columns: 1fr;
+        }
+
         .TitleVideo {
-            text-align: center;
-            color: gold;
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            font-size: 3rem;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-            margin: 2rem 0;
+            font-size: 2rem;
         }
+    }
+</style>
 
-        .subtitleVideo {
-            text-align: center;
-            color: ghostwhite;
-            font-family: 'Cinzel', serif;
-            font-weight: 80;
-            font-size: 3rem; /* circa 48px */
-            text-transform: uppercase;
-            letter-spacing: 4px;
-        }
+<p class="TitleVideo">⚔️ Video ⚔️</p>
 
-        @@media (max-width: 480px) {
-           
-            body{
-                background-size: cover;
-            }
-            .TitleVideo {
-                font-size: 3rem;
-            }
-
-            .subtitleVideo {
-            font-size: 1.5rem; 
-            }
-            
-            .video-container {
-            width: 45%; /* ← Larghezza responsive */
-            height: 25%;
-            margin: 20px auto;
-            border-width: 2px;
-        }
-    </style>
-
-    <p class="TitleVideo">Video</p>
-
-    <style>
-            .video-container {
-                position: relative;
-                width: 100%;
-                max-width: 1300px; /* ← Larghezza massima, non fissa */
-                padding-bottom: 56.25%; /* ← Mantiene ratio 16:9 */
-                margin: 40px auto;
-                background: #000;
-                border: 3px solid gold;
-                border-radius: 10px;
-                box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-                overflow: hidden;
-           }
-
-            .video-container iframe {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%; /* riempie il contenitore */
-                height: 100%; /* mantiene proporzioni */
-                display: block;
-            }
-
-    </style>
-
-    <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/FxDkoGhdFZc?si=SyFrD8CRXVihDT1R" 
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen>
-        </iframe>
+<div class="videos-grid">
+    <div class="video-card" @onclick="() => OpenModal(videoId1, label1)">
+        <div class="video-thumbnail">
+            <img src="https://img.youtube.com/vi/FxDkoGhdFZc/maxresdefault.jpg" alt="Video 1" />
+            <div class="play-overlay">
+                <div class="play-btn">▶</div>
+            </div>
+        </div>
+        <p class="video-label">Special video of my best 20 mods!</p>
     </div>
 
-     <div class="subtitleVideo">
-        <p style="text-align: center; color: white;">
-            Special video of my best 20 mods!
-        </p>
-     </div>
+    <div class="video-card" @onclick="() => OpenModal(videoId2, label2)">
+        <div class="video-thumbnail">
+            <img src="https://img.youtube.com/vi/z1Dd3GO5CGc/maxresdefault.jpg" alt="Video 2" />
+            <div class="play-overlay">
+                <div class="play-btn">▶</div>
+            </div>
+        </div>
+        <p class="video-label">Special video of all my monsters!</p>
+    </div>
+</div>
+
+@if (modalOpen)
+{
+    <div class="modal-overlay" @onclick="CloseModal">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <button class="modal-close" @onclick="CloseModal">✕</button>
+            <div class="modal-video">
+                <iframe src="https://www.youtube.com/embed/@activeVideoId?autoplay=1"
+                        title="YouTube video player"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                </iframe>
+            </div>
+            <p class="modal-title">@activeLabel</p>
+        </div>
+    </div>
+}
+
+@code {
+    private bool modalOpen = false;
+    private string activeVideoId = "";
+    private string activeLabel = "";
+
+    private string videoId1 = "FxDkoGhdFZc";
+    private string videoId2 = "z1Dd3GO5CGc";
+    private string label1 = "Special video of my best 20 mods!";
+    private string label2 = "Special video of all my monsters!";
+
+    private void OpenModal(string videoId, string label)
+    {
+        activeVideoId = videoId;
+        activeLabel = label;
+        modalOpen = true;
+    }
+
+    private void CloseModal()
+    {
+        modalOpen = false;
+        activeVideoId = "";
+    }
+}
