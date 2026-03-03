@@ -10,6 +10,12 @@ namespace WebApi.Data
         public DbSet<Clasification> Clasification { get; set; }
         public DbSet<PageVisit> PageVisits { get; set; }
 
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PageVisit>().ToTable("page_visits");
+        }
+
         public DragonListDbContext(DbContextOptions options):base(options)
         {
         }

@@ -35,7 +35,6 @@ namespace Client.Pages
         {
             var anonClient = HttpClientFactory.CreateClient("Anonymous");
 
-
             //dati esistenti 
             dragonList = await Http.GetFromJsonAsync<Dragon[]>("api/dragon");
             ClasificationList = await Http.GetFromJsonAsync<Clasification[]>("api/dragon/Clasification");
