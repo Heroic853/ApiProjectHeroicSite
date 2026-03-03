@@ -14,6 +14,7 @@ namespace WebApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PageVisit>().ToTable("page_visits");
+            modelBuilder.Entity<PageVisit>().Property(p => p.VisitedAt).HasColumnName("visited_at");
         }
 
         public DragonListDbContext(DbContextOptions options):base(options)

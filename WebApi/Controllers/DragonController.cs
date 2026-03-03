@@ -281,7 +281,7 @@ namespace WebApi.Controllers
         {
             try
             {
-                var visit = new PageVisit { VisitedAt = DateTime.Now };
+                var visit = new PageVisit { VisitedAt = DateTime.UtcNow }; // utc nice
                 await _dragonListDbContext.PageVisits.AddAsync(visit);
                 await _dragonListDbContext.SaveChangesAsync();
                 return Ok();
