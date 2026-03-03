@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Client</title>
+    <title>Heroic853 Site</title>
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
@@ -14,15 +14,107 @@
 
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div class="heroic-loader">
+            <div class="loader-content">
+                <div class="dragon-pulse"></div>
+                <h1 class="loader-title">Heroic853Site</h1>
+                <div class="loader-bar">
+                    <div class="loader-progress"></div>
+                </div>
+                <p class="loader-text">Loading Assets...</p>
+            </div>
+        </div>
     </div>
 
+    <style>
+        .heroic-loader {
+            background-color: #0d0500;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+        }
+
+        .loader-content {
+            text-align: center;
+        }
+
+        .dragon-pulse {
+            width: 80px;
+            height: 80px;
+            background: #8b0000;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #ff4500;
+            animation: pulse 1.5s infinite ease-in-out;
+            border: 2px solid #ffd700;
+        }
+
+        .loader-title {
+            color: #ffd700;
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .loader-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(139, 0, 0, 0.3);
+            border-radius: 2px;
+            margin: 0 auto;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .loader-progress {
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(90deg, #8b0000, #ffd700);
+            box-shadow: 0 0 10px #ffd700;
+            animation: loading-flow 2s infinite linear;
+        }
+
+        .loader-text {
+            color: #c0c0c0;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.9);
+                box-shadow: 0 0 0px #8b0000;
+            }
+
+            50% {
+                transform: scale(1);
+                box-shadow: 0 0 30px #ff4500;
+            }
+
+            100% {
+                transform: scale(0.9);
+                box-shadow: 0 0 0px #8b0000;
+            }
+        }
+
+        @keyframes loading-flow {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(250%);
+            }
+        }
+    </style>
+
     <div id="blazor-error-ui">
-        An unhandled error has occurred.
+        An shit error has occurred.
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>

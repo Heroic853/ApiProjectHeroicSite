@@ -193,13 +193,58 @@
         100% { transform: rotate(360deg); }
     }
 
+    /* Gestione per Mobile */
     @@media (max-width: 900px) {
-        .tables-grid {
-            grid-template-columns: 1fr;
-        }
-        .page-title {
-            font-size: 1.8rem;
-        }
+        .tables-grid
+
+    {
+        grid-template-columns: 1fr; /* Una tabella sotto l'altra */
+    }
+
+    .table-card {
+        grid-column: span 1 !important; /* Forza il grafico a stare in una colonna */
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        letter-spacing: 2px;
+    }
+
+    .admin-table thead {
+        display: none; 
+    }
+
+    .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
+        display: block; /* Tutto diventa un blocco verticale */
+        width: 100%;
+    }
+
+    .admin-table tr {
+        margin-bottom: 15px;
+        border-bottom: 2px solid #8b0000;
+        padding: 10px 0;
+    }
+
+    .admin-table td {
+        text-align: right; /* Il valore a destra */
+        padding-left: 50%; /* Spazio per il titolo a sinistra */
+        position: relative;
+        border-bottom: 1px solid rgba(139, 0, 0, 0.1);
+    }
+
+    .admin-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: #d4af37;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+
     }
 </style>
 
@@ -298,10 +343,11 @@
                         </table>
                     }
                 </div>
-
+                
+                @* Grafico di quanti utenti sono venuti *@
                 <div class="table-card" style="margin-top: 30px; grid-column: span 2; padding: 20px;">
                     <div class="table-card-header" style="margin-bottom: 20px;">
-                        <h2 class="table-card-title">📈 Website Traffic Analytics</h2>
+                        <h2 class="table-card-title"> Website Traffic </h2>
                     </div>
 
                     <ApexChart TItem="VisitStat" 

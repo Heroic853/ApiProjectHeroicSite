@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using ApexCharts;
+using Microsoft.AspNetCore.Components;
 using SharedLibrary.Dto;
+using System.Net.Http;
 using System.Net.Http.Json;
-using ApexCharts;
 
 namespace Client.Pages
 {
@@ -10,6 +11,7 @@ namespace Client.Pages
         // Liste per le tabelle esistenti
         private Clasification[]? ClasificationList;
         private Dragon[]? dragonList;
+        [Inject] private IHttpClientFactory HttpClientFactory { get; set; }
 
         // --- LOGICA PER IL GRAFICO ---
         private List<VisitStat> VisitStats = new();
@@ -31,17 +33,17 @@ namespace Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            // Caricamento dati esistenti
+            var anonClient = HttpClientFactory.CreateClient("Anonymous");
+
+
+            //dati esistenti 
             dragonList = await Http.GetFromJsonAsync<Dragon[]>("api/dragon");
             ClasificationList = await Http.GetFromJsonAsync<Clasification[]>("api/dragon/Clasification");
 
-            VisitStats = new List<VisitStat>
-            {
-                new VisitStat { Date = DateTime.Now.AddDays(-3), Count = 45 },
-                new VisitStat { Date = DateTime.Now.AddDays(-2), Count = 82 },
-                new VisitStat { Date = DateTime.Now.AddDays(-1), Count = 63 },
-                new VisitStat { Date = DateTime.Now, Count = 95 }
-            };
+            var stats = await anonClient.GetFromJsonAsync<List<VisitStat>>(
+                "https://apiprojectheroicsite.onrender.com/api/dragon/daily-stats");
+            if (stats != null)
+                VisitStats = stats;
         }
     }
 }

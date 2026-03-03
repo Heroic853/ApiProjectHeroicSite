@@ -21,6 +21,8 @@ builder.Services.AddHttpClient("ServerAPI", client =>
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
     .CreateClient("ServerAPI"));
+builder.Services.AddHttpClient("Anonymous", client =>
+    client.BaseAddress = new Uri("https://apiprojectheroicsite.onrender.com/"));
 
 //Auth0
 builder.Services.AddOidcAuthentication(options =>

@@ -276,6 +276,7 @@ namespace WebApi.Controllers
 
         // 1. Questo metodo salva la visita nel database
         [HttpPost("log-visit")]
+        [AllowAnonymous]
         public async Task<IActionResult> LogVisit()
         {
             try
@@ -294,6 +295,7 @@ namespace WebApi.Controllers
 
         // 2. Questo metodo conta le visite reali raggruppate per giorno
         [HttpGet("daily-stats")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetDailyStats()
         {
             var stats = await _dragonListDbContext.PageVisits

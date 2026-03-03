@@ -89,7 +89,7 @@ a, .btn-link {
             transition: stroke-dasharray 0.05s ease-in-out;
         }
 
-.loading-progress-text {
+/*.loading-progress-text {
     position: absolute;
     text-align: center;
     font-weight: bold;
@@ -99,3 +99,4 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+*/
