@@ -8,7 +8,9 @@ namespace SharedLibrary.Dto
 {
     public class PageVisit
     {
-        public int Id { get; set; }
-        public DateTime VisitedAt { get; set; } = DateTime.Now;
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public DateTime VisitedAt { get; set; }
+        public string? PageName { get; set; }
+        public string? UserEmail { get; set; }
     }
 }

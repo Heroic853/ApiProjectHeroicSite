@@ -16,6 +16,7 @@ namespace WebApi.Data
             modelBuilder.Entity<PageVisit>().ToTable("page_visits");
             modelBuilder.Entity<PageVisit>().Property(p => p.VisitedAt).HasColumnName("visited_at");
             modelBuilder.Entity<PageVisit>().Property(p => p.Id).HasColumnName("id");
+            modelBuilder.Entity<PageVisit>().Property(p => p.PageName).HasColumnName("page_name");
         }
 
         public DragonListDbContext(DbContextOptions options):base(options)
