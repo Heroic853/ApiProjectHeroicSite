@@ -22,7 +22,8 @@ namespace Client.Pages
             Chart = new Chart
             {
                 Background = "transparent",
-                ForeColor = "#d4af37"
+                ForeColor = "#d4af37",
+                Height = "250px"
             },
             Colors = new List<string> { "#8b0000" },
             Xaxis = new XAxis
@@ -43,6 +44,7 @@ namespace Client.Pages
                 "https://apiprojectheroicsite.onrender.com/api/dragon/daily-stats");
             if (stats != null)
                 VisitStats = stats;
+                StateHasChanged();
         }
     }
 }

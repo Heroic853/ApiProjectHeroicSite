@@ -3,6 +3,7 @@
 @inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
 
 <div style="text-align: center;">
     <img src="images/Heroic853Icon.png" width="150" height="150">
@@ -287,6 +288,7 @@
             try
             {
                 // Questo "avvisa" il controller che qualcuno è entrato nel sito
+                var anonClient = HttpClientFactory.CreateClient("Anonymous");
                 await Http.PostAsync("api/dragon/log-visit", null);
             }
             catch
