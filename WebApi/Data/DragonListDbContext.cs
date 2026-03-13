@@ -18,7 +18,7 @@ namespace WebApi.Data
             modelBuilder.Entity<PageVisit>().Property(p => p.Id)
                 .HasColumnName("id")
                 .ValueGeneratedOnAdd();
-            modelBuilder.Entity<PageVisit>().Property(p => p.PageName).HasColumnName("page_name");
+           // modelBuilder.Entity<PageVisit>().Property(p => p.PageName).HasColumnName("page_name");
             modelBuilder.Entity<PageVisit>().Property(p => p.UserEmail).HasColumnName("user_email");
         }
 

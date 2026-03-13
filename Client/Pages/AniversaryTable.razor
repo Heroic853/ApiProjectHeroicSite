@@ -358,7 +358,7 @@
                                         Items="VisitStats"
                                         Name="Visits"
                                         SeriesType="SeriesType.Line"
-                                        XValue="@(e => e.Date.ToShortDateString())"
+                                        XValue="@(e => e.Date.ToString("yyyy-MM-dd"))"
                                         YValue="@(e => e.Count)"
                                         Stroke="@(new SeriesStroke { Color = "#ffd700", Width = 3 })" />
                     </ApexChart>

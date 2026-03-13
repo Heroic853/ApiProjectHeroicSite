@@ -279,12 +279,14 @@ namespace WebApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> LogVisit()
         {
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
             try
             {
                 var visit = new PageVisit
                 {
                     VisitedAt = DateTime.UtcNow,
-                    PageName = "home"
+                   // PageName = "home", // inutile
+                    UserEmail = userEmail
                 };
                 await _dragonListDbContext.PageVisits.AddAsync(visit);
                 await _dragonListDbContext.SaveChangesAsync();
