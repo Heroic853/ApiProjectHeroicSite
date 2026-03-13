@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Dto;
+using Stripe.Checkout;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -315,6 +316,41 @@ namespace WebApi.Controllers
                 .ToListAsync();
 
             return Ok(stats);
+        }
+
+        // pagami scemo
+        [HttpPost("create-checkout")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CreateCheckout([FromBody] CheckoutRequest request)
+        {
+            var options = new SessionCreateOptions
+            {
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = new List<SessionLineItemOptions>
+        {
+            new SessionLineItemOptions
+            {
+                PriceData = new SessionLineItemPriceDataOptions
+                {
+                    Currency = "eur",
+                    UnitAmount = request.AmountCents, // es. 1000 = 10€
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
+                    {
+                        Name = request.PlanName
+                    }
+                },
+                Quantity = 1
+            }
+        },
+                Mode = "payment",
+                SuccessUrl = "https://heroic853.github.io/Heroic853SiteV1/payment-success",
+                CancelUrl = "https://heroic853.github.io/Heroic853SiteV1/commissions"
+            };
+
+            var service = new SessionService();
+            var session = await service.CreateAsync(options);
+
+            return Ok(new { url = session.Url });
         }
     }
 }

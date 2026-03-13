@@ -56,21 +56,21 @@
         flex-direction: column;
     }
 
-        .commission-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
-            border-color: #d4af37;
-        }
+    .commission-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+        border-color: #d4af37;
+    }
 
-        .commission-card.featured {
-            border: 2px solid #ffd700;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
-            transform: scale(1.03);
-        }
+    .commission-card.featured {
+        border: 2px solid #ffd700;
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        transform: scale(1.03);
+    }
 
-            .commission-card.featured:hover {
-                transform: scale(1.03) translateY(-8px);
-            }
+    .commission-card.featured:hover {
+        transform: scale(1.03) translateY(-8px);
+    }
 
     .featured-badge {
         background: linear-gradient(to right, #8b0000, #d4af37, #8b0000);
@@ -95,11 +95,11 @@
         font-size: 4rem;
     }
 
-        .card-image img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
+    .card-image img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
 
     .card-body {
         padding: 20px;
@@ -124,11 +124,11 @@
         margin-bottom: 5px;
     }
 
-        .card-price span {
-            color: #c0c0c0;
-            font-size: 0.85rem;
-            font-weight: normal;
-        }
+    .card-price span {
+        color: #c0c0c0;
+        font-size: 0.85rem;
+        font-weight: normal;
+    }
 
     .slots-badge {
         display: inline-block;
@@ -160,22 +160,22 @@
         text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
     }
 
-        .commission-btn:hover {
-            background: linear-gradient(135deg, #a01010, #c01818);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
-            transform: translateY(-2px);
-        }
+    .commission-btn:hover {
+        background: linear-gradient(135deg, #a01010, #c01818);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        transform: translateY(-2px);
+    }
 
-        .commission-btn.featured-btn {
-            background: linear-gradient(135deg, #b8860b, #d4af37);
-            color: #000;
-            border-color: #ffd700;
-        }
+    .commission-btn.featured-btn {
+        background: linear-gradient(135deg, #b8860b, #d4af37);
+        color: #000;
+        border-color: #ffd700;
+    }
 
-            .commission-btn.featured-btn:hover {
-                background: linear-gradient(135deg, #d4af37, #ffd700);
-                box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
-            }
+    .commission-btn.featured-btn:hover {
+        background: linear-gradient(135deg, #d4af37, #ffd700);
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+    }
 
     .support-text {
         color: #d4af37;
@@ -198,17 +198,17 @@
         margin: 0 0 15px 0;
     }
 
-        .features-premium li {
-            color: #d4af37;
-            font-size: 0.85rem;
-            padding: 2px 0;
-            font-style: italic;
-        }
+    .features-premium li {
+        color: #d4af37;
+        font-size: 0.85rem;
+        padding: 2px 0;
+        font-style: italic;
+    }
 
-            .features-premium li::before {
-                content: "• ";
-                color: #ffd700;
-            }
+    .features-premium li::before {
+        content: "• ";
+        color: #ffd700;
+    }
 
     .features-standard {
         list-style: disc;
@@ -216,11 +216,11 @@
         margin: 0;
     }
 
-        .features-standard li {
-            color: #c0c0c0;
-            font-size: 0.85rem;
-            padding: 2px 0;
-        }
+    .features-standard li {
+        color: #c0c0c0;
+        font-size: 0.85rem;
+        padding: 2px 0;
+    }
 
     .divider {
         border: none;
@@ -240,14 +240,14 @@
         background: rgba(13, 5, 0, 0.5);
     }
 
-        .contact-note a {
-            color: #d4af37;
-            text-decoration: none;
-        }
+    .contact-note a {
+        color: #d4af37;
+        text-decoration: none;
+    }
 
-            .contact-note a:hover {
-                color: #ffd700;
-            }
+    .contact-note a:hover {
+        color: #ffd700;
+    }
 
     @@media (max-width: 1100px) {
         .cards-grid {
@@ -284,7 +284,9 @@
             <div class="card-body">
                 <h2 class="card-title">Raum's First Faction</h2>
                 <div class="card-price">3 € <span>/ one time (+ VAT)</span></div>
-                <button class="commission-btn" disabled>Coming Soon</button>
+                <button class="commission-btn" @onclick='() => BuyPlan("Raum First Faction", 300)'>
+                    Buy Now
+                </button>
                 <p class="support-text">Support the mod creator, site and my meltal stability</p>
             </div>
         </div>
@@ -293,12 +295,14 @@
         <div class="commission-card featured">
             <div class="featured-badge">⭐ Most Popular ⭐</div>
             <div class="card-image">
-                <img src="images/IconSilver.png" alt="Raum's First Faction" />
+                <img src="images/IconSilver.png" alt="Raum's Second Faction" />
             </div>
             <div class="card-body">
                 <h2 class="card-title">Raum's Second Faction</h2>
                 <div class="card-price">10 € <span>/ one time (+ VAT)</span></div>
-                <button class="commission-btn featured-btn" disabled>Coming Soon</button>
+                <button class="commission-btn featured-btn" @onclick='() => BuyPlan("Raum Second Faction", 300)'>
+                    Buy Now
+                </button>
                 <div class="slots-badge">⚠️ Limited (5 slots remaining)</div>
                 <p class="features-title">Custom mods for Monster Hunter Rise Sunbreak and Monster Hunter World Iceborne and i can:</p>
                 <ul class="features-premium">
@@ -314,12 +318,14 @@
         <!-- PIANO 3 -->
         <div class="commission-card">
             <div class="card-image">
-                <img src="images/IconGold.png" alt="Raum's First Faction" />
+                <img src="images/IconGold.png" alt="Raum's Thirty Faction" />
             </div>
             <div class="card-body">
                 <h2 class="card-title">Raum's Thirty Faction</h2>
                 <div class="card-price">15 € <span>/ one time (+ VAT)</span></div>
-                <button class="commission-btn" disabled>Coming Soon</button>
+                <button class="commission-btn" @onclick='() => BuyPlan("Raum Thirty Faction", 300)'>
+                    Buy Now
+                </button>
                 <div class="slots-badge">⚠️ Limited (3 slots remaining)</div>
                 <p class="features-title">Custom mods for Monster Hunter Rise Sunbreak and Monster Hunter World Iceborne and i can:</p>
                 <ul class="features-premium">
@@ -337,12 +343,14 @@
         <!-- PIANO 4 -->
         <div class="commission-card">
             <div class="card-image">
-                <img src="images/IconDiamond.png" alt="Raum's First Faction" />
+                <img src="images/IconDiamond.png" alt="Raum's Fourth Faction" />
             </div>
             <div class="card-body">
                 <h2 class="card-title">Raum's Fourth Faction</h2>
                 <div class="card-price">50 € <span>/ one time (+ VAT)</span></div>
-                <button class="commission-btn" disabled>Coming Soon</button>
+                <button class="commission-btn" @onclick='() => BuyPlan("Raum Fourth Faction", 300)'>
+                    Buy Now
+                </button>
                 <div class="slots-badge">⚠️ Limited (1 slot remaining)</div>
                 <p class="features-title">Custom mods for Monster Hunter Rise Sunbreak and Monster Hunter World Iceborne and i can:</p>
                 <ul class="features-premium">

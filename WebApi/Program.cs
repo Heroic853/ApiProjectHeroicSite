@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
-
+using Stripe;
 
 Console.WriteLine("Fatalis STARTING to fly...");
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine(" Build CREATED");
 
+StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY"); // stripe secret key from environment variable
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrEmpty(connectionString))
