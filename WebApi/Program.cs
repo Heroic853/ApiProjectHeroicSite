@@ -7,7 +7,6 @@ Console.WriteLine("Fatalis STARTING to fly...");
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine(" Build CREATED");
 
-StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY"); // stripe secret key from environment variable
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrEmpty(connectionString))
@@ -47,6 +46,7 @@ builder.Services.AddCors(options =>
 });
 
 Console.WriteLine("SERVICES CONFIGURED");
+StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY"); // stripe secret key from environment variable
 var app = builder.Build();
 Console.WriteLine("CASTLE BUILT");
 
