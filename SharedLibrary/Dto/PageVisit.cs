@@ -10,7 +10,7 @@ namespace SharedLibrary.Dto
     {
         public Guid Id { get; set; } 
         public DateTime VisitedAt { get; set; }
-        public string? PageName { get; set; }
+      //  public string? PageName { get; set; }
         public string? UserEmail { get; set; }
     }
 }
