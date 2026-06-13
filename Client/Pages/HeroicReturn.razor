@@ -1,0 +1,588 @@
+﻿@page "/newmods"
+@using static Client.Pages.HeroicReturn
+
+<style>
+    body {
+        background-image: url('images/NewMods.webp');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
+    }
+
+    .page-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 40px 0px 40px 0px;
+        overflow: visible;
+    }
+
+    /* ── HERO SECTION ── */
+    .hero-section {
+        display: grid;
+        grid-template-columns: 4.4fr 4fr; 
+        gap: 0px;
+        margin-bottom: 0px;
+        min-height: 80vh;
+        overflow: visible;
+    }
+
+    .hero-image-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        overflow: visible;
+        margin-left: -600px;
+    }
+
+    .hero-image-wrapper:hover {
+        box-shadow: 0 0 10px, orange, darkorange;
+    }
+
+    .hero-image-wrapper img {
+        width: 120%;
+        max-width: 120%;
+        height: auto;
+        object-fit: contain;
+        transform: translateX(-8%);
+        filter: drop-shadow(0 0 40px rgba(255, 140, 0, 0.2)) drop-shadow(0 0 80px rgba(255, 100, 0, 0.3));
+        transition: filter 0.3s;
+    }
+
+    .hero-image-wrapper::before,
+    .hero-image-wrapper::after {
+        display: none;
+    }
+
+    .hero-image-wrapper::before {
+        top: 10px;
+        left: 10px;
+        border-width: 3px 0 0 3px;
+        box-shadow: -4px -4px 12px, darkorange;
+    }
+
+    .hero-image-wrapper::after {
+        bottom: 10px;
+        right: 10px;
+        border-width: 0 3px 3px 0;
+        box-shadow: 4px 4px 12px, orange;
+    }
+
+    /* ── INFO PANEL ── */
+    .hero-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 40px 40px 40px 0;
+    }
+
+    .mod-badge {
+        display: inline-block;
+        background: orange;
+        border: 1px solid orange;
+        border-radius: 20px;
+        padding: 6px 16px;
+        color: yellow;
+        font-size: 0.75rem;
+        font-family: 'Cinzel', serif;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        width: fit-content;
+    }
+
+    .mod-title {
+        color: #e8f4ff;
+        font-family: 'Cinzel', serif;
+        font-size: 2.4rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        line-height: 1.2;
+        text-shadow: 0 0 30px, darkorange, rgba(0, 0, 0, 0.8);
+        margin: 0;
+    }
+
+    .mod-title span {
+        color: orange;
+        text-shadow: 0 0 20px,orange;
+    }
+
+    .mod-divider {
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(90deg, darkorange, orange, transparent);
+        border-radius: 2px;
+    }
+
+    .mod-description {
+        color: #b0d4f0;
+        font-size: 1rem;
+        line-height: 1.8;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .mod-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .mod-tag {
+        background: orangered;
+        border: 1px solid orange;
+        border-radius: 20px;
+        padding: 5px 14px;
+        color: black;
+        font-size: 0.8rem;
+        font-family: 'Cinzel', serif;
+        letter-spacing: 1px;
+        transition: background 0.2s, border-color 0.2s;
+    }
+
+    .mod-tag:hover {
+        background: orangered;
+        border-color: darkorange;
+        color: orange;
+    }
+
+    .mod-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    .stat-box {
+        background: orangered;
+        border: 1px solid orange;
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+    }
+
+    .stat-label {
+        color: #6699bb;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-top: 4px;
+    }
+
+    .download-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 32px;
+        background: linear-gradient(135deg, darkorange, orange);
+        border: 2px solid darkorange;
+        border-radius: 10px;
+        color: #e8f4ff;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-decoration: none;
+        transition: all 0.3s;
+        box-shadow: 0 0 20px orangered;
+        width: fit-content;
+    }
+
+    .download-btn:hover {
+        background: linear-gradient(135deg, darkorange, orange);
+        box-shadow: 0 0 40px orangered;
+        transform: translateY(-2px);
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    /* ── GALLERY SECTION ── */
+    .gallery-title {
+        color: yellow;
+        font-family: 'Cinzel', serif;
+        font-size: 1.2rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        text-align: center;
+        margin-bottom: 24px;
+        position: relative;
+    }
+
+    .gallery-title::before,
+    .gallery-title::after {
+        content: '⚡';
+        margin: 0 12px;
+        opacity: 0.6;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .gallery-item {
+        border: 2px solid orange;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s;
+        aspect-ratio: 16 / 9;
+        background: orangered;
+    }
+
+    .gallery-item:hover {
+        border-color: orange;
+        box-shadow: 0 0 25px orangered;
+        transform: translateY(-4px);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .gallery-item:hover img {
+        transform: scale(1.05);
+    }
+
+    .gallery-item .img-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: yellow;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        background: linear-gradient(135deg, darkorange, orange);
+    }
+
+    /* ── LIGHTBOX ── */
+    .lightbox-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        animation: fadeIn 0.2s ease;
+        padding: 20px;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .lightbox-img {
+        max-width: 90vw;
+        max-height: 85vh;
+        object-fit: contain;
+        border: 2px solid orange;
+        border-radius: 8px;
+        box-shadow: 0 0 60px, darkorange;
+    }
+
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: darkorange;
+        border: 2px solid orange;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: orange;
+        font-size: 18px;
+        transition: background 0.2s;
+    }
+
+    .lightbox-close:hover {
+        background: orange;
+        color: #fff;
+    }
+
+    /* ── MOBILE ── */
+    @@media (max-width: 768px) {
+        .hero-section {
+            position: relative;
+            display: grid;
+            grid-template-columns: 55% 45%;
+            gap: 0;
+            min-height: 90vh;
+            overflow: hidden;
+            margin-bottom: 60px;
+        }
+
+        .hero-image-wrapper img {
+            width: 180%;
+            max-width: 180%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            min-height: unset;
+            filter: drop-shadow(0 0 40px rgba(255, 140, 0, 0.8)) drop-shadow(0 0 80px rgba(255, 100, 0, 0.5));
+            transition: filter 0.3s;
+            transform: translateX(-10%) translateY(5%);
+        }
+
+        .mod-title {
+            font-size: 1.6rem;
+        }
+
+        .gallery-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .download-btn {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .page-container {
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .hero-section {
+            grid-template-columns: 1fr;
+            gap: 0;
+            min-height: auto;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .hero-image-wrapper {
+            margin-left: 0;
+            justify-content: center;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .hero-image-wrapper img {
+            width: 100%;
+            max-width: 100%;
+            transform: none;
+            filter: drop-shadow(0 0 30px rgba(255, 140, 0, 0.6)) drop-shadow(0 0 60px rgba(255, 100, 0, 0.3));
+        }
+
+        .hero-info {
+            padding: 20px;
+        }
+
+        .mod-title {
+            font-size: 1.6rem;
+        }
+
+        .gallery-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .download-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .roar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #1a0000, #3a0000);
+            border: 2px solid orange;
+            border-radius: 10px;
+            color: orange;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
+            width: fit-content;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .roar-btn:hover {
+            background: linear-gradient(135deg, #3a0000, #600000);
+            box-shadow: 0 0 35px rgba(255, 140, 0, 0.7);
+            transform: translateY(-2px);
+            color: yellow;
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(255, 140, 0, 0.6);
+            }
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .mod-title {
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .gallery-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .mod-stats {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+        }
+
+        .mod-tag {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+        }
+
+        .download-btn {
+            font-size: 0.85rem;
+            padding: 12px 20px;
+            letter-spacing: 1px;
+        }
+    }
+</style>
+
+@if (lightboxOpen)
+{
+    <div class="lightbox-overlay" @onclick="CloseLightbox">
+        <button class="lightbox-close" @onclick="CloseLightbox" @onclick:stopPropagation="true">✕</button>
+        <img class="lightbox-img" src="@lightboxSrc" alt="Screenshot" @onclick:stopPropagation="true" />
+    </div>
+}
+
+    <!-- Immagine sinistra -->
+<div class="page-container">
+
+    <!-- HERO -->
+    <div class="hero-section">
+
+        <div class="hero-image-wrapper">
+            <img src="images/Landconquest.webp" alt="Landconquest Lagiacrus" />
+            <div class="hero-image-overlay"></div>
+        </div>
+
+
+        <!-- Info destra -->
+        <div class="hero-info">
+            <h1 class="mod-title">
+                LandConquest<br />
+                <span>Lagiacrus</span>
+            </h1>
+
+            <div class="mod-divider"></div>
+
+            <p class="mod-description">
+                Long ago, there was a Lagiacrus that was considered part of an invasive species. 
+                It slaughtered every creature of the sea purely for the pleasure of killing, and 
+                for this reason it was feared even by the Wyverns of the sky.
+                One day, during a full moon, it emerged and saw a golden flash strike beside it was a 
+                message from the ancient God of the earth and thunder.
+                The god approached in the form of an electric spirit and granted it his divine power, believing 
+                that a creature like it could conquer the lands.
+                This power transformed the Lagiacrus: its skin turned brown and hardened like stone. 
+                More spikes grew along its back, its claws became red and elongated, sharpening like blades. 
+                Its tail partially turned gray and gleamed like a sword, with the tail to tear apart mountains.
+                Finally, it was given a gem imbued with the power of the Seven Winds, with the purpose of 
+                finding the place where all winds converge, in order to obtain its complete and ultimate power.
+                Now it has reached the Forbidden Lands, the final place where the winds meet, after conquering 
+                previous territories and destroying them with its earthquakes.
+                Now your objective is to defeat the Landconquest. Kill it, tear the Gem of the Seven Winds from 
+                its chest, and claim victory in the Supremacy Landconquest!
+            </p>
+
+            <div class="mod-tags">
+                <span class="mod-tag">4K Textures</span>
+                <span class="mod-tag">Custom EFX</span>
+                <span class="mod-tag">Custom Icon</span>
+                <span class="mod-tag">Custom Materials</span>
+                <span class="mod-tag">Custom Theme and Roars</span>
+            </div>
+
+            <div class="mod-stats">
+               
+            </div>
+
+            <a class="download-btn"
+               href="https://www.nexusmods.com/monsterhunterwilds/mods/4493"
+               target="_blank">
+                Download on Nexus Mods
+            </a>
+
+            <button class="roar-btn" @onclick="PlayRandomRoar">
+                🔊 Hear the Roar
+            </button>
+        </div>
+    </div>
+
+    <!-- GALLERY -->
+    <p class="gallery-title">Screenshots</p>
+
+    <div class="gallery-grid">
+        @foreach (var (src, i) in screenshots.Select((s, i) => (s, i)))
+        {
+            <div class="gallery-item" @onclick="() => OpenLightbox(src)">
+                @if (!string.IsNullOrEmpty(src))
+                {
+                    <img src="@src" alt="Screenshot @(i + 1)" loading="lazy" />
+                }
+                else
+                {
+                    <div class="img-placeholder">Screenshot @(i + 1)</div>
+                }
+            </div>
+        }
+    </div>
+
+</div>
+
+@code {
+    private bool lightboxOpen = false;
+    private string lightboxSrc = "";
+
+    private void OpenLightbox(string src)
+    {
+        if (!string.IsNullOrEmpty(src))
+        {
+            lightboxSrc = src;
+            lightboxOpen = true;
+        }
+    }
+
+    private void CloseLightbox() => lightboxOpen = false;
+    private List<string> screenshots = new()
+    {
+        "images/Land1.webp",
+        "images/Land2.webp",
+        "images/Land3.webp",
+    };
+}

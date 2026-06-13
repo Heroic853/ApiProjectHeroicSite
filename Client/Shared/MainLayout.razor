@@ -1,0 +1,527 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+
+<style>
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* ── Layout ── */
+    .layout-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .page-content {
+        flex: 1;
+        padding: 30px 20px;
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* navbar */
+    .topnav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: #0d0905;
+        border-bottom: 2px solid #8b0000;
+        box-shadow: 0 2px 20px rgba(139, 0, 0, 0.4);
+    }
+
+    .topnav-inner {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+        height: 56px;
+    }
+
+    /* ── Logo ── */
+    .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none !important;
+        flex-shrink: 0;
+    }
+
+    .nav-logo img {
+        border-radius: 6px;
+        border: 1px solid #8b0000;
+    }
+
+    .nav-logo-text {
+        font-family: 'Cinzel', serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #d4af37;
+        letter-spacing: 2px;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    }
+
+    .logo-accent {
+        color: #ff3333;
+    }
+
+    /* ── Nav links (desktop) ── */
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        flex: 1;
+    }
+
+    .nav-links li a,
+    .nav-links li .nav-link {
+        display: block;
+        padding: 6px 12px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #a0a0a0 !important;
+        text-decoration: none !important;
+        border-radius: 4px;
+        transition: color 0.2s, background 0.2s;
+        white-space: nowrap;
+    }
+
+    .nav-links li a:hover,
+    .nav-links li .nav-link:hover {
+        color: #d4af37 !important;
+        background: rgba(212, 175, 55, 0.08);
+    }
+
+    .nav-links li a.active,
+    .nav-links li .nav-link.active {
+        color: #d4af37 !important;
+        background: rgba(139, 0, 0, 0.4);
+        border-bottom: 2px solid #d4af37;
+    }
+
+    /* ── Auth zone ── */
+    .nav-auth {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    .nav-user-zone {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .nav-user-chip {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 5px 12px;
+        background: rgba(139, 0, 0, 0.3);
+        border: 1px solid #8b0000;
+        border-radius: 20px;
+        text-decoration: none !important;
+        transition: all 0.2s;
+    }
+
+    .nav-user-chip:hover {
+        background: rgba(139, 0, 0, 0.55);
+        border-color: #d4af37;
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    }
+
+    .user-icon {
+        font-size: 0.9rem;
+    }
+
+    .user-email {
+        font-family: 'Cinzel', serif;
+        font-size: 0.68rem;
+        color: #c0c0c0;
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .nav-signout-btn {
+        background: rgba(139, 0, 0, 0.4);
+        border: 1px solid #8b0000;
+        color: #ff6b6b;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-signout-btn:hover {
+        background: rgba(200, 0, 0, 0.6);
+        color: #fff;
+        border-color: #ff0000;
+    }
+
+    .nav-signin-btn {
+        padding: 7px 18px;
+        background: #8b0000;
+        border: 1px solid #d4af37;
+        border-radius: 5px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #d4af37 !important;
+        text-decoration: none !important;
+        transition: all 0.2s;
+    }
+
+    .nav-signin-btn:hover {
+        background: #a01010;
+        box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+        color: #ffd700 !important;
+    }
+
+    .hamburger {
+        display: none;
+        background: #8b0000;
+        border: 1px solid #d4af37;
+        border-radius: 6px;
+        color: #d4af37;
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        padding: 0;
+    }
+
+    .hamburger:hover {
+        background: #a01010;
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+
+    .ham-icon {
+        line-height: 1;
+    }
+
+    .mobile-drawer {
+        background: #0d0905;
+        border-top: 1px solid #8b0000;
+        padding: 16px 20px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .drawer-user {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: rgba(139, 0, 0, 0.3);
+        border: 1px solid #8b0000;
+        border-radius: 8px;
+    }
+
+    .drawer-user-icon {
+        font-size: 1.1rem;
+    }
+
+    .drawer-user-email {
+        font-family: 'Cinzel', serif;
+        font-size: 0.75rem;
+        color: #c0c0c0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .drawer-links {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .drawer-links li a,
+    .drawer-links li .nav-link {
+        display: block;
+        padding: 11px 16px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #a0a0a0 !important;
+        text-decoration: none !important;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        transition: all 0.2s;
+    }
+
+    .drawer-links li a:hover,
+    .drawer-links li .nav-link:hover,
+    .drawer-links li a.active,
+    .drawer-links li .nav-link.active {
+        color: #d4af37 !important;
+        background: rgba(139, 0, 0, 0.35);
+        border-color: #8b0000;
+    }
+
+    .drawer-signout {
+        margin-top: 4px;
+        padding: 11px;
+        background: rgba(139, 0, 0, 0.3);
+        border: 1px solid #8b0000;
+        border-radius: 5px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #ff6b6b;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+
+    .drawer-signout:hover {
+        background: rgba(200, 0, 0, 0.5);
+        border-color: #ff0000;
+        color: #fff;
+    }
+
+    .drawer-signin {
+        display: block;
+        padding: 12px;
+        background: #8b0000;
+        border: 1px solid #d4af37;
+        border-radius: 5px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #d4af37 !important;
+        text-decoration: none !important;
+        text-align: center;
+        transition: all 0.2s;
+    }
+
+    .drawer-signin:hover {
+        background: #a01010;
+        color: #ffd700 !important;
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+        text-align: center;
+        padding: 16px;
+        color: white;
+        font-family: 'Cinzel', serif;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        background: black;
+    }
+
+    @@media (max-width: 900px) {
+        .nav-links {
+            display: none;
+        }
+
+        .hamburger {
+            display: flex;
+        }
+
+        .nav-user-chip .user-email {
+            display: none;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .nav-logo-text {
+            display: none;
+        }
+
+        .nav-user-chip {
+            padding: 5px 8px;
+        }
+    }
+</style>
+<div class="layout-wrapper">
+    <nav class="topnav">
+        <div class="topnav-inner">
+
+            <!-- LEFT: Logo -->
+            <a href="" class="nav-logo">
+                <img src="images/Heroic853Icon.webp" width="38" height="38" alt="Heroic853" />
+                <span class="nav-logo-text">Nemesis Heroic</span>
+            </a>
+
+            <!-- CENTER: Nav links (desktop) -->
+            <AuthorizeView>
+                <Authorized>
+                    <ul class="nav-links" id="nav-links">
+                        <li><NavLink href="" Match="NavLinkMatch.All">Introduction</NavLink></li>
+                        <li><NavLink href="commissions">Commissions</NavLink></li>
+                       @*  <li><NavLink href="MessageOfGratitude">Mod History</NavLink></li> *@
+                        <li><NavLink href="newmods">Updates Mods</NavLink></li>
+                        <li><NavLink href="videopage">Videos</NavLink></li>
+                        <li><NavLink href="musicproj">Soundtrack</NavLink></li>
+                        <li><NavLink href="forbiddenMonsters">Forbidden Monsters</NavLink></li>
+                        <li><NavLink href="dragonList">Monster Choice</NavLink></li>
+                        @if (context.User.IsInRole("Admin"))
+                        {
+                            <li><NavLink href="aniversarytable">⚙ Admin</NavLink></li>
+                        }
+                    </ul>
+                </Authorized>
+                <NotAuthorized>
+                    <ul class="nav-links" id="nav-links">
+                        <li><NavLink href="" Match="NavLinkMatch.All">Introduction</NavLink></li>
+                        <li><NavLink href="commissions">Commissions</NavLink></li>
+                     @*    <li><NavLink href="MessageOfGratitude">Mod History</NavLink></li> *@
+                        <li><NavLink href="newmods">Updates Mods</NavLink></li>
+                        <li><NavLink href="videopage">Videos</NavLink></li>
+                        <li><NavLink href="musicproj">Soundtrack</NavLink></li>
+                        <li><NavLink href="forbiddenMonsters">Forbidden Monsters</NavLink></li>
+                    </ul>
+                </NotAuthorized>
+            </AuthorizeView>
+
+            <!-- Auth zone -->
+            <div class="nav-auth">
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="nav-user-zone">
+                            <NavLink href="UserProfile" class="nav-user-chip">
+                                <span class="user-icon">⚔️</span>
+                                <span class="user-email">@context.User.FindFirst("email")?.Value</span>
+                            </NavLink>
+                            <button class="nav-signout-btn" @onclick="SignOut" title="Sign Out">✕</button>
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink href="authentication/login" class="nav-signin-btn">Sign In</NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+                <button class="hamburger" @onclick="ToggleMenu" aria-label="Menu">
+                    @if (menuOpen)
+                    {
+                        <span class="ham-icon">✕</span>
+                    }
+                    else
+                    {
+                        <span class="ham-icon">☰</span>
+                    }
+                </button>
+            </div>
+        </div>
+
+        <!-- MOBILE DRAWER -->
+        @if (menuOpen)
+        {
+            <div class="mobile-drawer">
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="drawer-user">
+                            <span class="drawer-user-icon">⚔️</span>
+                            <span class="drawer-user-email">@context.User.FindFirst("email")?.Value</span>
+                        </div>
+                        <ul class="drawer-links">
+                            <li><NavLink href="" Match="NavLinkMatch.All" @onclick="CloseMenu">Introduction</NavLink></li>
+                            <li><NavLink href="commissions" @onclick="CloseMenu">Commissions</NavLink></li>
+                         @*    <li><NavLink href="MessageOfGratitude" @onclick="CloseMenu">Mod History</NavLink></li> *@
+                            <li><NavLink href="newmods" @onclick="CloseMenu">Updates Mods</NavLink></li>
+                            <li><NavLink href="videopage" @onclick="CloseMenu">Videos</NavLink></li>
+                            <li><NavLink href="musicproj" @onclick="CloseMenu">Soundtrack</NavLink></li>
+                            <li><NavLink href="forbiddenMonsters" @onclick="CloseMenu">Forbidden Monsters</NavLink></li>
+                            <li><NavLink href="dragonList" @onclick="CloseMenu">Monster Choice</NavLink></li>
+                            <li><NavLink href="UserProfile" @onclick="CloseMenu">User Settings</NavLink></li>
+                            @if (context.User.IsInRole("Admin"))
+                            {
+                                <li><NavLink href="aniversarytable" @onclick="CloseMenu">⚙ Admin</NavLink></li>
+                            }
+                        </ul>
+                        <button class="drawer-signout" @onclick="SignOut">Sign Out</button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <ul class="drawer-links">
+                            <li><NavLink href="" Match="NavLinkMatch.All" @onclick="CloseMenu">Introduction</NavLink></li>
+                            <li><NavLink href="commissions" @onclick="CloseMenu">Commissions</NavLink></li>
+                           @*  <li><NavLink href="MessageOfGratitude" @onclick="CloseMenu">Mod History</NavLink></li> *@
+                            <li><NavLink href="newmods" @onclick="CloseMenu">Updates Mods</NavLink></li>
+                            <li><NavLink href="videopage" @onclick="CloseMenu">Videos</NavLink></li>
+                            <li><NavLink href="musicproj" @onclick="CloseMenu">Soundtrack</NavLink></li>
+                            <li><NavLink href="forbiddenMonsters" @onclick="CloseMenu">Forbidden Monsters</NavLink></li>
+                        </ul>
+                      @*   <NavLink href="authentication/login" class="drawer-signin" @onclick="CloseMenu">Sign In</NavLink> *@
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        }
+    </nav>
+
+    <main class="page-content">
+        @Body
+    </main>
+
+    <footer class="site-footer">
+        <p>©Heroic853 2026</p>
+    </footer>
+</div>
+
+@code {
+    bool menuOpen = false;
+
+    void ToggleMenu() => menuOpen = !menuOpen;
+    void CloseMenu() => menuOpen = false;
+
+    async void SignOut()
+    {
+        menuOpen = false;
+        await JSRuntime.InvokeVoidAsync("forceLogout");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var anonClient = HttpClientFactory.CreateClient("Anonymous");
+            await Http.PostAsync("api/dragon/log-visit", null);
+        }
+        catch { }
+    }
+}

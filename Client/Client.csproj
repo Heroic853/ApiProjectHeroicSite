@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <!-- Abilita trimming -->
+        <PublishTrimmed>true</PublishTrimmed>
+
+        <!-- Abilita compression Brotli + Gzip -->
+        <BlazorWebAssemblyEnableCompression>true</BlazorWebAssemblyEnableCompression>
+
+        <!-- AOT off -->
+        <RunAOTCompilation>false</RunAOTCompilation>
+
+        <!-- Rimuovi ICU inutile -->
+        <InvariantGlobalization>true</InvariantGlobalization>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- TrimmerRootAssembly va QUI nell'ItemGroup! -->
+        <TrimmerRootAssembly Include="Client" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Blazor-ApexCharts" Version="6.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="8.0.8" />
+        <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.13" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.8" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="wwwroot/appsettings.json" CopyToOutputDirectory="Always" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj" />
+    </ItemGroup>
+</Project>

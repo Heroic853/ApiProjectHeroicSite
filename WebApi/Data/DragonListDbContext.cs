@@ -1,0 +1,34 @@
+﻿using Microsoft.EntityFrameworkCore;
+using SharedLibrary.Dto;
+
+namespace WebApi.Data
+{
+    public class DragonListDbContext : DbContext
+    {
+        public DbSet<Dragon> DragonSet { get; set; } // prima tabella
+        public DbSet<User> User { get; set; } // seconda tabella
+        public DbSet<Clasification> Clasification { get; set; }
+        public DbSet<PageVisit> PageVisits { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PageVisit>().ToTable("page_visits");
+            modelBuilder.Entity<PageVisit>().Property(p => p.VisitedAt).HasColumnName("visited_at");
+            modelBuilder.Entity<PageVisit>().Property(p => p.Id)
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+           // modelBuilder.Entity<PageVisit>().Property(p => p.PageName).HasColumnName("page_name");
+            modelBuilder.Entity<PageVisit>().Property(p => p.UserEmail).HasColumnName("user_email");
+        }
+
+        public DragonListDbContext(DbContextOptions options):base(options)
+        {
+        }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS01;Database=DragonList;Trusted_Connection=True;TrustServerCertificate=True;"); //Databese istanza che e DragonList LOCALHOST
+        //}
+    }
+}

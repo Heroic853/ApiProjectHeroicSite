@@ -1,0 +1,49 @@
+﻿@page "/loginHeroic"
+@using Microsoft.AspNetCore.Components.Authorization
+
+<style>
+    body {
+        background-image: url('images/img4.webp');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .login-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .loginTitle {
+        text-align: center;
+        color: gold;
+        font-family: 'Pirata One', serif;
+        font-weight: 700;
+        font-size: 3rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        margin: 2rem 0;
+    }
+</style>
+
+<p class="loginTitle">Login</p>
+<div class="login-container">
+    <AuthorizeView>
+        <Authorized>
+            <p style="color:lightgreen; font-size:1.2rem;">
+                ✅ Welcome, @context.User.Identity?.Name!
+            </p>
+            <NavLink href="" class="btn btn-primary">Go to Home</NavLink>
+            <a href="authentication/logout" class="btn btn-danger">Logout</a>
+        </Authorized>
+        <NotAuthorized>
+            <p style="color:white;">Login to access HeroicSite</p>
+            <a href="authentication/login" class="btn btn-success">Login / Register</a>
+            <NavLink href="" class="btn btn-secondary">Back to Home</NavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
