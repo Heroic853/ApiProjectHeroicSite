@@ -1,0 +1,540 @@
+﻿@page "/"
+@inject IJSRuntime JSRuntime
+
+<style>
+    body {
+        background-image: url('images/RedWallpaper.webp');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
+    }
+
+    .section-title {
+        text-align: center;
+        color: gold;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        font-size: 3rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        margin: 2rem 0;
+    }
+
+    .topClasifications {
+        box-shadow: 0 0 25px rgba(255, 215, 0, 1);
+        padding: 10px;
+        margin: 30px auto;
+        width: fit-content;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .topClasifications img {
+        display: block;
+        transition: transform 0.3s;
+    }
+
+    .topClasifications:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 40px rgba(255,0,0,0.8);
+    }
+
+    .topClasifications:hover img {
+        transform: scale(1.02);
+    }
+
+    /* ── GALLERY GRID ── */
+    .monster-gallery {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        padding: 1rem;
+        justify-items: center;
+    }
+
+    .monster-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 3px solid #8b0000;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0,0,0,0.5);
+        text-align: center;
+        padding: 8px;
+        background: rgba(20, 10, 5, 0.6);
+        color: white;
+        transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+        width: 100%;
+    }
+
+    .monster-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0 22px rgba(255, 215, 0, 0.5);
+        border-color: #d4af37;
+    }
+
+    .monster-card.selected {
+        border-color: #ffd700;
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        background: rgba(139, 0, 0, 0.3);
+    }
+
+    .monster-card img {
+        width: 100%;
+        height: auto;
+        border-radius: 6px;
+    }
+
+    .monster-card p {
+        font-family: 'Cinzel', serif;
+        color: #d4af37;
+        font-weight: bold;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 0.4rem;
+        text-align: center;
+    }
+
+    /* FULLSCREEN OVERLAY */
+    .monster-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.92);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 80px;
+        animation: overlayIn 0.3s ease;
+        overflow-y: auto;
+    }
+
+    @@keyframes overlayIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Close */
+    .overlay-close {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        background: rgba(139,0,0,0.85);
+        border: 2px solid #d4af37;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #d4af37;
+        font-size: 18px;
+        z-index: 2010;
+        transition: all 0.2s;
+    }
+
+    .overlay-close:hover {
+        background: #a01010;
+        color: #fff;
+        box-shadow: 0 0 15px rgba(255,215,0,0.4);
+    }
+
+    /* Arrows — fixed left/right, vertically centered */
+    .overlay-arrow {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(139,0,0,0.55);
+        border: 2px solid #8b0000;
+        border-radius: 50%;
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #d4af37;
+        font-size: 2rem;
+        z-index: 2010;
+        transition: all 0.2s;
+        line-height: 1;
+    }
+
+    .overlay-arrow:hover {
+        background: rgba(160,16,16,0.9);
+        border-color: #d4af37;
+        box-shadow: 0 0 15px rgba(255,215,0,0.4);
+    }
+
+    .overlay-arrow.left {
+        left: 12px;
+    }
+
+    .overlay-arrow.right {
+        right: 12px;
+    }
+
+    /* Content row: big free image + info text */
+    .overlay-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 56px;
+        width: 100%;
+        max-width: 1150px;
+        animation: contentIn 0.35s ease;
+    }
+
+    @@keyframes contentIn {
+        from {
+            opacity: 0;
+            transform: scale(0.96) translateY(16px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .overlay-free-image {
+        flex: 0 0 auto;
+        width: 500px;
+        max-width: 45vw;
+    }
+
+    .overlay-free-image img {
+        width: 240%;
+        height: auto;
+        display: block;
+        object-fit: contain;
+        transform: translateX(-50%);
+        filter: drop-shadow(0 0 50px rgba(139,0,0,0.65)) drop-shadow(0 16px 48px rgba(0,0,0,0.95));
+    }
+
+    /* Info: clean text, no box */
+    .overlay-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        max-width: 480px;
+    }
+
+    .overlay-rank {
+        font-family: 'Cinzel', serif;
+        font-size: 0.7rem;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        color: #8b0000;
+    }
+
+    .overlay-name {
+        font-family: 'Cinzel', serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #d4af37;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 0 0 30px rgba(212,175,55,0.35);
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    .overlay-divider {
+        width: 70px;
+        height: 3px;
+        background: linear-gradient(90deg, #8b0000, #d4af37, transparent);
+        border-radius: 2px;
+        border: none;
+        margin: 0;
+    }
+
+    .overlay-description {
+        font-family: 'Georgia', serif;
+        font-size: 0.93rem;
+        line-height: 1.8;
+        color: #c0b090;
+    }
+
+    .overlay-download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 32px;
+        background: linear-gradient(135deg, #8b0000, #5a0000);
+        border: 2px solid #d4af37;
+        border-radius: 10px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.88rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #ffd700;
+        text-decoration: none;
+        transition: background 0.25s, box-shadow 0.25s, transform 0.25s;
+        align-self: flex-start;
+        box-shadow: 0 0 20px rgba(139,0,0,0.5);
+        margin-top: 4px;
+    }
+
+    .overlay-download-btn:hover {
+        background: linear-gradient(135deg, #a01010, #700000);
+        box-shadow: 0 0 35px rgba(255,215,0,0.5);
+        transform: translateY(-2px);
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .overlay-download-btn svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+        flex-shrink: 0;
+    }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .reveal-delay-1 {
+        transition-delay: 0.1s;
+    }
+
+    .reveal-delay-2 {
+        transition-delay: 0.2s;
+    }
+
+    .reveal-delay-3 {
+        transition-delay: 0.3s;
+    }
+
+    .reveal-delay-4 {
+        transition-delay: 0.4s;
+    }
+
+    /* ══════════════════════════════════════
+           MOBILE
+        ══════════════════════════════════════ */
+    @@media (max-width: 768px) {
+        .monster-overlay {
+            padding: 70px 16px 100px;
+            align-items: flex-start;
+        }
+
+        .overlay-content {
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .overlay-free-image {
+            width: 78%;
+            max-width: 300px;
+        }
+
+        .overlay-info {
+            max-width: 100%;
+            align-items: center;
+            text-align: center;
+        }
+
+        .overlay-divider {
+            align-self: center;
+        }
+
+        .overlay-name {
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+
+        .overlay-download-btn {
+            align-self: center;
+            font-size: 0.8rem;
+            padding: 12px 22px;
+        }
+        /* arrows: bottom corners on mobile */
+        .overlay-arrow {
+            top: auto;
+            bottom: 20px;
+            transform: none;
+            width: 46px;
+            height: 46px;
+            font-size: 1.5rem;
+        }
+
+        .overlay-arrow.left {
+            left: 20px;
+        }
+
+        .overlay-arrow.right {
+            right: 20px;
+        }
+
+        .overlay-close {
+            top: 12px;
+            right: 12px;
+            width: 38px;
+            height: 38px;
+            font-size: 15px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .monster-gallery {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .monster-card {
+            padding: 5px;
+        }
+
+        .monster-card p {
+            font-size: 0.65rem;
+            margin-top: 0.25rem;
+        }
+
+        .topClasifications img {
+            width: 100%;
+            height: auto;
+        }
+
+        .overlay-free-image {
+            width: 88%;
+        }
+
+        .overlay-name {
+            font-size: 1.15rem;
+        }
+    }
+</style>
+
+@* ══ OVERLAY FULLSCREEN — position:fixed, non tocca la pagina ══ *@
+@if (showModal)
+{
+    <div class="monster-overlay" @onclick="CloseModal">
+
+        <button class="overlay-close" @onclick="CloseModal" @onclick:stopPropagation="true" title="Close">✕</button>
+
+        @* Freccia sinistra: solo se non siamo al primo *@
+        @if (currentIndex > 0)
+        {
+            <button class="overlay-arrow left" @onclick="PrevMonster" @onclick:stopPropagation="true">‹</button>
+        }
+
+        @* Freccia destra: solo se non siamo all'ultimo *@
+        @if (currentIndex < monsters.Count - 1)
+        {
+            <button class="overlay-arrow right" @onclick="NextMonster" @onclick:stopPropagation="true">›</button>
+        }
+
+        <div class="overlay-content" @onclick:stopPropagation="true">
+
+            <div class="overlay-free-image">
+                <img src="@currentMonster.LargeImagePath" alt="@currentMonster.Name" />
+            </div>
+
+            <div class="overlay-info">
+                <span class="overlay-rank">Rank #@(currentIndex + 4)</span>
+                <h2 class="overlay-name">@currentMonster.Name</h2>
+                <hr class="overlay-divider" />
+                <p class="overlay-description">@currentMonster.Description</p>
+
+                @if (!string.IsNullOrEmpty(currentMonster.NexusLink))
+                {
+                    <a class="overlay-download-btn" href="@currentMonster.NexusLink" target="_blank">
+                        Download on Nexus Mods
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<p class="section-title">Rank</p>
+
+<div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
+    <a href="videopage">
+        <img src="images/SpecialVideoTags.webp" width="400" height="100">
+    </a>
+    <a href="newmods">
+        <img src="images/NewModsTags.webp" width="400" height="100">
+    </a>
+</div>
+
+<p style="text-align: center; color: white;">
+    The votes are now in for the most popular moded monster of Monster Hunter!
+</p>
+
+<div class="topClasifications">
+    <a href="https://www.nexusmods.com/monsterhunterworld/mods/5721">
+        <img src="images/img1th.webp" width="800" height="500" fetchpriority="high">
+    </a>
+</div>
+
+<div class="topClasifications">
+    <a href="https://www.nexusmods.com/monsterhunterworld/mods/5565">
+        <img src="images/2th.webp" width="800" height="500">
+    </a>
+</div>
+
+<div class="topClasifications">
+    <a href="https://www.nexusmods.com/monsterhunterworld/mods/6285">
+        <img src="images/Img3th.webp" width="800" height="500">
+    </a>
+</div>
+
+<div class="monster-gallery">
+    @foreach (var (monster, index) in monsters.Select((m, i) => (m, i)))
+    {
+        var delay = (index % 4) + 1;
+        <div class="monster-card  reveal-delay-@delay (showModal && currentIndex == index ? "selected" : "")"
+             @onclick="() => OpenModal(index)">
+            <img src="@monster.ThumbnailPath" alt="@monster.Name" loading="lazy" />
+            <p>@monster.Name</p>
+        </div>
+    }
+</div>
+
+<script>
+    (function () {
+        function initReveal() {
+            var els = document.querySelectorAll('.reveal');
+            if (!els.length) { setTimeout(initReveal, 300); return; }
+            var obs = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('visible');
+                        obs.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            els.forEach(function (el) { obs.observe(el); });
+        }
+        setTimeout(initReveal, 500);
+    })();
+</script>

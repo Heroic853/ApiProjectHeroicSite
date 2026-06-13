@@ -1,0 +1,255 @@
+﻿@page "/forbiddenMonsters"
+
+<style>
+    body {
+        background-image: url('images/ForbiddenWallpaper.webp');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
+    }
+
+    .section-title {
+        text-align: center;
+        color: gold;
+        font-family: 'Creepster', serif;
+        font-weight: 700;
+        font-size: 3rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        margin: 2rem 0;
+    }
+
+    .forbidden-monster {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2.5rem;
+        padding: 1rem;
+        justify-items: center;
+    }
+
+    .monster-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 5px solid #8b0000;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        text-align: center;
+        padding: 10px;
+        background: rgba(26, 26, 26, 0.5);
+        color: white;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .monster-card img {
+        width: 250px;
+        height: auto;
+    }
+
+    .monster-card p {
+        font-family: 'Cinzel', serif;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 0.5rem;
+        text-align: center;
+    }
+
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .reveal-delay-1 {
+        transition-delay: 0.1s;
+    }
+
+    .reveal-delay-2 {
+        transition-delay: 0.2s;
+    }
+
+    .reveal-delay-3 {
+        transition-delay: 0.3s;
+    }
+
+    .reveal-delay-4 {
+        transition-delay: 0.4s;
+    }
+
+    /* Mobile */
+    @@media (max-width: 480px) {
+        body {
+            background-size: cover;
+        }
+
+        .forbidden-monster {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .monster-card {
+            padding: 5px;
+        }
+
+        .monster-card img {
+            width: 100%;
+            max-width: none;
+        }
+
+        .monster-card p {
+            font-size: 0.7rem;
+            margin-top: 0.25rem;
+        }
+    }
+</style>
+
+<p class="section-title">Forbidden Monsters</p>
+
+<p style="text-align: center; color: white;">
+    The Forbidden monsters that were never seen in the game!
+</p>
+
+<div class="forbidden-monster">
+
+    <div class="monster-card reveal reveal-delay-1">
+        <img src="images/Forb9.webp">
+            <p>
+                ???
+            </p>
+    </div>
+
+
+    <div class="monster-card reveal reveal-delay-2">
+        <img src="images/Forb12.webp">
+            <p>
+                Demon Flame Legiana
+            </p>
+    </div>
+
+    <div class="monster-card reveal reveal-delay-3">
+        <img src="images/Forb15.webp">
+            <p>
+                Thunderbubble Rey Dau
+            </p>
+    </div>
+
+    <div class="monster-card reveal reveal-delay-4">
+        <img src="images/Forb16.webp">
+            <p>
+                Expo 2025 Osaka Abomination Rathalos
+            </p>
+        </div>
+
+    <div class="monster-card reveal reveal-delay-1">
+            <img src="images/Forb18.webp">
+            <p>
+                Allfather Ibushy
+            </p>
+    </div>
+
+    <div class="monster-card reveal reveal-delay-2">
+        <img src="images/Forb19.webp">
+        <p>
+            Stygian Zinogre
+        </p>
+    </div>
+
+    <div class="monster-card reveal reveal-delay-3">
+            <img src="images/Forb20.webp">
+            <p>
+                Risen Devil King Raum
+            </p>
+    </div>
+
+    <div class="monster-card reveal reveal-delay-4">
+            <img src="images/Forb22.webp">
+            <p>
+                UNCKNOWN Phase 1
+            </p>
+    </div>
+
+    <div class="monster-card  reveal reveal-delay-1">
+            <img src="images/Forb23.webp">
+            <p>
+                UNCKNOWN Phase 2
+            </p>
+    </div>
+
+    <div class="monster-card  reveal reveal-delay-2">
+            <img src="images/Forb24.webp">
+            <p>
+                UNCKNOWN Phase 3
+            </p>
+    </div>
+
+    <div class="monster-card  reveal reveal-delay-3">
+            <img src="images/Forb25.webp">
+            <p>
+                Rukodiora
+            </p>
+    </div>
+
+    <div class="monster-card reveal reveal-delay-4">
+            <img src="images/Forb26.webp">
+            <p>
+                Rebidiora
+            </p>
+    </div>
+
+    <div class="monster-card reveal reveal-delay-1">
+            <img src="images/Forb28.webp">
+            <p>
+                Eruzerion Thunder & Nature
+            </p>
+    </div>
+
+    <div class="monster-card reveal reveal-delay-2">
+            <img src="images/Forb36.webp">
+            <p>
+                Destruction Rathalos
+            </p>
+    </div>
+
+    <div class="monster-card reveal reveal-delay-3">
+            <img src="images/Forb37.webp">
+            <p>
+                Ice Zinogre
+            </p>
+    </div>
+</div>
+
+<script>
+    (function() {
+        function initReveal() {
+            var els = document.querySelectorAll('.reveal');
+            if (!els.length) { setTimeout(initReveal, 300); return; }
+            var obs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('visible');
+                        obs.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            els.forEach(function(el) { obs.observe(el); });
+        }
+        setTimeout(initReveal, 500);
+    })();
+</script>
