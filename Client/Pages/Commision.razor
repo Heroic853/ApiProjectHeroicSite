@@ -231,26 +231,32 @@
         margin: 15px 0;
     }
 
-   /*  .contact-note {
-        text-align: center;
-        color: #888;
-        font-family: 'Cinzel', serif;
-        font-size: 0.85rem;
-        margin-top: 40px;
-        padding: 20px;
-        border: 1px solid rgba(139, 0, 0, 0.3);
-        border-radius: 10px;
-        background: rgba(13, 5, 0, 0.5);
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
     }
 
-    .contact-note a {
-        color: #d4af37;
-        text-decoration: none;
+    .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
     }
 
-    .contact-note a:hover {
-        color: #ffd700;
-    } */
+    .reveal-delay-1 {
+        transition-delay: 0.1s;
+    }
+
+    .reveal-delay-2 {
+        transition-delay: 0.2s;
+    }
+
+    .reveal-delay-3 {
+        transition-delay: 0.3s;
+    }
+
+    .reveal-delay-4 {
+        transition-delay: 0.4s;
+    }
 
     @@media (max-width: 1100px) {
         .cards-grid {
@@ -280,7 +286,7 @@
     <div class="cards-grid">
 
         <!-- PIANO 1 -->
-        <div class="commission-card">
+        <div class="commission-card reveal reveal-delay-1">
             <div class="card-image">
                 <img src="images/IconBronze.webp" alt="Raum's First Faction" />
             </div>
@@ -303,7 +309,7 @@
         </div>
 
         <!-- PIANO 2 - FEATURED -->
-        <div class="commission-card featured">
+        <div class="commission-card featured reveal reveal-delay-2">
             <div class="featured-badge">⭐ Most Popular ⭐</div>
             <div class="card-image">
                 <img src="images/IconSilver.webp" alt="Raum's Second Faction" />
@@ -328,7 +334,7 @@
         </div>
 
         <!-- PIANO 3 -->
-        <div class="commission-card">
+        <div class="commission-card reveal reveal-delay-3">
             <div class="card-image">
                 <img src="images/IconGold.webp" alt="Raum's Thirty Faction" />
             </div>
@@ -354,7 +360,7 @@
         </div>
 
         <!-- PIANO 4 -->
-        <div class="commission-card">
+        <div class="commission-card reveal reveal-delay-4">
             <div class="card-image">
                 <img src="images/IconDiamond.webp" alt="Raum's Fourth Faction" />
             </div>
@@ -390,3 +396,22 @@
         <a href="#">Discord</a> to arrange your commission!
     </div> *@
 </div>
+
+<script>
+    (function() {
+        function initReveal() {
+            var els = document.querySelectorAll('.reveal');
+            if (!els.length) { setTimeout(initReveal, 300); return; }
+            var obs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('visible');
+                        obs.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            els.forEach(function(el) { obs.observe(el); });
+        }
+        setTimeout(initReveal, 500);
+    })();
+</script>

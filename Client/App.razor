@@ -13,9 +13,95 @@
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
-            <PageTitle>Not found</PageTitle>
+            <PageTitle>Pagina non trovata</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
+                <style>
+                    body {
+                        background-image: url('images/NewMods.webp');
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        background-position: top center;
+                        background-attachment: fixed;
+                        background-color: black;
+                        min-height: 100vh;
+                    }
+
+                    .notfound-container {
+                        min-height: 80vh;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        text-align: center;
+                        gap: 24px;
+                        padding: 40px;
+                    }
+
+                    .notfound-dragon {
+                        width: 300px;
+                        max-width: 80vw;
+                        filter: drop-shadow(0 0 40px rgba(255, 140, 0, 0.5));
+                        animation: float 3s ease-in-out infinite;
+                    }
+
+                    .notfound-title {
+                        font-family: 'Cinzel', serif;
+                        font-size: 2rem;
+                        color: orange;
+                        text-transform: uppercase;
+                        letter-spacing: 3px;
+                        text-shadow: 0 0 30px orangered;
+                        margin: 0;
+                    }
+
+                    .notfound-sub {
+                        color: #b0d4f0;
+                        font-family: 'Segoe UI', sans-serif;
+                        font-size: 1rem;
+                        line-height: 1.7;
+                        max-width: 480px;
+                    }
+
+                    .notfound-btn {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 10px;
+                        padding: 14px 32px;
+                        background: linear-gradient(135deg, darkorange, orange);
+                        border: 2px solid darkorange;
+                        border-radius: 10px;
+                        color: #fff;
+                        font-family: 'Cinzel', serif;
+                        font-size: 1rem;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 2px;
+                        text-decoration: none;
+                        transition: all 0.3s;
+                        box-shadow: 0 0 20px orangered;
+                    }
+
+                    .notfound-btn:hover {
+                        box-shadow: 0 0 40px orangered;
+                        transform: translateY(-2px);
+                        color: #fff;
+                        text-decoration: none;
+                    }
+                </style>
+
+                <div class="notfound-container">
+                    <img class="notfound-dragon" src="images/RaumNotFound.webp" alt="Drago" />
+
+                    <h1 class="notfound-title">Hier is nothing for now...</h1>
+
+                    <p class="notfound-sub">
+                        This page is STUCK<br />
+                    </p>
+
+                    <a class="notfound-btn" href="/">
+                        Go back to Home
+                    </a>
+                </div>
             </LayoutView>
         </NotFound>
     </Router>

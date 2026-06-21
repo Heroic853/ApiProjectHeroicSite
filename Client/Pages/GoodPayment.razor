@@ -1,0 +1,385 @@
+﻿@page "/payment-success"
+@inject NavigationManager Nav
+@inject IHttpClientFactory HttpClientFactory
+
+<style>
+    body {
+        background-image: url('images/GoldWallpaper.webp');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
+    }
+
+    .success-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+
+    .success-card {
+        background: rgba(10, 8, 4, 0.92);
+        border: 1px solid rgba(255, 180, 0, 0.3);
+        border-radius: 16px;
+        padding: 48px 40px;
+        max-width: 520px;
+        width: 100%;
+        box-shadow: 0 0 60px rgba(255, 140, 0, 0.08), 0 20px 60px rgba(0,0,0,0.6);
+    }
+
+    .success-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 36px;
+        text-align: center;
+    }
+
+    .success-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: rgba(255, 165, 0, 0.1);
+        border: 2px solid orange;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @@keyframes popIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .success-title {
+        font-family: 'Cinzel', serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: orange;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    .success-subtitle {
+        color: #8a9bb0;
+        font-size: 0.85rem;
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(0, 180, 80, 0.1);
+        border: 1px solid rgba(0, 200, 80, 0.4);
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 0.75rem;
+        color: #40d080;
+        font-family: 'Segoe UI', sans-serif;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #40d080;
+        animation: blink 1.5s ease-in-out infinite;
+    }
+
+    @@keyframes blink {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.3;
+        }
+    }
+
+    .amount-block {
+        text-align: center;
+        padding: 24px 0;
+        border-top: 1px solid rgba(255, 165, 0, 0.15);
+        border-bottom: 1px solid rgba(255, 165, 0, 0.15);
+        margin-bottom: 28px;
+    }
+
+    .amount-label {
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 0.72rem;
+        color: #6699bb;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .amount-value {
+        font-family: 'Cinzel', serif;
+        font-size: 2.8rem;
+        font-weight: 700;
+        color: orange;
+        letter-spacing: 2px;
+        text-shadow: 0 0 20px rgba(255, 140, 0, 0.4);
+    }
+
+    .amount-currency {
+        font-size: 1.4rem;
+        color: #b08030;
+        vertical-align: super;
+        margin-right: 4px;
+    }
+
+    .detail-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 32px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        background: rgba(255, 140, 0, 0.04);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 165, 0, 0.1);
+    }
+
+    .detail-key {
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 0.78rem;
+        color: #6699bb;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .detail-val {
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 0.88rem;
+        color: #d4b060;
+        font-weight: 600;
+        text-align: right;
+        max-width: 60%;
+        word-break: break-all;
+    }
+
+        .detail-val.code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #a0c4e0;
+            letter-spacing: 1px;
+        }
+
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-secondary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 13px;
+        background: transparent;
+        border: 1px solid rgba(255, 165, 0, 0.3);
+        border-radius: 10px;
+        color: #b08030;
+        font-family: 'Cinzel', serif;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+        .btn-secondary:hover {
+            border-color: orange;
+            color: orange;
+            background: rgba(255, 140, 0, 0.05);
+            text-decoration: none;
+        }
+
+    .card-footer-note {
+        margin-top: 24px;
+        text-align: center;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 0.72rem;
+        color: #445566;
+        line-height: 1.6;
+    }
+
+    .loading-text {
+        text-align: center;
+        color: orange;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+        letter-spacing: 2px;
+        padding: 40px;
+    }
+
+    .error-text {
+        text-align: center;
+        color: #ff4444;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+        padding: 40px;
+        line-height: 1.8;
+    }
+
+    @@media (max-width: 480px) {
+        .success-card {
+            padding: 32px 20px;
+        }
+
+        .amount-value {
+            font-size: 2.2rem;
+        }
+
+        .success-title {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<div class="success-wrapper">
+    <div class="success-card">
+
+        @if (loading)
+        {
+            <div class="loading-text">⏳ Verifica transazione...</div>
+        }
+        else if (error)
+        {
+            <div class="error-text">
+                ❌ Transazione non valida.<br />
+                <a class="btn-secondary" style="margin-top:20px;display:inline-flex;" href="/">← Home</a>
+            </div>
+        }
+        else
+        {
+            <div class="success-header">
+                <div class="success-icon">✓</div>
+                <h1 class="success-title">Transaction Completed</h1>
+                <p class="success-subtitle">Your payment has been processed successfully.</p>
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    CONFIRMED
+                </div>
+            </div>
+
+            <div class="amount-block">
+                <div class="amount-label">Total amount</div>
+                <div class="amount-value">
+                    <span class="amount-currency">€</span>@Amount.ToString("F2")
+                </div>
+            </div>
+
+            <div class="detail-list">
+                <div class="detail-row">
+                    <span class="detail-key">Product</span>
+                    <span class="detail-val">@ModName</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">Date & Time</span>
+                    <span class="detail-val">@TransactionDate.ToString("dd/MM/yyyy HH:mm:ss")</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">Transaction ID</span>
+                    <span class="detail-val code">@TransactionId</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-key">Payment Method</span>
+                    <span class="detail-val">@PaymentMethod</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <a class="btn-secondary" href="/">← Go Back to Home</a>
+            </div>
+
+            <p class="card-footer-note">
+                You will receive a confirmation email at the address linked to your account.<br />
+                For support, contact us with your Transaction ID.
+            </p>
+        }
+
+    </div>
+</div>
+
+@code {
+    [Parameter, SupplyParameterFromQuery] public string session_id { get; set; } = "";
+
+    private bool loading = true;
+    private bool error = false;
+    private decimal Amount = 0;
+    private string ModName = "";
+    private string TransactionId = "";
+    private string PaymentMethod = "";
+    private DateTime TransactionDate = DateTime.Now;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrEmpty(session_id))
+        {
+            error = true;
+            loading = false;
+            return;
+        }
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient("Anonymous");
+            var result = await client.GetFromJsonAsync<SessionResult>(
+                $"api/dragon/get-session?sessionId={session_id}");
+
+            if (result == null) { error = true; loading = false; return; }
+
+            Amount = result.Amount;
+            ModName = result.ModName;
+            TransactionId = result.TransactionId;
+            PaymentMethod = result.PaymentMethod;
+            TransactionDate = result.Date;
+        }
+        catch
+        {
+            error = true;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private class SessionResult
+    {
+        public decimal Amount { get; set; }
+        public string ModName { get; set; } = "";
+        public string TransactionId { get; set; } = "";
+        public string PaymentMethod { get; set; } = "";
+        public DateTime Date { get; set; }
+    }
+}

@@ -2,7 +2,7 @@
 
 <style>
     body {
-        background-image: url('images/SfondoClasifications.webp');
+        background-image: url('images/RedWallpaper.webp');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: top center;
@@ -34,30 +34,21 @@
         min-width: 0;
     }
 
-        .parchment::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: radial-gradient(ellipse at 0% 0%, rgba(80,40,0,0.4) 0%, transparent 30%), radial-gradient(ellipse at 100% 0%, rgba(80,40,0,0.4) 0%, transparent 30%), radial-gradient(ellipse at 0% 100%, rgba(80,40,0,0.4) 0%, transparent 30%), radial-gradient(ellipse at 100% 100%, rgba(80,40,0,0.4) 0%, transparent 30%);
-            pointer-events: none;
-            border-radius: 4px;
-            z-index: 1;
-        }
+    .parchment::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        background: radial-gradient(ellipse at 0% 0%, rgba(80,40,0,0.4) 0%, transparent 30%), radial-gradient(ellipse at 100% 0%, rgba(80,40,0,0.4) 0%, transparent 30%), radial-gradient(ellipse at 0% 100%, rgba(80,40,0,0.4) 0%, transparent 30%), radial-gradient(ellipse at 100% 100%, rgba(80,40,0,0.4) 0%, transparent 30%);
+        pointer-events: none;
+        border-radius: 4px;
+        z-index: 1;
+    }
 
     .parchment-header {
         text-align: center;
         padding: 50px 60px 30px;
         border-bottom: 2px solid rgba(80,40,10,0.3);
     }
-
-        .parchment-header::after {
-            content: 'â§';
-            display: block;
-            color: #6b4520;
-            font-size: 1.4rem;
-            margin-top: 10px;
-            opacity: 0.6;
-        }
 
     .parchment-title {
         font-family: 'Cinzel', serif;
@@ -88,14 +79,14 @@
         transition: opacity 0.8s ease, transform 0.8s ease;
     }
 
-        .year-section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .year-section.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
 
-        .year-section:last-child {
-            border-bottom: none;
-        }
+    .year-section:last-child {
+        border-bottom: none;
+    }
 
     .year-label {
         font-family: 'Cinzel', serif;
@@ -124,6 +115,7 @@
         margin-bottom: 24px;
     }
 
+    /* ── Featured image box (optional per year) ── */
     .img-box {
         width: 100%;
         height: 300px;
@@ -137,11 +129,11 @@
         overflow: hidden;
     }
 
-        .img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    .img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
     .img-box-placeholder {
         display: flex;
@@ -154,12 +146,7 @@
         letter-spacing: 2px;
     }
 
-        .img-box-placeholder::before {
-            content: 'IMAGE';
-            font-size: 1rem;
-            opacity: 0.3;
-        }
-
+    /* ── Mod list ── */
     .mod-list {
         display: flex;
         flex-direction: column;
@@ -169,69 +156,91 @@
     .mod-entry {
         display: flex;
         align-items: flex-start;
-        gap: 12px;
-        padding: 12px 0;
-        border-bottom: 1px solid rgba(80,40,10,0.1);
+        gap: 14px;
+        padding: 18px 0;
+        border-bottom: 1px solid rgba(80,40,10,0.12);
         opacity: 0;
         transform: translateX(-16px);
         transition: opacity 0.5s ease, transform 0.5s ease;
     }
 
-        .mod-entry.visible {
-            opacity: 1;
-            transform: translateX(0);
-        }
+    .mod-entry.visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
 
-        .mod-entry:last-child {
-            border-bottom: none;
-        }
-
-    .mod-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: #6b4520;
-        border: 1px solid #3b2008;
-        margin-top: 7px;
-        flex-shrink: 0;
+    .mod-entry:last-child {
+        border-bottom: none;
     }
 
     .mod-info {
         flex: 1;
     }
 
+    /* ── Mod image inside card ── */
+    .mod-img {
+        width: 100%;
+        max-height: 380px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 3px solid #6b4520;
+        outline: 1px solid #8b5e30;
+        margin-bottom: 14px;
+        display: block;
+        box-shadow: 0 0 0 6px rgba(80,40,10,0.12), 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    /* ── Mod name — big, red/orange ── */
     .mod-name {
         font-family: 'Cinzel', serif;
-        font-size: 0.95rem;
+        font-size: 1.15rem;
         font-weight: 700;
-        color: #2c1a08;
-        letter-spacing: 1px;
-        margin-bottom: 3px;
+        color: #a03000;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.25);
+        line-height: 1.3;
     }
 
     .mod-desc {
         font-family: 'Georgia', serif;
         font-size: 0.88rem;
         color: #5a3820;
-        line-height: 1.6;
+        line-height: 1.7;
         font-style: italic;
+        margin-bottom: 8px;
     }
 
     .mod-link {
-        display: inline-block;
-        margin-top: 4px;
+        display: inline-flex !important;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        padding: 8px 20px;
+        background: linear-gradient(135deg, #6b2000, #4a1500);
+        border: 2px solid #8b3000;
+        border-radius: 6px;
         font-family: 'Cinzel', serif;
-        font-size: 0.72rem;
-        color: #8b4513;
-        text-decoration: none;
-        letter-spacing: 1px;
-        border-bottom: 1px solid rgba(139,69,19,0.3);
-        transition: color 0.2s;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #d4a060 !important;
+        text-decoration: none !important;
+        transition: all 0.2s;
     }
 
-        .mod-link:hover {
-            color: #3b2008;
-        }
+    .mod-link::before {
+        content: '↗';
+    }
+
+    .mod-link:hover {
+        background: linear-gradient(135deg, #8b3000, #6b2000);
+        color: #f0c080 !important;
+        box-shadow: 0 0 14px rgba(139,48,0,0.5);
+        transform: translateY(-1px);
+    }
 
     .parchment-footer {
         text-align: center;
@@ -242,175 +251,36 @@
         font-style: italic;
     }
 
-    /* ── TIMELINE ── */
-    .timeline-rail {
-        width: 70px;
-        flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 50px 0;
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        overflow-y: auto;
-        overflow-x: hidden;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        background: rgba(0,0,0,0.8);
-        border-left: 1px solid rgba(212,175,55,0.15);
+    .mod-entry.special {
+        border: 2px solid #ffd700;
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        transform: scale(1.03);
     }
 
-        .timeline-rail::-webkit-scrollbar {
-            display: none;
-        }
-
-        .timeline-rail::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 3px;
-            background: linear-gradient(180deg, transparent 0%, #8b6914 4%, #ffd700 15%, #d4af37 50%, #ffd700 85%, #8b6914 96%, transparent 100%);
-            z-index: 0;
-        }
-
-        .timeline-rail::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: calc(50% + 7px);
-            width: 1px;
-            background: linear-gradient(180deg, transparent, rgba(212,175,55,0.25), transparent);
-            z-index: 0;
-        }
-
-    .t-connector {
-        width: 1px;
-        height: 28px;
-        z-index: 1;
-    }
-
-    .timeline-year-btn {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 5px;
-        text-decoration: none;
-        padding: 10px 0;
-        width: 100%;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .t-arrow-left {
+    .mod-entry.special::before {
+        content: '★ EXPANSION';
         position: absolute;
-        left: 4px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        border-top: 4px solid transparent;
-        border-bottom: 4px solid transparent;
-        border-right: 6px solid rgba(139,105,20,0.5);
-        transition: all 0.3s;
-    }
-
-    .t-arrow-right {
-        position: absolute;
-        right: 4px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        border-top: 4px solid transparent;
-        border-bottom: 4px solid transparent;
-        border-left: 6px solid rgba(139,105,20,0.5);
-        transition: all 0.3s;
-    }
-
-    .timeline-year-btn:hover .t-arrow-left {
-        border-right-color: #ffd700;
-    }
-
-    .timeline-year-btn:hover .t-arrow-right {
-        border-left-color: #ffd700;
-    }
-
-    .t-dot {
-        width: 11px;
-        height: 11px;
-        border-radius: 50%;
-        background: #2a1400;
-        border: 2px solid #8b6914;
-        z-index: 2;
-        transition: all 0.3s;
-    }
-
-    .timeline-year-btn:hover .t-dot,
-    .timeline-year-btn.active .t-dot {
-        background: #ffd700;
-        border-color: #ffd700;
-        box-shadow: 0 0 10px rgba(255,215,0,0.8);
-        transform: scale(1.3);
-    }
-
-    .t-label {
-        color: #907040;
+        top: -10px;
+        left: 16px;
+        background: linear-gradient(90deg, #8b3000, #a04000);
+        color: #f0c080;
         font-family: 'Cinzel', serif;
-        font-size: 0.58rem;
-        letter-spacing: 1px;
-        text-align: center;
-        transition: color 0.3s;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 3px;
+        padding: 3px 12px;
+        border-radius: 3px;
+        border: 1px solid #c06020;
     }
 
-    .timeline-year-btn:hover .t-label,
-    .timeline-year-btn.active .t-label {
-        color: #ffd700;
+    .mod-entry.special .mod-name {
+        color: yellow;
+        font-size: 1.50rem;
     }
 
     @@media (max-width: 768px) {
         .archive-wrapper {
-            flex-direction: column;
             padding: 20px 12px 80px;
-        }
-
-        .timeline-rail {
-            width: 100%;
-            height: auto;
-            flex-direction: row;
-            position: sticky;
-            top: 0;
-            padding: 10px 20px;
-            overflow-x: auto;
-            overflow-y: hidden;
-            border-left: none;
-            border-bottom: 1px solid rgba(212,175,55,0.2);
-            z-index: 50;
-        }
-
-            .timeline-rail::before, .timeline-rail::after {
-                display: none;
-            }
-
-        .timeline-year-btn {
-            flex-direction: row;
-            gap: 6px;
-            padding: 6px 12px;
-            width: auto;
-        }
-
-        .t-arrow-left, .t-arrow-right {
-            display: none;
-        }
-
-        .t-label {
-            font-size: 0.65rem;
         }
 
         .parchment-title {
@@ -432,13 +302,16 @@
         .img-box {
             height: 180px;
         }
+
+        .mod-name {
+            font-size: 1rem;
+        }
     }
 </style>
 
 <div class="archive-wrapper">
-
-    <!-- PERGAMENA -->
     <div class="parchment">
+
         <div class="parchment-header">
             <h1 class="parchment-title">Message of Gratitude</h1>
             <p class="parchment-intro">
@@ -450,146 +323,717 @@
             </p>
         </div>
 
+        <!-- 2026 -->
         <div class="year-section" id="y2026">
             <div class="year-label">2026</div>
-            <div class="year-subtitle">The Journey Continues</div>
+            <div class="year-subtitle">The Special Return</div>
             <div class="year-divider"></div>
-            <div class="img-box"><div class="img-box-placeholder">2026</div></div>
             <div class="mod-list">
                 <div class="mod-entry">
-                    <div class="mod-dot"></div><div class="mod-info">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
                         <div class="mod-name">Heroic Site Launch</div>
-                        <div class="mod-desc">The official Heroic853 website goes live — a home for all mods, rankings and community.</div>
+                        <div class="mod-desc">The official Heroic853 website goes live, a home for all my mods, rankings and community.</div>
                     </div>
                 </div>
                 <div class="mod-entry">
-                    <div class="mod-dot"></div><div class="mod-info">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Landconquest.webp" alt="Landconquest" loading="lazy" />
                         <div class="mod-name">Land Conquest Lagiacrus</div>
-                        <div class="mod-desc">The Thunder Leviathan conquers the land. Custom textures 4K, EFX, theme and roars.</div>
-                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterwilds/mods/4493" target="_blank">Nexus Mods ↗</a>
+                        <div class="mod-desc">
+                            A Landconquest Lagiacrus with a mysterious power that can manipulate the power of 
+                            lightning and earth thanks to its Seven Winds gem that was given by its God
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterwilds/mods/4493" target="_blank">Nexus Mods</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="year-section" id="y2025">
-            <div class="year-label">2025</div>
-            <div class="year-subtitle">New Horizons</div>
-            <div class="year-divider"></div>
-            <div class="img-box"><div class="img-box-placeholder">2025</div></div>
-            <div class="mod-list">
-                <div class="mod-entry">
-                    <div class="mod-dot"></div><div class="mod-info">
-                        <div class="mod-name">Your Mod Name Here</div>
-                        <div class="mod-desc">Description of your 2025 mod — replace with your real content.</div>
-                    </div>
-                </div>
-                <div class="mod-entry">
-                    <div class="mod-dot"></div><div class="mod-info">
-                        <div class="mod-name">Your Mod Name Here</div>
-                        <div class="mod-desc">Another 2025 creation — add your real mods here.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <!-- 2024 -->
         <div class="year-section" id="y2024">
             <div class="year-label">2024</div>
-            <div class="year-subtitle">Growing Legacy</div>
+            <div class="year-subtitle">20th Birthday</div>
             <div class="year-divider"></div>
-            <div class="img-box"><div class="img-box-placeholder">2024</div></div>
             <div class="mod-list">
+               
                 <div class="mod-entry">
-                    <div class="mod-dot"></div><div class="mod-info">
-                        <div class="mod-name">Your Mod Name Here</div>
-                        <div class="mod-desc">Description of your 2024 mod — replace with real content.</div>
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/CrimsonDemon.webp" alt="CrimsonDemon Fatalis" loading="lazy" />
+                        <div class="mod-name">CrimsonDemon Fatalis the Dread</div>
+                        <div class="mod-desc">
+                            The new God who was summoned by a magician? How can this beast be so powerful?
+                            He is not from the same world... His power when he awakens will only bring chaos and ruin!!
+                            We should stop it as soon as possible!!
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/7627" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+               
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/SparklingRath.webp" alt="Sparkling Zerureusu" loading="lazy" />
+                        <div class="mod-name">Sparkling Zerureusu 20th Birthday</div>
+                        <div class="mod-desc">
+                            In a village once upon a time the white dragon Zerureusu dominated the skies
+                            but due to an unknown power he was corrupted and his good soul was taken away,
+                            bringing chaos and despair. Go find the culprit...
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/7210" target="_blank">Nexus Mods</a>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!--  2023 -->
         <div class="year-section" id="y2023">
             <div class="year-label">2023</div>
-            <div class="year-subtitle">Rising Power</div>
+            <div class="year-subtitle">New Stories</div>
             <div class="year-divider"></div>
-            <div class="img-box"><div class="img-box-placeholder">2023</div></div>
             <div class="mod-list">
+                
                 <div class="mod-entry">
-                    <div class="mod-dot"></div><div class="mod-info">
-                        <div class="mod-name">Your Mod Name Here</div>
-                        <div class="mod-desc">Description of your 2023 mod.</div>
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/RisenAlatreon.webp" alt="Risen Alatreon" loading="lazy" />
+                        <div class="mod-name">Primordial Risen Alatreon</div>
+                        <div class="mod-desc">
+                            The last warrior of Armagedon war of dragons is hier to destroy the world for 
+                            revange all. Now is risen and so destructive monster! Kill the beast! Kill the history 
+                            of the first albino Alatreon for save all
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/6981" target="_blank">Nexus Mods</a>
                     </div>
                 </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Armagedon.webp" alt="Armageddon Amatsu" loading="lazy" />
+                        <div class="mod-name">Armageddon Amatsu</div>
+                        <div class="mod-desc">
+                            In the densest darkness a storm can be seen arising. A storm created by himself a sinful 
+                            monster that was the cause of the apocalypse called Armageddon. It is seen in the storm 
+                            flying wreaking havoc and ready to destroy everything as it did as the previous city. 
+                            He and the so called… ARMAGEDDON AMATSU , THE RESURECTED APOCALYPSE
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterrise/mods/2601" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/GoreMagalaZenith.webp" alt="Zenith Gore Magala" loading="lazy" />
+                        <div class="mod-name">Zenith Gore Magala True frenzy</div>
+                        <div class="mod-desc">
+                            A new Zenith was descovered in the Sunrises and from darkness is hier! 
+                            Fight the new Zenith for descovery more about zeniths monsters or devils monster...
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterrise/mods/2410" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Dancan.webp" alt="Dancan the Werewolf" loading="lazy" />
+                        <div class="mod-name">Dancan The Werewolf</div>
+                        <div class="mod-desc">
+                            The werewolf of the dry crazy book that will kill everyone. 
+                            Help Prince and the others to reason or kill him...
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterrise/mods/2293" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Raum.webp" alt="Raum the Devil King" loading="lazy" />
+                        <div class="mod-name">Raum The Devil King</div>
+                        <div class="mod-desc">
+                            The devil king Raum resurge from the hell for devouring the world. 
+                            Wich the role and new surprise. Defeated you will have as a gift 
+                            his anti-demon demonic armor that can help you with the next monsters.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterrise/mods/2189" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/ZenithShagaru.webp" alt="Zenith Shagaru Magala" loading="lazy" />
+                        <div class="mod-name">Zenith Shagaru Magala True Frenzy</div>
+                        <div class="mod-desc">
+                            Is hier a Zenith and is hier for a anormaly thanks a monster called R.. 
+                            Who created great demonic magical power which released the supernatural forces. 
+                            Go to investigate and defeat this Zenith for the good of the world
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterrise/mods/2013" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
             </div>
         </div>
 
+        <!-- 2022 -->
         <div class="year-section" id="y2022">
             <div class="year-label">2022</div>
-            <div class="year-subtitle">Forging the Path</div>
+            <div class="year-subtitle">The Best Year</div>
             <div class="year-divider"></div>
-            <div class="img-box"><div class="img-box-placeholder">2022</div></div>
             <div class="mod-list">
+               
                 <div class="mod-entry">
-                    <div class="mod-dot"></div><div class="mod-info">
-                        <div class="mod-name">Your Mod Name Here</div>
-                        <div class="mod-desc">Description of your 2022 mod.</div>
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Maleficent.webp" alt="Maleficent Dragon" loading="lazy" />
+                        <div class="mod-name">Maleficent Dragon</div>
+                        <div class="mod-desc">
+                            The new Maleficent come in the new world for conquer all kingdoms and kill every hunter.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/6396" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+                
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Phantom.webp" alt="Phantom Hallowed Xenojiiva" loading="lazy" />
+                        <div class="mod-name">Phantom Hallowed Xenojiiva</div>
+                        <div class="mod-desc">
+                            After years of the xenojiiva's death, the place is abandoned and the monster's corpse is
+                            devoured by the other monsters, leaving only bones. One day in October 31st a demon 
+                            left his world and possessed this monster skeleton by putting together the pieces 
+                            of the bones. The wings appeared as spiritual energy and his soul glowed red. 
+                            His paws inste.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/6384" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Galaxy.webp" alt="A52-Galaxy Nergigante" loading="lazy" />
+                        <div class="mod-name">A52-Galaxy Nergigante new universe</div>
+                        <div class="mod-desc">
+                            The new Nergigante come in the new world for destroid the universe.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/6327" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Blinking.webp" alt="Blinking Nargacuga" loading="lazy" />
+                        <div class="mod-name">Blinking Nargacuga from MHFZ</div>
+                        <div class="mod-desc">
+                            A new monster come into the new world for destroid the world.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/6285" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Viking.webp" alt="Viking Kushala doara" loading="lazy" />
+                        <div class="mod-name">Viking Kushala Doara</div>
+                        <div class="mod-desc">
+                            A new lore of vikings for the Viking Pride Kushala Doara.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/6265" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/OldRath.webp" alt="Rathalos From Mh1 Commision" loading="lazy" />
+                        <div class="mod-name">Rathalos From Mh1 Commision</div>
+                        <div class="mod-desc">
+                            The old rathalos return from mh1.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/6257" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Valstrax.webp" alt="Normal Valstrax" loading="lazy" />
+                        <div class="mod-name">Normal Valstrax</div>
+                        <div class="mod-desc">
+                            This mod replace Crimson Glow Valstrax wich a normal Valstrax removing 
+                            red lithings and hard lithings of dragon.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterrise/mods/753" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/DragonSlayer.webp" alt="Dragon Slayer" loading="lazy" />
+                        <div class="mod-name">Berserker Long sword The Dragon Slayer</div>
+                        <div class="mod-desc">
+                            The Dragon slayer come in mhr for kill demons and monsters!
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterrise/mods/742" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Immortal.webp" alt="IMMORTAL ZINOGRE" loading="lazy" />
+                        <div class="mod-name">IMMORTAL ZINOGRE</div>
+                        <div class="mod-desc">
+                            A monster that is illuminated by the moonlight and around him has immortal spirits that 
+                            feed on his electrified organism. The so called the immortal Zinogre the wolf howling at the moon. 
+                            When the Explore Islands were flooded with water this monster was saved by becoming a spirit and 
+                            flying across the sky like a comet and descendi.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/6106" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry special">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/LuciferWar.webp" alt="Lucifer War" loading="lazy" />
+                        <div class="mod-name">MONSTER HUNTER LUCIFER WAR</div>
+                        <div class="mod-desc">
+                            After Lucifer takes for the fury that his hell was no longer there and the 
+                            hunters died each time giving in in the battles, Lucifer decided to unleash 
+                            the fury by coming out of the huge Rift in the sky and completely destroy the New World.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/6004" target="_blank">Nexus Mods</a>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!--2021 -->
         <div class="year-section" id="y2021">
             <div class="year-label">2021</div>
             <div class="year-subtitle">The Beginning</div>
             <div class="year-divider"></div>
-            <div class="img-box"><div class="img-box-placeholder">2021</div></div>
             <div class="mod-list">
                 <div class="mod-entry">
-                    <div class="mod-dot"></div><div class="mod-info">
-                        <div class="mod-name">The First Mod</div>
-                        <div class="mod-desc">Where it all began — the first creation that started the Heroic853 modding journey.</div>
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Tigrexx.webp" alt="Destroid Tigrex" loading="lazy" />
+                        <div class="mod-name">DESTROID TIGREX XENO</div>
+                        <div class="mod-desc">
+                            Destroier tigrex was ifluenced by rathalos Destructor wivern to kill and eat all
+                            monster wich unknown powers. Now this tigrex have explosion roars of Xeno and can
+                            invade all maps wich Xeno stones wuch mental phihic magic.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5827" target="_blank">Nexus Mods</a>
                     </div>
                 </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/Rathdest.webp" alt="Disctruction Rathalos" loading="lazy" />
+                        <div class="mod-name">DESTRUCTION WYVERN RATHALOS FROM MHXR</div>
+                        <div class="mod-desc">
+                            The distruction of wiverns come to kill all wyvers wich blue flame and mental control of earth.
+                            The hunter now need to kill the DESTROIER WYVER RATHALOS EXTREME!! Wo get alive?
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5819" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+
+                <div class="mod-entry">
+                    <div class="mod-dot"></div>
+                    <div class="mod-info">
+                        <img class="mod-img" src="images/allmods/unknown.webp" alt="U N K N O W N" loading="lazy" />
+                        <div class="mod-name">TRUE UNKNOWN SOLTRICE WAR THE DEMON</div>
+                        <div class="mod-desc">
+                            True Unknown come in this world to destroid the world wich him soltrice wars of furies.
+                            He now have attack of hell and super rage and scared attacks. Fire hell attack and
+                            changesof sky wich fire.
+                        </div>
+                        <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5817" target="_blank">Nexus Mods</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Sturdy.webp" alt="Sturdy Kusha Doara" loading="lazy" />
+                <div class="mod-name">Sturdy Kusha Doara</div>
+                <div class="mod-desc">
+                    Rusted Kusha Doara come in new world to devour the world wich tornados.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5784" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Smelty.webp" alt="Smelly Alatreon" loading="lazy" />
+                <div class="mod-name">Smelly STINKYN Alatreon</div>
+                <div class="mod-desc">
+                    New Alatreon wich pover of Vaal Hazack the Stinkin monster power.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5780" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Slime.webp" alt="Slime Nami" loading="lazy" />
+                <div class="mod-name">Slime Stiky namielle</div>
+                <div class="mod-desc">
+                    A Namielle wich power wich slime and explosion meting the raging brachidios and eat 
+                    the immortal reactor and he become stronger and scared. new the hunters need to hunt this 
+                    beast to defeat the invasion of slime.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5754" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Waternarga.webp" alt="Water Narga" loading="lazy" />
+                <div class="mod-name">FIERCE WATER NARGACUGA</div>
+                <div class="mod-desc">
+                    They have primarily deep blue fur with a small gray tuft on their backs with orange 
+                    underbellies and mostly dark gray limbs, they also have white tipped ears and dark grey beaks.
+                    Their arms have a few sandy beige spikes on them and their wing blades are larger and segmented 
+                    into sharp vent like structures with sandy beige spikes.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5746" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Atlantis.webp" alt="Atlantis Fatalis" loading="lazy" />
+                <div class="mod-name">ATLANTIS FATALIS WATER ELEMENT</div>
+                <div class="mod-desc">
+                    The Fatalis after death falls into the void of the ruins of the castle. The general was happy 
+                    for the death of the Fatalis and so they began to have a party to celebrate the death of the Fatalis.
+                    After 500 years the castle has been abandoned for many years due to the presence of a Fatalis. 
+                    The Fatalis who had been amazoned and resurrected.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5729" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Colosal.webp" alt="AOT Devil" loading="lazy" />
+                <div class="mod-name">Aberrant deviljho Giant Colosal from AOT</div>
+                <div class="mod-desc">
+                    Aberrant Deviljho are special individuals of Deviljho with the appearance that are inspired 
+                    by the Colossus Titan. Unlike their relatives, Aberrant Deviljho has no thick hide covering 
+                    their entire bodies but only their flesh. Like the Colossus Titan, Aberrant Deviljo.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5721" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Celtus.webp" alt="Super Velk" loading="lazy" />
+                <div class="mod-name">Velkana -0 Celtus Power From Neptun Ice</div>
+                <div class="mod-desc">
+                    The Velkana come at alatreon stage for destroid all and eat ice. A Velkana wich difference 
+                    change of body for the ecosistem.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5717" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Flame.webp" alt="Scorch Flame Rath" loading="lazy" />
+                <img class="mod-img" src="images/allmods/Scorch.webp" alt="Scorch Flame Rath" loading="lazy" />
+                <div class="mod-name">Scorching heat Rathian and Flame Rathalos From MHXR</div>
+                <div class="mod-desc">
+                    Scorching heat rathiand and Flame rathalos come at new world for destroid the world 
+                    from her flame and rages.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5691" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/QuestsChalenge.webp" alt="Chaleng Quest" loading="lazy" />
+                <div class="mod-name">5 EXTREME Monsters Chaleng Crown Icerbone</div>
+                <div class="mod-desc">
+                    Over 10 quest wich 5 monster extreme arci tempered. 1 giant 4 little and 
+                    give you more materials and golden crowns.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5679" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/GoldKirin.webp" alt="Emperor Kirin" loading="lazy" />
+                <div class="mod-name">Thunder Emperor Kirin</div>
+                <div class="mod-desc">
+                    Its body structure and overall look is similar to the one of a normal Kirin. Thunder Lord Kirin 
+                    is bigger than its counterpart. Its body is colored with gradients of gold, its horn has a copper/red 
+                    color and its mane has a pale grey and yellow gradient. Its surrounding aura is also golden.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5656" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/shara.webp" alt="Shara Demon" loading="lazy" />
+                <div class="mod-name">Shara Demon Ice Revive</div>
+                <div class="mod-desc">
+                    The new monster shara died and this soul come in hell and become a demon from Dante demon.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5635" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/redwolf.webp" alt="Shity" loading="lazy" />
+                <div class="mod-name">Redwolf</div>
+                <div class="mod-desc">
+                    The redwolf stigian the powerfull black wolf and devil forces come in the new world 
+                    for destroid wich devil force.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5623" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Thunderlord.webp" alt="Thund Zin" loading="lazy" />
+                <div class="mod-name">Thunderlord Zinogre</div>
+                <div class="mod-desc">
+                    A new Thunderlord come in this world for devoured wich thunder of God.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5622" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/GoldNerg.webp" alt="Nergigante ice fire" loading="lazy" />
+                <div class="mod-name">Golden King Nergigante Fire X Ice</div>
+                <div class="mod-desc">
+                    A nergigante meet a kulve taroth and get fight wich her and nergigante before 
+                    the batle eat gold of kulve taroth and become  golden wich the new attacks.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5621" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/UraganViol.webp" alt="Rocky Uragan" loading="lazy" />
+                <div class="mod-name">Rocky Uragaan Ice from MHXR EXPLORE NEW DEVARIANT</div>
+                <div class="mod-desc">
+                    This uragan come from the last world of monster hunter explore and come in this new world for destroid worlds. 
+                    This uragaan use ice element and fot defeat you need the fire element 
+                    for defeat this beast of ices!
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5577" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/safi.webp" alt="Demon safi" loading="lazy" />
+                <div class="mod-name">Demon ice and fire Safi jiiva SUPREME FURRY</div>
+                <div class="mod-desc">
+                    A new monste, Safi become a demon thank super bioenergi and eat elder dragons. debofe this, 
+                    this safi become more powerful and become hostile and use ice and fire elements.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5565" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Madquest.webp" alt="Quests X" loading="lazy" />
+                <div class="mod-name">Extreme Quests</div>
+                <div class="mod-desc">
+                    EXTREME quest over 10 quest.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5552" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Hammer.webp" alt="Red Hammer" loading="lazy" />
+                <div class="mod-name">Demon dragon hammer</div>
+                <div class="mod-desc">
+                    Demon dragon hammer retexture and 3d modeling replace the hamer of silver rathalos.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5542" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/FatalisVelk.webp" alt="Fatalis Velk" loading="lazy" />
+                <div class="mod-name">True Simbol of fatalis Velkana</div>
+                <div class="mod-desc">
+                    The true simbol of Fatalis is a Velkana corupted from Nemesis Heroic the first Fatalis. 
+                    Now Velkana launch fire and explosion and for beat you need to complete the quest 
+                    of 2 Velkana of fire.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5525" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Zood.webp" alt="Zood" loading="lazy" />
+                <div class="mod-name">Zood imortal Berserk</div>
+                <div class="mod-desc">
+                    Zood immortal come at monster hunter replaced which the Behemoth.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5510" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Kulv.webp" alt="Kulve Demon" loading="lazy" />
+                <div class="mod-name">Kulve Demon</div>
+                <div class="mod-desc">
+                    Kulve taroth demon the bsidian form fro wich 6 eyes.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5467" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/God.webp" alt="God Alt" loading="lazy" />
+                <div class="mod-name">God Alatreon</div>
+                <div class="mod-desc">
+                    The God Alatreon is hier wich golden scale and terief eyes.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5436" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/BeastBerserk.webp" alt="Beast Berserk" loading="lazy" />
+                <div class="mod-name">Beast of darkness Berserk</div>
+                <div class="mod-desc">
+                    Beast of Darknes of Berserk come in new world replaced by aphotom, ebony odogoron and shamons for ride it.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5411" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/ZinoAlatr.webp" alt="Shyty" loading="lazy" />
+                <div class="mod-name">Zinogre Cremisi</div>
+                <div class="mod-desc">
+                    A new zinogre cdompared wich Alatreon forces in the new world.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5409" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/MizuApex.webp" alt="Mizu Apex" loading="lazy" />
+                <div class="mod-name">Apex Mizutzune</div>
+                <div class="mod-desc">
+                    Apex mizutsune of Monster hunter Rise.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5324" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Varu.webp" alt="Varusaburosu" loading="lazy" />
+                <div class="mod-name">Varusaburosu</div>
+                <div class="mod-desc">
+                    Varusaburosu: the monster that returns to the new world but little changed.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5302" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/Ebony.webp" alt="Ebony" loading="lazy" />
+                <div class="mod-name">Ebony Kushala Doara</div>
+                <div class="mod-desc">
+                    A kushala doara that feeds on ebony crystals and its metal turns black. By eating this kind of crystal 
+                    his body is filled with longer and stronger crystals that the purple sharpness causes to bounce 
+                    off his body. The variant of the monster existing only hardened arch in the mission 
+                    found at the ancient forest.
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5295" target="_blank">Nexus Mods</a>
+            </div>
+        </div>
+
+        <div class="mod-entry">
+            <div class="mod-dot"></div>
+            <div class="mod-info">
+                <img class="mod-img" src="images/allmods/ConfigHell.webp" alt="Configuration Hellblade" loading="lazy" />
+                <div class="mod-name">Configuration Hellblade Glavenus</div>
+                <div class="mod-desc">
+                    New monster caled Configuration Hellblade Glavenus, a monster come from hell wich fury 
+                    and rage replace the normal glavenus,
+                </div>
+                <a class="mod-link" href="https://www.nexusmods.com/monsterhunterworld/mods/5202" target="_blank">Nexus Mods</a>
             </div>
         </div>
 
         <div class="parchment-footer">❧ Heroic853 — Modding Archive ❧</div>
     </div>
-
-    <!-- TIMELINE A DESTRA -->
-    <nav class="timeline-rail" id="timelineRail">
-        <div class="t-connector"></div>
-        <a class="timeline-year-btn" href="#y2026">
-            <div class="t-arrow-left"></div><div class="t-dot"></div>
-            <span class="t-label">2026</span><div class="t-arrow-right"></div>
-        </a>
-        <div class="t-connector"></div>
-        <a class="timeline-year-btn" href="#y2025">
-            <div class="t-arrow-left"></div><div class="t-dot"></div>
-            <span class="t-label">2025</span><div class="t-arrow-right"></div>
-        </a>
-        <div class="t-connector"></div>
-        <a class="timeline-year-btn" href="#y2024">
-            <div class="t-arrow-left"></div><div class="t-dot"></div>
-            <span class="t-label">2024</span><div class="t-arrow-right"></div>
-        </a>
-        <div class="t-connector"></div>
-        <a class="timeline-year-btn" href="#y2023">
-            <div class="t-arrow-left"></div><div class="t-dot"></div>
-            <span class="t-label">2023</span><div class="t-arrow-right"></div>
-        </a>
-        <div class="t-connector"></div>
-        <a class="timeline-year-btn" href="#y2022">
-            <div class="t-arrow-left"></div><div class="t-dot"></div>
-            <span class="t-label">2022</span><div class="t-arrow-right"></div>
-        </a>
-        <div class="t-connector"></div>
-        <a class="timeline-year-btn" href="#y2021">
-            <div class="t-arrow-left"></div><div class="t-dot"></div>
-            <span class="t-label">2021</span><div class="t-arrow-right"></div>
-        </a>
-        <div class="t-connector"></div>
-    </nav>
 </div>
 
 <script>
@@ -597,7 +1041,6 @@
         function init() {
             var sections = document.querySelectorAll('.year-section');
             var modEntries = document.querySelectorAll('.mod-entry');
-            var btns = document.querySelectorAll('.timeline-year-btn');
             if (!sections.length) { setTimeout(init, 400); return; }
 
             var secObs = new IntersectionObserver(function (es) {
@@ -617,17 +1060,6 @@
                 });
             }, { threshold: 0.1 });
             modEntries.forEach(function (el) { entObs.observe(el); });
-
-            var actObs = new IntersectionObserver(function (es) {
-                es.forEach(function (e) {
-                    if (e.isIntersecting) {
-                        btns.forEach(function (b) { b.classList.remove('active'); });
-                        var m = document.querySelector('.timeline-year-btn[href="#' + e.target.id + '"]');
-                        if (m) m.classList.add('active');
-                    }
-                });
-            }, { threshold: 0.3 });
-            sections.forEach(function (s) { actObs.observe(s); });
         }
         setTimeout(init, 500);
     })();
