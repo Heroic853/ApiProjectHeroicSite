@@ -3,7 +3,7 @@
 
 <style>
     body {
-        background-image: url('images/RedWallpaper.webp');
+        background-image: url('images/GoldWallpaper.webp');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: top center;
@@ -331,9 +331,7 @@
         transition-delay: 0.4s;
     }
 
-    /* ══════════════════════════════════════
-           MOBILE
-        ══════════════════════════════════════ */
+    /*  MOBILE */
     @@media (max-width: 768px) {
         .monster-overlay {
             padding: 70px 16px 100px;
@@ -433,7 +431,7 @@
     }
 </style>
 
-@* ══ OVERLAY FULLSCREEN — position:fixed, non tocca la pagina ══ *@
+@* OVERLAY FULLSCREEN — position:fixed, non tocca la pagina *@
 @if (showModal)
 {
     <div class="monster-overlay" @onclick="CloseModal">
@@ -512,7 +510,7 @@
     @foreach (var (monster, index) in monsters.Select((m, i) => (m, i)))
     {
         var delay = (index % 4) + 1;
-        <div class="monster-card  reveal-delay-@delay (showModal && currentIndex == index ? "selected" : "")"
+        <div class="monster-card reveal-delay-@delay (showModal && currentIndex == index ? "selected" : "")"
              @onclick="() => OpenModal(index)">
             <img src="@monster.ThumbnailPath" alt="@monster.Name" loading="lazy" />
             <p>@monster.Name</p>
