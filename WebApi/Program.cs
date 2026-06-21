@@ -45,12 +45,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddScoped<EmailService>();
-
 Console.WriteLine("SERVICES CONFIGURED");
-StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY"); // stripe secret key from environment variable
 var app = builder.Build();
 Console.WriteLine("CASTLE BUILT");
+StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY"); // stripe secret key from environment variable
 
 try
 {
