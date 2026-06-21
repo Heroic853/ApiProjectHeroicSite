@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Dto;
-using Stripe;
 using Stripe.Checkout;
 using System.Security.Claims;
 using System.Text.Json;
@@ -14,7 +13,7 @@ namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/dragon")]
-   // [Authorize]
+    // [Authorize]
 
     public class DragonController : ControllerBase
     {
@@ -22,11 +21,10 @@ namespace WebApi.Controllers
         private readonly DragonListDbContext _dragonListDbContext;
         private readonly ILogger<DragonController> _logger;
 
-        public DragonController(ILogger<DragonController> logger, DragonListDbContext dragonListDbContext, IConfiguration config)
+        public DragonController(ILogger<DragonController> logger, DragonListDbContext dragonListDbContext)
         {
             _logger = logger;
             _dragonListDbContext = dragonListDbContext;
-            StripeConfiguration.ApiKey = config["Stripe:SecretKey"];
         }
 
         [HttpGet] // leggere
@@ -78,7 +76,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("users")]
-        public async Task<IActionResult> GetUsers() 
+        public async Task<IActionResult> GetUsers()
         {
             try
             {
@@ -288,7 +286,7 @@ namespace WebApi.Controllers
                 var visit = new PageVisit
                 {
                     VisitedAt = DateTime.UtcNow,
-                   // PageName = "home", // inutile
+                    // PageName = "home", // inutile
                     UserEmail = userEmail
                 };
                 await _dragonListDbContext.PageVisits.AddAsync(visit);
@@ -321,42 +319,6 @@ namespace WebApi.Controllers
         }
 
         // pagami scemo
-        //[HttpPost("create-checkout")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> CreateCheckout([FromBody] CheckoutRequest request)
-        //{
-        //    var options = new SessionCreateOptions
-        //    {
-        //        PaymentMethodTypes = new List<string> { "card" },
-        //        LineItems = new List<SessionLineItemOptions>
-        //{
-        //    new SessionLineItemOptions
-        //    {
-        //        PriceData = new SessionLineItemPriceDataOptions
-        //        {
-        //            Currency = "eur",
-        //            UnitAmount = request.AmountCents, // es. 1000 = 10€
-        //            ProductData = new SessionLineItemPriceDataProductDataOptions
-        //            {
-        //                Name = request.PlanName
-        //            }
-        //        },
-        //        Quantity = 1
-        //    }
-        //},
-        //        Mode = "payment",
-        //        //SuccessUrl = "https://heroic853.github.io/Heroic853SiteV1/payment-success",
-        //        SuccessUrl = "https://localhost:7119/payment-success?session_id={CHECKOUT_SESSION_ID}",
-        //        CancelUrl = "https://heroic853.github.io/Heroic853SiteV1/commissions"
-        //    };
-
-        //    var service = new SessionService();
-        //    var session = await service.CreateAsync(options);
-
-        //    return Ok(new { url = session.Url });
-        //}
-
-
         [HttpPost("create-checkout")]
         [AllowAnonymous]
         public async Task<IActionResult> CreateCheckout([FromBody] CheckoutRequest request)
@@ -371,7 +333,7 @@ namespace WebApi.Controllers
                 PriceData = new SessionLineItemPriceDataOptions
                 {
                     Currency = "eur",
-                    UnitAmount = request.AmountCents,
+                    UnitAmount = request.AmountCents, // es. 1000 = 10€
                     ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
                         Name = request.PlanName
@@ -381,87 +343,14 @@ namespace WebApi.Controllers
             }
         },
                 Mode = "payment",
-                // ── salva il nome nei metadata per recuperarlo dopo ──
-                Metadata = new Dictionary<string, string>
-        {
-            { "planName", request.PlanName }
-        },
-                SuccessUrl = "https://localhost:7119/payment-success?session_id={CHECKOUT_SESSION_ID}",
+                SuccessUrl = "https://heroic853.github.io/Heroic853SiteV1/payment-success",
                 CancelUrl = "https://heroic853.github.io/Heroic853SiteV1/commissions"
             };
 
             var service = new SessionService();
             var session = await service.CreateAsync(options);
+
             return Ok(new { url = session.Url });
         }
-
-        [HttpGet("get-session")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetSession(
-        [FromQuery] string sessionId,
-        [FromServices] EmailService emailService)
-        {
-            try
-            {
-                var service = new SessionService();
-                var session = await service.GetAsync(sessionId, new SessionGetOptions
-                {
-                    Expand = new List<string>
-            {
-                "line_items",
-                "line_items.data.price.product",
-                "payment_intent",
-                "customer_details"
-            }
-                });
-
-                if (session.PaymentStatus != "paid")
-                    return BadRequest(new { message = "Pagamento non completato" });
-
-                // Prende il nome dal product
-                var lineItem = session.LineItems?.Data?.FirstOrDefault();
-                var planName = lineItem?.Description ?? "Mod Commission";
-                var amount = (session.AmountTotal ?? 0) / 100m;
-
-                // PaymentIntent contiene il vero ID transazione
-                var transactionId = session.PaymentIntentId ?? session.Id;
-                var date = session.Created;
-
-                var customerEmail = session.CustomerDetails?.Email;
-                var customerName = session.CustomerDetails?.Name ?? "Hunter";
-
-                _logger.LogInformation($"Session: {sessionId}, Amount: {amount}, Plan: {planName}, TxId: {transactionId}, Email: {customerEmail}");
-
-                if (!string.IsNullOrEmpty(customerEmail))
-                {
-                    await emailService.SendPaymentConfirmation(
-                        customerEmail,
-                        customerName,
-                        planName,
-                        amount,
-                        transactionId,
-                        date);
-                }
-                else
-                {
-                    _logger.LogWarning("Email cliente non trovata nella sessione Stripe");
-                }
-
-                return Ok(new
-                {
-                    amount,
-                    modName = planName,
-                    transactionId,
-                    paymentMethod = "Credit Card",
-                    date
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Errore get-session: {ex.Message}");
-                return StatusCode(500, new { message = ex.Message });
-            }
-        }
-
     }
 }
