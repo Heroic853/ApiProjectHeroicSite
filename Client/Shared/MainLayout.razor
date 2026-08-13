@@ -594,12 +594,34 @@
     {
         try
         {
+            // Una sola visita per sessione di navigazione.
+            //
+            // Serve per il 404.html di GitHub Pages: durante il tentativo di
+            // login silenzioso Auth0 rimanda a /authentication/login-callback,
+            // che su Pages non esiste come file, quindi risponde il 404.html che
+            // fa location.replace(). Quello e' un RICARICAMENTO COMPLETO: l'app
+            // Blazor riparte da zero e OnInitializedAsync viene eseguito una
+            // seconda volta, contando due volte la stessa visita.
+            //
+            // sessionStorage sopravvive al ricaricamento ma non alla chiusura
+            // della tab, che e' esattamente il comportamento che vogliamo.
+            var giaContata = await JSRuntime.InvokeAsync<string?>(
+                "sessionStorage.getItem", "heroic-visita-contata");
+
+            if (!string.IsNullOrEmpty(giaContata))
+                return;
+
+            // Il flag va scritto PRIMA della chiamata: se lo scrivessimo dopo,
+            // un secondo giro partito nel frattempo conterebbe di nuovo.
+            await JSRuntime.InvokeVoidAsync(
+                "sessionStorage.setItem", "heroic-visita-contata", "1");
+
             // IMPORTANTE: qui va il client "Anonymous".
             // Prima usava "Http" (quello con il token Auth0): per un visitatore
             // non loggato l'AuthorizationMessageHandler lanciava
-            // AccessTokenNotAvailableException, il catch la ingoiava, e la visita
-            // non veniva mai registrata. Risultato: il grafico admin contava solo
-            // gli utenti loggati, cioe' quasi nessuno.
+            // AccessTokenNotAvailableException, il catch la ingoiava, e la
+            // richiesta non usciva nemmeno dal browser. Risultato: il grafico
+            // admin contava solo gli utenti loggati, cioe' quasi nessuno.
             var anonClient = HttpClientFactory.CreateClient("Anonymous");
             await anonClient.PostAsync("api/dragon/log-visit", null);
         }
