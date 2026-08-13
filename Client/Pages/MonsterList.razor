@@ -79,6 +79,245 @@
             }
 
          }
+
+    /* ---- Scheda voto + recensione -------------------------------------
+       I controlli erano quelli di Bootstrap: alti 36-38px, misurati sul
+       sito. Sotto i 44px il dito sbaglia il bersaglio, per questo la
+       pagina era scomoda sul telefono. Qui sono 52px.
+       Colori presi dal resto del sito: nero, rosso scuro, oro. */
+
+    .review-card {
+        max-width: 620px;
+        margin: 0 auto 40px;
+        background: rgba(13, 5, 0, 0.82);
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        border-radius: 12px;
+        padding: 28px 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .review-card-title {
+        margin: 0 0 6px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .review-card-sub {
+        margin: 0 0 24px;
+        color: #c0c0c0;
+        font-size: 0.9rem;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .review-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #d4af37;
+        font-size: 0.78rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .review-optional {
+        color: #8a8a8a;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .review-field {
+        width: 100%;
+        /* 52px: sopra la soglia dei 44px per il tocco */
+        min-height: 52px;
+        margin-bottom: 18px;
+        padding: 13px 15px;
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 8px;
+        color: #f0f0f0;
+        /* 16px impedisce a iOS di ingrandire la pagina al focus */
+        font-size: 16px;
+        font-family: inherit;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .review-field:focus {
+        outline: none;
+        border-color: #ffd700;
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.14);
+    }
+
+    .review-field option {
+        background: #0d0500;
+        color: #f0f0f0;
+    }
+
+    .review-textarea {
+        min-height: 120px;
+        margin-bottom: 4px;
+        resize: vertical;
+        line-height: 1.55;
+    }
+
+    .review-counter {
+        margin-bottom: 20px;
+        color: #8a8a8a;
+        font-size: 0.72rem;
+        text-align: right;
+    }
+
+    .review-submit {
+        width: 100%;
+        min-height: 54px;
+        background: linear-gradient(135deg, #8b0000, #b01818);
+        border: 1px solid #ffd700;
+        border-radius: 8px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.25s;
+    }
+
+    .review-submit:hover:not(:disabled) {
+        background: linear-gradient(135deg, #a81010, #d02020);
+        box-shadow: 0 0 22px rgba(255, 215, 0, 0.35);
+    }
+
+    .review-submit:disabled {
+        opacity: 0.55;
+        cursor: default;
+    }
+
+    .review-message {
+        margin: 16px 0 0;
+        padding: 11px 14px;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        text-align: center;
+    }
+
+    .review-message-ok {
+        background: rgba(26, 127, 55, 0.18);
+        border: 1px solid rgba(26, 127, 55, 0.5);
+        color: #7ee08f;
+    }
+
+    .review-message-error {
+        background: rgba(139, 0, 0, 0.22);
+        border: 1px solid rgba(200, 40, 40, 0.5);
+        color: #ff9c9c;
+    }
+
+    /* ---- Elenco delle recensioni ---- */
+
+    .reviews-list {
+        max-width: 620px;
+        margin: 0 auto 60px;
+    }
+
+    .reviews-empty {
+        margin: 18px 0 0;
+        color: #8a8a8a;
+        font-size: 0.9rem;
+        text-align: center;
+        font-style: italic;
+    }
+
+    .review-item {
+        margin-top: 16px;
+        padding: 18px 20px;
+        background: rgba(13, 5, 0, 0.7);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        border-left: 3px solid #8b0000;
+        border-radius: 8px;
+    }
+
+    .review-item-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .review-item-monster {
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 0.95rem;
+        font-weight: bold;
+    }
+
+    .review-item-vote {
+        flex: 0 0 auto;
+        padding: 3px 11px;
+        background: rgba(139, 0, 0, 0.55);
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        border-radius: 20px;
+        color: #d4af37;
+        font-size: 0.72rem;
+        letter-spacing: 0.5px;
+    }
+
+    .review-item-text {
+        margin: 0 0 12px;
+        color: #e0e0e0;
+        font-size: 0.92rem;
+        line-height: 1.6;
+        /* Un testo senza spazi non deve sfondare la scheda */
+        overflow-wrap: break-word;
+        white-space: pre-line;
+    }
+
+    .review-item-foot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        color: #8a8a8a;
+        font-size: 0.75rem;
+    }
+
+    .review-delete {
+        margin-left: auto;
+        min-height: 32px;
+        padding: 5px 12px;
+        background: transparent;
+        border: 1px solid rgba(200, 40, 40, 0.6);
+        border-radius: 6px;
+        color: #ff9c9c;
+        font-size: 0.72rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .review-delete:hover {
+        background: rgba(139, 0, 0, 0.35);
+        border-color: #ff6b6b;
+    }
+
+    @@media (max-width: 600px) {
+        .review-card {
+            padding: 22px 16px;
+            border-radius: 10px;
+        }
+
+        .review-card-title {
+            font-size: 1.2rem;
+        }
+
+        .review-item {
+            padding: 15px 16px;
+        }
+    }
     </style>
 
     <p class="title">Creator Mod's & Feedbacks</p>
@@ -130,23 +369,102 @@
 
     @* Classification Label *@
     <div class="feedback-labels">
-        <select @bind="Clasification.Monster" @attributes="InputAttributes" class="form-control">
-            <option value="">Monster Choice</option>
-            @foreach (var monster in Moded)
+
+        <div class="review-card">
+            <h2 class="review-card-title">Rate a mod</h2>
+            <p class="review-card-sub">
+                Pick a mod, leave a quick rating, and write a review if you feel like it.
+            </p>
+
+            <label class="review-label" for="rev-monster">Which mod</label>
+            <select id="rev-monster" class="review-field" @bind="Clasification.Monster">
+                <option value="">— choose a mod —</option>
+                @foreach (var monster in Moded)
+                {
+                    <option value="@monster">@monster</option>
+                }
+            </select>
+
+            <label class="review-label" for="rev-vote">Your rating</label>
+            <select id="rev-vote" class="review-field" @bind="Clasification.Feedback">
+                <option value="">— choose a rating —</option>
+                @foreach (var feedback in Feedbacks)
+                {
+                    <option value="@feedback">@feedback</option>
+                }
+            </select>
+
+            @* Il testo e' facoltativo: chi ha fretta vota e basta *@
+            <label class="review-label" for="rev-text">
+                Your review <span class="review-optional">(optional)</span>
+            </label>
+            <textarea id="rev-text"
+                      class="review-field review-textarea"
+                      rows="4"
+                      maxlength="1500"
+                      placeholder="What did you think of this mod?"
+                      @bind="Clasification.Review"
+                      @bind:event="oninput"></textarea>
+
+            <div class="review-counter">
+                @(Clasification.Review?.Length ?? 0) / 1500
+            </div>
+
+            <button class="review-submit" @onclick="Saved" disabled="@invioInCorso">
+                @(invioInCorso ? "Sending..." : "Send")
+            </button>
+
+            @if (!string.IsNullOrEmpty(messageTextFeedbacks))
             {
-                <option value="@monster">@monster</option>
+                <p class="review-message @(messaggioEUnErrore ? "review-message-error" : "review-message-ok")">
+                    @messageTextFeedbacks
+                </p>
             }
-        </select>
+        </div>
 
-        <select @bind="Clasification.Feedback" @attributes="InputAttributes" class="form-control">
-            <option value="">Feedback</option>
-            @foreach (var feedback in Feedbacks)
+        @* Recensioni scritte dagli utenti. L'endpoint e' pubblico e non
+           restituisce le email: l'autore arriva gia' mascherato dal server. *@
+        <div class="reviews-list">
+            <h2 class="review-card-title">What hunters say</h2>
+
+            @if (recensioniInCaricamento)
             {
-                <option value="@feedback">@feedback</option>
+                <p class="reviews-empty">Loading reviews...</p>
             }
-        </select>
+            else if (recensioni.Count == 0)
+            {
+                <p class="reviews-empty">
+                    No reviews yet. Be the first to write one!
+                </p>
+            }
+            else
+            {
+                @foreach (var r in recensioni)
+                {
+                    <div class="review-item">
+                        <div class="review-item-head">
+                            <span class="review-item-monster">@r.Monster</span>
+                            <span class="review-item-vote">@r.Feedback</span>
+                        </div>
 
-        <button class="btn btn-success" @onclick="Saved">Confirm Save</button>
+                        <p class="review-item-text">@r.Review</p>
 
-        <p style="color: white;"><b>@messageTextFeedbacks</b></p>
+                        <div class="review-item-foot">
+                            <span>@r.AuthorLabel</span>
+                            <span>@r.CreatedAt.ToString("dd/MM/yyyy")</span>
+
+                            <AuthorizeView Roles="Admin">
+                                <Authorized>
+                                    <button class="review-delete"
+                                            title="Delete this review"
+                                            @onclick="() => CancellaRecensione(r.Id)">
+                                        Delete
+                                    </button>
+                                </Authorized>
+                            </AuthorizeView>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
     </div>
