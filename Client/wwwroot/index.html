@@ -10,6 +10,42 @@
     <link href="css/app.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="Client.styles.css" rel="stylesheet" />
+
+    <!-- ==========================================================
+         DECODIFICA URL PER GITHUB PAGES — NON RIMUOVERE
+         ==========================================================
+         GitHub Pages non conosce le rotte di Blazor: se qualcuno apre
+         direttamente /newmods, o se Auth0 rimanda a
+         /authentication/login-callback, Pages risponde 404 e serve il
+         file 404.html.
+
+         Quel file trasforma l'indirizzo in
+             /Heroic853SiteV1/?/newmods
+             /Heroic853SiteV1/?/authentication/login-callback&code=...~and~state=...
+         per poter arrivare comunque all'app.
+
+         Ma qualcuno deve fare il lavoro inverso, e mancava: Blazor
+         leggeva il percorso "/" e mostrava la home. Di conseguenza
+         nessun link diretto funzionava e IL LOGIN NON POTEVA COMPLETARSI,
+         perche' il "code" di Auth0 non raggiungeva mai il gestore OIDC.
+
+         Questo script ricostruisce l'indirizzo vero con replaceState
+         PRIMA che Blazor parta (per questo sta nell'head, non a fine body).
+         -->
+    <script type="text/javascript">
+        (function (l) {
+            if (l.search[1] === '/') {
+                var decoded = l.search.slice(1).split('&').map(function (s) {
+                    return s.replace(/~and~/g, '&');
+                }).join('?');
+
+                window.history.replaceState(
+                    null, null,
+                    l.pathname.slice(0, -1) + decoded + l.hash
+                );
+            }
+        }(window.location));
+    </script>
 </head>
 
 <body>
@@ -120,6 +156,10 @@
     </div>
 
     <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
+    <!-- Funzioni JS chiamate da Blazor (playSound). Va caricato PRIMA di
+         blazor.webassembly.js, altrimenti al primo click la funzione
+         potrebbe non essere ancora definita. -->
+    <script src="js/site.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 
 </body>
