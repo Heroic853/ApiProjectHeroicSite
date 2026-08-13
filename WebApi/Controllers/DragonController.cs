@@ -545,7 +545,12 @@ namespace WebApi.Controllers
             }
             catch (StripeException ex)
             {
-                _logger.LogWarning(ex, "Stripe non ha trovato la sessione {SessionId}", sessionId);
+                // Un sessionId inesistente non e' un errore del server: capita se
+                // qualcuno apre /payment-success con un link vecchio o modificato.
+                // Si logga una riga sola: passare "ex" stampava tutto lo stack
+                // trace di Stripe.net per una cosa del tutto prevedibile.
+                _logger.LogWarning("Sessione Stripe non trovata: {SessionId} ({Motivo})",
+                    sessionId, ex.StripeError?.Message ?? ex.Message);
                 return NotFound(new { message = "Session not found" });
             }
         }
