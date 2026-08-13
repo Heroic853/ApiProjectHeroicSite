@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
@@ -575,19 +576,38 @@
     void ToggleMenu() => menuOpen = !menuOpen;
     void CloseMenu() => menuOpen = false;
 
-    async void SignOut()
+    // Era "async void" e chiamava una funzione JS "forceLogout" che non esiste
+    // in nessun file del progetto: il bottone Sign Out lanciava un errore JS
+    // silenzioso e non faceva assolutamente niente.
+    //
+    // NavigateToLogout avvia il logout gestito da Blazor: pulisce il token
+    // locale, e poi Authentication.razor chiude anche la sessione su Auth0
+    // (altrimenti il cookie SSO di Auth0 resta valido e al login successivo
+    // rientri senza che ti chieda le credenziali).
+    void SignOut()
     {
         menuOpen = false;
-        await JSRuntime.InvokeVoidAsync("forceLogout");
+        NavManager.NavigateToLogout("authentication/logout");
     }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            // IMPORTANTE: qui va il client "Anonymous".
+            // Prima usava "Http" (quello con il token Auth0): per un visitatore
+            // non loggato l'AuthorizationMessageHandler lanciava
+            // AccessTokenNotAvailableException, il catch la ingoiava, e la visita
+            // non veniva mai registrata. Risultato: il grafico admin contava solo
+            // gli utenti loggati, cioe' quasi nessuno.
             var anonClient = HttpClientFactory.CreateClient("Anonymous");
-            await Http.PostAsync("api/dragon/log-visit", null);
+            await anonClient.PostAsync("api/dragon/log-visit", null);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            // Il conteggio visite non deve mai rompere il sito, ma almeno
+            // lascia traccia nella console del browser.
+            Console.WriteLine($"[log-visit] non riuscito: {ex.Message}");
+        }
     }
 }

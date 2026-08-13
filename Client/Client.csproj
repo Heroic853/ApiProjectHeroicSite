@@ -8,8 +8,19 @@
         <!-- Abilita trimming -->
         <PublishTrimmed>true</PublishTrimmed>
 
-        <!-- Abilita compression Brotli + Gzip -->
-        <BlazorWebAssemblyEnableCompression>true</BlazorWebAssemblyEnableCompression>
+        <!-- Compressione Brotli/Gzip DISATTIVATA, e non e' una perdita.
+             Generava un .br e un .gz per ogni file di _framework (120 file in
+             piu', 5.4 MB) che GitHub Pages non usa: quei file precompressi
+             servono solo a un server configurato per la content negotiation,
+             mentre Pages serve i file normali e comprime lui al volo.
+             Erano peso morto nel repo del sito.
+
+             Servono DUE proprieta' perche' il nome e' cambiato:
+             BlazorWebAssemblyEnableCompression per l'SDK .NET 8,
+             CompressionEnabled per l'SDK .NET 9 e successivi (quello che hai
+             installato tu e' il 10.0.302, quindi vale la seconda). -->
+        <BlazorWebAssemblyEnableCompression>false</BlazorWebAssemblyEnableCompression>
+        <CompressionEnabled>false</CompressionEnabled>
 
         <!-- AOT off -->
         <RunAOTCompilation>false</RunAOTCompilation>
@@ -40,4 +51,60 @@
     <ItemGroup>
         <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj" />
     </ItemGroup>
+
+    <!-- Sostituisce il base href nell'index.html PUBBLICATO.
+
+         Il sorgente tiene <base href="/" /> perche' serve cosi' quando lanci
+         il progetto in locale. Ma su GitHub Pages il sito sta sotto
+         /Heroic853SiteV1/, e con href="/" Blazor cercherebbe _framework nella
+         radice del dominio: 404 su tutto e pagina bianca.
+         Finora lo correggevi a mano a ogni pubblicazione. Adesso lo fa la build.
+
+         Se cambi il nome del repo di Pages, cambia solo questa proprieta'. -->
+    <PropertyGroup>
+        <GitHubPagesBasePath>/Heroic853SiteV1/</GitHubPagesBasePath>
+    </PropertyGroup>
+
+    <UsingTask TaskName="SostituisciTesto" TaskFactory="RoslynCodeTaskFactory"
+               AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+        <ParameterGroup>
+            <Percorso ParameterType="System.String" Required="true" />
+            <Cerca ParameterType="System.String" Required="true" />
+            <Sostituisci ParameterType="System.String" Required="true" />
+        </ParameterGroup>
+        <Task>
+            <Code Type="Fragment" Language="cs">
+                <![CDATA[
+                if (System.IO.File.Exists(Percorso))
+                {
+                    var testo = System.IO.File.ReadAllText(Percorso);
+                    if (testo.Contains(Cerca))
+                        System.IO.File.WriteAllText(Percorso, testo.Replace(Cerca, Sostituisci));
+                }
+                ]]>
+            </Code>
+        </Task>
+    </UsingTask>
+
+    <Target Name="ImpostaBaseHrefPerGitHubPages" AfterTargets="Publish"
+            Condition="'$(GitHubPagesBasePath)' != ''">
+        <SostituisciTesto Percorso="$(PublishDir)wwwroot\index.html"
+                          Cerca="&lt;base href=&quot;/&quot; /&gt;"
+                          Sostituisci="&lt;base href=&quot;$(GitHubPagesBasePath)&quot; /&gt;" />
+        <Message Importance="high"
+                 Text="  -> base href impostato a $(GitHubPagesBasePath) nella publish" />
+    </Target>
+
+    <!-- Crea .nojekyll nella publish.
+         Senza questo file GitHub Pages passa il sito a Jekyll, che IGNORA
+         cartelle e file che iniziano con "_": e la cartella con tutto Blazor
+         si chiama _framework. Risultato: sito completamente bianco.
+         Generarlo qui evita di dovertelo ricordare a ogni pubblicazione. -->
+    <Target Name="CreateNoJekyllFile" AfterTargets="Publish">
+        <WriteLinesToFile File="$(PublishDir)wwwroot\.nojekyll"
+                          Lines=""
+                          Overwrite="true"
+                          WriteOnlyWhenDifferent="true" />
+        <Message Importance="high" Text="  -> creato .nojekyll (necessario per GitHub Pages)" />
+    </Target>
 </Project>

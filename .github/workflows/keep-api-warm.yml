@@ -1,0 +1,43 @@
+# Tiene sveglia l'API.
+#
+# Perche' serve: sui piani gratuiti (Render, Railway) il container viene spento
+# dopo ~15 minuti senza traffico. La visita successiva deve aspettare che si
+# riaccenda: sono 30-60 secondi in cui il sito sembra rotto. Questo ping ogni
+# 10 minuti evita lo spegnimento.
+#
+# Se passi a un piano a pagamento (senza spin-down) questo workflow non serve
+# piu' e puoi cancellarlo.
+
+name: Keep API warm
+
+on:
+  schedule:
+    # Ogni 10 minuti. GitHub non garantisce la puntualita' al minuto:
+    # nei momenti di carico puo' ritardare di qualche minuto.
+    - cron: "*/10 * * * *"
+  # Permette di lanciarlo a mano dalla tab Actions
+  workflow_dispatch:
+
+# Evita che due ping si accavallino
+concurrency:
+  group: keep-api-warm
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping /health
+        run: |
+          URL="https://apiprojectheroicsite.onrender.com/health"
+
+          # --max-time 90: se il container era spento deve avere il tempo di
+          # riaccendersi, altrimenti il ping fallisce proprio quando serviva.
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 90 "$URL")
+          echo "HTTP $code da $URL"
+
+          if [ "$code" != "200" ]; then
+            echo "::warning::L'API ha risposto $code invece di 200"
+            exit 1
+          fi

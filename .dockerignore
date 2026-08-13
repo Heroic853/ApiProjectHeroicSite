@@ -1,0 +1,16 @@
+# Senza questo file "COPY" trascinava dentro l'immagine .git, .vs, bin e obj:
+# build piu' lenti e rischio di copiare binari compilati su Windows in un
+# container Linux.
+**/.git
+**/.github
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/node_modules
+**/*.user
+**/*.suo
+**/.dockerignore
+**/Dockerfile
+**/README.md
+Client/

@@ -1,8 +1,50 @@
-﻿@page "/authentication/{action}"
+@page "/authentication/{action}"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.Extensions.Configuration
+@inject NavigationManager NavManager
+@inject IConfiguration Config
 
-<RemoteAuthenticatorView Action="@Action" />
+<RemoteAuthenticatorView Action="@Action">
+
+    @* Blazor qui ha già svuotato il token locale, ma la sessione SSO su Auth0
+       è ancora aperta: il suo cookie vive sul dominio Auth0, non sul nostro.
+       Senza questo passaggio, al login successivo Auth0 ti fa rientrare
+       subito senza chiedere le credenziali — sembra che il logout non funzioni.
+
+       /v2/logout chiude quel cookie. Lo facciamo esplicitamente perché
+       funziona anche se nel tenant Auth0 il logout OIDC non è abilitato. *@
+    <LogOutSucceeded>
+        <p class="logout-message">Closing your session...</p>
+    </LogOutSucceeded>
+
+</RemoteAuthenticatorView>
 
 @code {
-    [Parameter] public string Action { get; set; }
+    [Parameter] public string Action { get; set; } = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        // "logged-out" è lo step finale del logout gestito da Blazor
+        if (string.Equals(Action, "logged-out", StringComparison.OrdinalIgnoreCase))
+        {
+            NavManager.NavigateTo(BuildAuth0LogoutUrl(), forceLoad: true);
+        }
+    }
+
+    /// <summary>
+    /// Costruisce l'URL di logout di Auth0.
+    /// ATTENZIONE: il valore di returnTo deve essere presente in
+    /// Auth0 → Applications → la tua app → Allowed Logout URLs,
+    /// altrimenti Auth0 blocca il redirect con un errore.
+    /// </summary>
+    private string BuildAuth0LogoutUrl()
+    {
+        var authority = (Config["Auth0:Authority"] ?? "").TrimEnd('/');
+        var clientId = Config["Auth0:ClientId"] ?? "";
+        var returnTo = "https://heroic853.github.io/Heroic853SiteV1";
+
+        return $"{authority}/v2/logout"
+             + $"?client_id={Uri.EscapeDataString(clientId)}"
+             + $"&returnTo={Uri.EscapeDataString(returnTo)}";
+    }
 }

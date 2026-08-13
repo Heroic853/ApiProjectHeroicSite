@@ -2,17 +2,28 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
+
+		<!-- I segreti per lo sviluppo locale (connection string, chiavi Stripe/Auth0)
+		     stanno in %APPDATA%\Microsoft\UserSecrets\<questo-id>\secrets.json,
+		     FUORI dal repo: appsettings.Development.json e launchSettings.json sono
+		     tracciati da git e non devono contenere password.
+		     Si impostano con: dotnet user-secrets set "chiave" "valore" -->
+		<UserSecretsId>heroic853-webapi-local-dev</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<!-- Pacchetti rimossi perche' non usati da nessuna riga di codice:
+		     - Microsoft.AspNetCore.Components.WebAssembly.Authentication (10.0.3):
+		       pacchetto per il client Blazor, e in versione net10 su un progetto net8
+		     - Microsoft.EntityFrameworkCore.SqlServer: il database e' PostgreSQL
+		     - ZedGraph: libreria di grafici per Windows Forms
+		     Meno pacchetti = immagine Docker piu' piccola e avvio piu' rapido. -->
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="10.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,7 +32,6 @@
 		<PackageReference Include="Stripe.net" Version="50.4.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
-		<PackageReference Include="ZedGraph" Version="5.2.1" />
 	</ItemGroup>
 
 	<ItemGroup>

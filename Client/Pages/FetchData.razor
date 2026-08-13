@@ -12,8 +12,11 @@
         }
     </style>
 
-@if (ApplicationManager.IsLoggedIn())
-{
+@* Come in UsersTable: ApplicationManager.IsLoggedIn() era sempre false perche'
+   Username non viene mai assegnato da quando c'e' Auth0. Ora usa lo stato di
+   autenticazione vero. *@
+<AuthorizeView>
+    <Authorized>
     <h1 style="font-family: Arial, sans-serif; font-weight: bold; background: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red); -webkit-background-clip: text; color: transparent;">
         Monster List
     </h1>
@@ -53,14 +56,15 @@
             </tbody>
         </table>
     }
-}
-else
-{
-    <p style="color: white;">
-        You need to Login to see this...
-    </p>
+    </Authorized>
 
-    <NavLink class="btn btn-secondary" href="existingHunter?Param2=Blazzing&Param2=Blazor">
-        <span class="oi oi-list-rich" aria-hidden="true" style="background-color:greenyellow"></span> Login Hunter
-    </NavLink>
-}
+    <NotAuthorized>
+        <p style="color: white;">
+            You need to Login to see this...
+        </p>
+
+        <NavLink class="btn btn-secondary" href="authentication/login">
+            <span class="oi oi-list-rich" aria-hidden="true" style="background-color:greenyellow"></span> Login Hunter
+        </NavLink>
+    </NotAuthorized>
+</AuthorizeView>
