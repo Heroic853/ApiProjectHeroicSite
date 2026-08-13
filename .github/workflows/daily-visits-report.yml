@@ -1,0 +1,75 @@
+# Report giornaliero delle visite via email.
+#
+# Perche' un workflow e non un timer dentro l'API: sui piani gratuiti il
+# container viene spento quando non ha traffico, quindi un timer interno
+# semplicemente non scatterebbe. GitHub Actions gira comunque.
+#
+# CONFIGURAZIONE (una volta sola):
+#   1. Su Render, tra le Environment Variables, aggiungi CRON_SECRET con una
+#      stringa lunga e casuale a tua scelta.
+#   2. Su GitHub, in questo repo: Settings -> Secrets and variables -> Actions
+#      -> New repository secret, nome CRON_SECRET, stesso valore.
+#   Devono combaciare, altrimenti l'API risponde 401.
+
+name: Report visite giornaliero
+
+on:
+  schedule:
+    # 00:20 UTC: la giornata precedente e' finita, quindi il conteggio e'
+    # completo. GitHub non garantisce il minuto esatto, puo' ritardare.
+    - cron: "20 0 * * *"
+  # Per lanciarlo a mano dalla tab Actions e vedere subito se funziona
+  workflow_dispatch:
+    inputs:
+      dayOffset:
+        description: "0 = oggi (parziale), 1 = ieri (giornata completa)"
+        required: false
+        default: "1"
+
+concurrency:
+  group: daily-visits-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Chiedi all'API di mandare il report
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          DAY_OFFSET: ${{ github.event.inputs.dayOffset || '1' }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::Il secret CRON_SECRET non e' impostato in questo repo."
+            exit 1
+          fi
+
+          URL="https://apiprojectheroicsite.onrender.com/api/dragon/send-daily-report?dayOffset=$DAY_OFFSET"
+
+          # Il container potrebbe essere spento: la prima richiesta deve avere
+          # il tempo di farlo risvegliare, altrimenti il report salta.
+          risposta=$(curl -s -w "\n%{http_code}" --max-time 120 \
+            -X POST "$URL" \
+            -H "X-Cron-Secret: $CRON_SECRET")
+
+          codice=$(echo "$risposta" | tail -n1)
+          corpo=$(echo "$risposta" | sed '$d')
+
+          echo "HTTP $codice"
+          echo "$corpo"
+
+          if [ "$codice" != "200" ]; then
+            echo "::error::L'API ha risposto $codice invece di 200"
+            exit 1
+          fi
+
+          # Rende visibile il risultato nel riepilogo del workflow,
+          # cosi' lo leggi senza aprire i log
+          {
+            echo "### Report visite"
+            echo ""
+            echo '```json'
+            echo "$corpo"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
