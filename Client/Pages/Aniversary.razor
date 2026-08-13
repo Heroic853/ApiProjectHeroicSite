@@ -207,18 +207,38 @@
         }
     }
 
+    /* L'immagine del modale.
+
+       Prima c'era width:240% con transform:translateX(-50%): l'immagine
+       veniva resa a 240% del contenitore e poi spostata a sinistra di
+       meta' della PROPRIA larghezza. Misurato sul sito: su una finestra
+       1280x720 l'immagine era larga 1152px e partiva da x=-441, cioe'
+       441px finivano fuori dallo schermo. E lo spostamento dipendeva
+       dalle dimensioni del file, quindi ogni mostro finiva in un punto
+       diverso.
+
+       Ora l'immagine si dimensiona da sola entro DUE limiti (larghezza
+       del contenitore e altezza della finestra) ed e' centrata dal
+       flex del contenitore. Cosi' la posizione non dipende piu' dal
+       rapporto d'aspetto del file: verificato che un'immagine 1280x720
+       e una 1920x1080 vengono rese identiche. */
     .overlay-free-image {
-        flex: 0 0 auto;
-        width: 500px;
-        max-width: 45vw;
+        flex: 1 1 52%;
+        max-width: 640px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .overlay-free-image img {
-        width: 240%;
-        height: auto;
         display: block;
+        /* width/height auto + i due max: il browser rimpicciolisce in
+           proporzione senza deformare e senza bande vuote */
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 72vh;
         object-fit: contain;
-        transform: translateX(-50%);
         filter: drop-shadow(0 0 50px rgba(139,0,0,0.65)) drop-shadow(0 16px 48px rgba(0,0,0,0.95));
     }
 
@@ -344,9 +364,18 @@
             gap: 24px;
         }
 
+        /* Qui prima si correggeva solo il CONTENITORE e non l'immagine
+           dentro: il width:240% del blocco base restava valido, quindi sul
+           telefono l'immagine era larga 691px in una finestra di 375px e
+           il 46% finiva fuori dallo schermo. */
         .overlay-free-image {
-            width: 78%;
-            max-width: 300px;
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .overlay-free-image img {
+            max-height: 42vh;
         }
 
         .overlay-info {
@@ -422,7 +451,12 @@
         }
 
         .overlay-free-image {
-            width: 88%;
+            width: 100%;
+        }
+
+        /* Schermi molto piccoli: lascia piu' spazio al testo sotto */
+        .overlay-free-image img {
+            max-height: 34vh;
         }
 
         .overlay-name {
@@ -510,7 +544,12 @@
     @foreach (var (monster, index) in monsters.Select((m, i) => (m, i)))
     {
         var delay = (index % 4) + 1;
-        <div class="monster-card reveal-delay-@delay (showModal && currentIndex == index ? "selected" : "")"
+        @* Mancava la @ prima della parentesi: Razor scriveva l'espressione
+           come testo dentro l'attributo class, quindi la classe "selected"
+           non veniva MAI applicata e lo stile .monster-card.selected era
+           CSS morto. Verificato nel DOM del sito online: la class conteneva
+           letteralmente (showModal && currentIndex == index ? *@
+        <div class="monster-card reveal-delay-@delay @(showModal && currentIndex == index ? "selected" : "")"
              @onclick="() => OpenModal(index)">
             <img src="@monster.ThumbnailPath" alt="@monster.Name" loading="lazy" />
             <p>@monster.Name</p>
