@@ -46,47 +46,58 @@
     </style>
 
 
-    @* @if (ApplicationManager.IsLoggedIn()) //se è loggato mostra la tabella *@  
-    @if (ApplicationManager.Username == "Admin") // se e admin mostra la tabella, altrimenti messaggio di non autorizzazione
-    {
-        <p class="title-users">Registred Users</p>
+    @* Prima il controllo era "ApplicationManager.Username == \"Admin\"", ma quella
+       proprietà non viene MAI assegnata da nessuna parte (l'unico punto che la
+       scriveva è commentato in ExistingHunter.razor.cs, da quando c'è Auth0).
+       Risultato: la condizione era sempre falsa e la tabella non si vedeva mai.
+       Ora usa i ruoli veri di Auth0, come fa già la pagina admin. *@
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <p class="title-users">Registred Users</p>
 
-        <p style="text-align: center; color: white;">
-            Hier is only for Admins to see how much Hunters was registred to this site of Guild Enjoy!
-        </p>
-
-        @if (UsersList == null)
-        {
-            <p style="color: white;"><em>Loading please...</em></p>
-        }
-        else
-        {
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th style="color: yellow;">Username</th>
-                        <th style="color: yellow;">Account</th>
-                        <th style="color: yellow;">Password</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var forecast in UsersList)
-                    {
-                        <tr>
-                            <td style="color: lightgrey;">@forecast.Username</td>
-                            <td style="color: lightgrey;">@forecast.Account</td>
-                            <td style="color: lightgrey;">@forecast.Password</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    }
-    else
-    {
-        <div class="not-auth">
             <p style="text-align: center; color: white;">
-               Sorry you are not authorized
+                Hier is only for Admins to see how much Hunters was registred to this site of Guild Enjoy!
             </p>
-        </div>
-    }
+
+            @if (loadError is not null)
+            {
+                <p style="color: #ff6b6b; text-align: center;">@loadError</p>
+            }
+            else if (UsersList == null)
+            {
+                <p style="color: white;"><em>Loading please...</em></p>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="color: yellow;">Username</th>
+                            <th style="color: yellow;">Account</th>
+                            <th style="color: yellow;">Registered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* La colonna Password è stata rimossa: l'API non manda
+                           più le password (prima le restituiva in chiaro). *@
+                        @foreach (var registered in UsersList)
+                        {
+                            <tr>
+                                <td style="color: lightgrey;">@registered.Username</td>
+                                <td style="color: lightgrey;">@registered.Account</td>
+                                <td style="color: lightgrey;">@registered.RegistrationDate.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </Authorized>
+
+        <NotAuthorized>
+            <div class="not-auth">
+                <p style="text-align: center; color: white;">
+                   Sorry you are not authorized
+                </p>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>

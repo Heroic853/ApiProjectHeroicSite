@@ -245,6 +245,29 @@
         font-size: 0.8rem;
     }
 
+    /* Bottoni per scegliere la finestra temporale del grafico */
+    .range-btn {
+        background: transparent;
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        color: #c0c0c0;
+        padding: 5px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.78rem;
+        letter-spacing: 1px;
+        transition: all 0.2s ease;
+    }
+
+    .range-btn:hover {
+        border-color: #ffd700;
+        color: #ffd700;
+    }
+
+    .range-btn-active {
+        background: rgba(139, 0, 0, 0.6);
+        border-color: #ffd700;
+        color: #ffd700;
+        font-weight: bold;
     }
 </style>
 
@@ -346,23 +369,59 @@
                 
                 @* Grafico di quanti utenti sono venuti *@
                 <div class="table-card" style="margin-top: 30px; grid-column: span 2; padding: 20px;">
-                    <div class="table-card-header" style="margin-bottom: 20px;">
+                    <div class="table-card-header" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
                         <h2 class="table-card-title"> Website Traffic </h2>
+
+                        <div style="display: flex; gap: 8px;">
+                            @foreach (var range in new[] { 7, 30, 90 })
+                            {
+                                <button class="range-btn @(chartDays == range ? "range-btn-active" : "")"
+                                        @onclick="() => ChangeRange(range)">
+                                    @range gg
+                                </button>
+                            }
+                        </div>
                     </div>
 
-                    <ApexChart TItem="VisitStat" 
-                               Title="Daily Visitors" 
-                               Options="ChartOptions"
-                               Height="250">
-        
-                        <ApexPointSeries TItem="VisitStat"
-                                        Items="VisitStats"
-                                        Name="Visits"
-                                        SeriesType="SeriesType.Line"
-                                        XValue="@(e => e.Date.ToString("yyyy-MM-dd"))"
-                                        YValue="@(e => e.Count)"
-                                        Stroke="@(new SeriesStroke { Color = "#ffd700", Width = 3 })" />
-                    </ApexChart>
+                    @if (chartLoading)
+                    {
+                        <p style="color: #c0c0c0; padding: 20px 0;">Loading traffic data...</p>
+                    }
+                    else if (chartError is not null)
+                    {
+                        <p style="color: #ff6b6b; padding: 20px 0;">
+                            Could not load traffic data: @chartError
+                        </p>
+                    }
+                    else
+                    {
+                        <div style="display: flex; gap: 30px; margin-bottom: 16px; flex-wrap: wrap;">
+                            <div>
+                                <div style="color: #c0c0c0; font-size: 0.75rem; letter-spacing: 1px;">TOTAL VISITS</div>
+                                <div style="color: #ffd700; font-size: 1.6rem; font-weight: bold;">@TotalVisits</div>
+                            </div>
+                            <div>
+                                <div style="color: #c0c0c0; font-size: 0.75rem; letter-spacing: 1px;">BUSIEST DAY</div>
+                                <div style="color: #ffd700; font-size: 1.6rem; font-weight: bold;">@PeakVisits</div>
+                            </div>
+                        </div>
+
+                        @* @ref serve per poter chiamare UpdateSeriesAsync quando
+                           i dati arrivano dopo il primo render *@
+                        <ApexChart TItem="VisitStat"
+                                   @ref="visitsChart"
+                                   Title="Daily Visitors"
+                                   Options="ChartOptions"
+                                   Height="280">
+
+                            <ApexPointSeries TItem="VisitStat"
+                                             Items="VisitStats"
+                                             Name="Visits"
+                                             SeriesType="SeriesType.Line"
+                                             XValue="@(e => e.Date.ToString("dd/MM"))"
+                                             YValue="@(e => e.Count)" />
+                        </ApexChart>
+                    }
                 </div>
 
             </div>
