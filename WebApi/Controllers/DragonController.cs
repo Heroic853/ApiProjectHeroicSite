@@ -311,24 +311,132 @@ namespace WebApi.Controllers
         // CLASSIFICA / FEEDBACK
         // ------------------------------------------------------------------
 
+        /// <summary>Lunghezza massima di una recensione scritta.</summary>
+        private const int MaxLunghezzaRecensione = 1500;
+
         [HttpPost("Clasification")]
         public async Task<IActionResult> Clasification([FromBody] Clasification clasification)
         {
+            if (string.IsNullOrWhiteSpace(clasification.Monster))
+                return BadRequest(new { message = "Choose a monster" });
+
+            if (string.IsNullOrWhiteSpace(clasification.Feedback))
+                return BadRequest(new { message = "Choose a feedback" });
+
+            // Il testo libero va limitato: senza un tetto qualcuno puo'
+            // riempire il database con una richiesta sola.
+            var review = clasification.Review?.Trim();
+            if (review?.Length > MaxLunghezzaRecensione)
+                return BadRequest(new { message = $"Review too long (max {MaxLunghezzaRecensione} characters)" });
+
+            clasification.Review = string.IsNullOrWhiteSpace(review) ? null : review;
+
             // Stesso discorso del voto sui draghi: chi ha votato lo ricava il
             // server dal token, cosi' non e' falsificabile dal browser.
             clasification.UserEmail = CurrentUserIdentifier();
+            clasification.CreatedAt = DateTime.UtcNow;
 
             await _dragonListDbContext.Clasification.AddAsync(clasification);
             await _dragonListDbContext.SaveChangesAsync();
-            _logger.LogInformation("Nuovo feedback salvato su {Monster} (da {User})",
-                clasification.Monster, clasification.UserEmail);
+
+            _logger.LogInformation(
+                "Nuovo feedback su {Monster} (da {User}, recensione: {Recensione})",
+                clasification.Monster,
+                clasification.UserEmail,
+                clasification.Review is null ? "no" : $"{clasification.Review.Length} caratteri");
+
             return Ok(new { message = "Feedback saved" });
         }
 
         [HttpGet("Clasification")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IEnumerable<Clasification>> GetAniversary()
         {
-            return await _dragonListDbContext.Clasification.AsNoTracking().ToListAsync();
+            // Solo l'admin: questa versione include UserEmail, che e' un dato
+            // personale. Per il pubblico c'e' /reviews.
+            return await _dragonListDbContext.Clasification
+                .AsNoTracking()
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Le recensioni da mostrare ai visitatori, sotto ogni mostro.
+        ///
+        /// Pubblico ma SENZA email: l'autore viene mascherato lato server.
+        /// Restituire l'entita' Clasification cosi' com'e' pubblicherebbe
+        /// l'indirizzo di chi ha scritto.
+        /// </summary>
+        [HttpGet("reviews")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetReviews([FromQuery] string? monster = null, [FromQuery] int limit = 50)
+        {
+            limit = Math.Clamp(limit, 1, 200);
+
+            var query = _dragonListDbContext.Clasification.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(monster))
+                query = query.Where(c => c.Monster == monster);
+
+            // Solo le righe che hanno davvero un testo: chi ha solo votato
+            // non deve comparire come recensione vuota.
+            var righe = await query
+                .Where(c => c.Review != null && c.Review != "")
+                .OrderByDescending(c => c.CreatedAt)
+                .Take(limit)
+                .Select(c => new { c.Id, c.Monster, c.Feedback, c.Review, c.CreatedAt, c.UserEmail })
+                .ToListAsync();
+
+            var recensioni = righe.Select(c => new ReviewDto
+            {
+                Id = c.Id,
+                Monster = c.Monster,
+                Feedback = c.Feedback,
+                Review = c.Review,
+                CreatedAt = c.CreatedAt,
+                AuthorLabel = MascheraAutore(c.UserEmail)
+            });
+
+            return Ok(recensioni);
+        }
+
+        /// <summary>
+        /// Cancella una recensione. Serve per togliere dalla pagina quelle
+        /// offensive: e' il prezzo di renderle pubbliche.
+        /// </summary>
+        [HttpDelete("reviews/{id:int}")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> DeleteReview(int id)
+        {
+            var riga = await _dragonListDbContext.Clasification.FindAsync(id);
+            if (riga is null)
+                return NotFound(new { message = "Review not found" });
+
+            _dragonListDbContext.Clasification.Remove(riga);
+            await _dragonListDbContext.SaveChangesAsync();
+
+            _logger.LogInformation("Admin ha cancellato la recensione {Id} su {Monster}", id, riga.Monster);
+            return Ok(new { message = "Review deleted" });
+        }
+
+        /// <summary>
+        /// Trasforma l'identita' salvata in un'etichetta pubblicabile.
+        /// "amalia.rossi@gmail.com" -> "ama***"
+        /// "auth0|abc123"           -> "Hunter"
+        /// </summary>
+        private static string MascheraAutore(string? identita)
+        {
+            if (string.IsNullOrWhiteSpace(identita))
+                return "Anonymous Hunter";
+
+            // Se non c'e' la chiocciola non e' un'email ma l'id Auth0:
+            // non va mostrato nemmeno in parte.
+            var chiocciola = identita.IndexOf('@');
+            if (chiocciola <= 0)
+                return "Hunter";
+
+            var nome = identita[..chiocciola];
+            return nome.Length <= 3 ? nome + "***" : nome[..3] + "***";
         }
 
         // ------------------------------------------------------------------
