@@ -7,9 +7,12 @@
 # CONFIGURAZIONE (una volta sola):
 #   1. Su Render, tra le Environment Variables, aggiungi CRON_SECRET con una
 #      stringa lunga e casuale a tua scelta.
-#   2. Su GitHub, in questo repo: Settings -> Secrets and variables -> Actions
-#      -> New repository secret, nome CRON_SECRET, stesso valore.
-#   Devono combaciare, altrimenti l'API risponde 401.
+#   2. Su GitHub, IN QUESTO REPO (Heroic853/ApiProjectHeroicSite):
+#         Settings -> Secrets and variables -> Actions
+#         -> scheda "Secrets" (NON "Variables")
+#         -> New repository secret
+#         -> Name: CRON_SECRET     Secret: lo stesso valore di Render
+#   I due valori devono combaciare, altrimenti l'API risponde 401.
 
 name: Report visite giornaliero
 
@@ -35,16 +38,64 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # Questo passo non usa il segreto: serve solo a capire DOVE e' finito
+      # quando manca. Non stampa mai il valore, solo la lunghezza.
+      - name: Controlla la configurazione
+        env:
+          SECRET_LEN: ${{ secrets.CRON_SECRET != '' && 'presente' || 'ASSENTE' }}
+          VAR_PRESENTE: ${{ vars.CRON_SECRET != '' && 'presente' || 'assente' }}
+        run: |
+          echo "Repository ...........: ${{ github.repository }}"
+          echo "Branch ...............: ${{ github.ref_name }}"
+          echo "secrets.CRON_SECRET ..: $SECRET_LEN"
+          echo "vars.CRON_SECRET .....: $VAR_PRESENTE"
+
+          if [ "$SECRET_LEN" = "presente" ]; then
+            echo "Configurazione ok."
+            exit 0
+          fi
+
+          echo ""
+          echo "Il segreto non e' visibile a questo workflow."
+          echo ""
+
+          if [ "$VAR_PRESENTE" = "presente" ]; then
+            echo "TROVATO IL PROBLEMA: CRON_SECRET e' stato salvato nella scheda"
+            echo "'Variables' invece che nella scheda 'Secrets'."
+            echo ""
+            echo "Le due schede sono nella stessa pagina ma sono diverse: le"
+            echo "Variables vengono stampate in chiaro nei log, quindi non vanno"
+            echo "usate per un segreto. Cancellalo da Variables e ricrealo in"
+            echo "Secrets -> New repository secret."
+            echo ""
+            echo "::error::CRON_SECRET e' in 'Variables' invece che in 'Secrets'"
+            exit 1
+          fi
+
+          echo "Controlla, in ordine:"
+          echo ""
+          echo "  1. Il REPO giusto. Questo workflow gira in"
+          echo "     ${{ github.repository }}"
+          echo "     Il segreto va messo qui, NON in Heroic853SiteV1."
+          echo ""
+          echo "  2. La SCHEDA giusta. Settings -> Secrets and variables ->"
+          echo "     Actions -> scheda 'Secrets' (non 'Variables')."
+          echo ""
+          echo "  3. Il TIPO giusto. Deve essere un 'Repository secret'."
+          echo "     Se lo hai messo come 'Environment secret', questo job non"
+          echo "     lo vede: gli servirebbe una riga 'environment:'."
+          echo ""
+          echo "  4. Il NOME esatto: CRON_SECRET"
+          echo "     Tutto maiuscolo, con l'underscore, senza spazi."
+          echo ""
+          echo "::error::CRON_SECRET non visibile. Vedi i punti qui sopra."
+          exit 1
+
       - name: Chiedi all'API di mandare il report
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           DAY_OFFSET: ${{ github.event.inputs.dayOffset || '1' }}
         run: |
-          if [ -z "$CRON_SECRET" ]; then
-            echo "::error::Il secret CRON_SECRET non e' impostato in questo repo."
-            exit 1
-          fi
-
           URL="https://apiprojectheroicsite.onrender.com/api/dragon/send-daily-report?dayOffset=$DAY_OFFSET"
 
           # Il container potrebbe essere spento: la prima richiesta deve avere
@@ -58,6 +109,16 @@ jobs:
 
           echo "HTTP $codice"
           echo "$corpo"
+
+          if [ "$codice" = "401" ]; then
+            echo "::error::L'API ha rifiutato il segreto. Il valore su GitHub e quello su Render non combaciano: ricontrolla che siano identici, senza spazi o ritorni a capo in piu'."
+            exit 1
+          fi
+
+          if [ "$codice" = "503" ]; then
+            echo "::error::L'API dice che CRON_SECRET non e' impostata dalla SUA parte: aggiungila tra le Environment Variables su Render."
+            exit 1
+          fi
 
           if [ "$codice" != "200" ]; then
             echo "::error::L'API ha risposto $codice invece di 200"
