@@ -8,6 +8,7 @@ using Stripe.Checkout;
 using System.Security.Claims;
 using System.Text.Json;
 using WebApi.Data;
+using WebApi.Services;
 
 namespace WebApi.Controllers
 {
@@ -21,15 +22,18 @@ namespace WebApi.Controllers
         private readonly DragonListDbContext _dragonListDbContext;
         private readonly ILogger<DragonController> _logger;
         private readonly IConfiguration _config;
+        private readonly EmailService _email;
 
         public DragonController(
             ILogger<DragonController> logger,
             DragonListDbContext dragonListDbContext,
-            IConfiguration config)
+            IConfiguration config,
+            EmailService email)
         {
             _logger = logger;
             _dragonListDbContext = dragonListDbContext;
             _config = config;
+            _email = email;
         }
 
         /// <summary>
@@ -553,6 +557,217 @@ namespace WebApi.Controllers
                     sessionId, ex.StripeError?.Message ?? ex.Message);
                 return NotFound(new { message = "Session not found" });
             }
+        }
+
+        // ------------------------------------------------------------------
+        // WEBHOOK STRIPE
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// Ricorda gli eventi Stripe gia' gestiti, per non mandare due email
+        /// se Stripe consegna lo stesso evento piu' volte (cosa che fa: la
+        /// consegna e' "at least once", non "exactly once").
+        ///
+        /// LIMITE NOTO: sta in memoria, quindi si azzera al riavvio del
+        /// container. Copre le riconsegne ravvicinate, che sono il caso reale.
+        /// Per una garanzia totale servirebbe una tabella sul database.
+        /// </summary>
+        private static readonly HashSet<string> _eventiGestiti = new();
+        private static readonly Queue<string> _ordineEventi = new();
+        private static readonly object _lockEventi = new();
+
+        private static bool EventoGiaGestito(string eventId)
+        {
+            lock (_lockEventi)
+            {
+                if (!_eventiGestiti.Add(eventId))
+                    return true;
+
+                // Tiene la lista limitata: senza questo cresce all'infinito
+                _ordineEventi.Enqueue(eventId);
+                if (_ordineEventi.Count > 500)
+                    _eventiGestiti.Remove(_ordineEventi.Dequeue());
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Riceve gli eventi di Stripe. Da qui partono la ricevuta al cliente
+        /// e la notifica di vendita.
+        ///
+        /// Perche' un webhook e non la pagina /payment-success: la pagina la
+        /// puo' ricaricare il cliente (una mail a ogni refresh) o non aprirla
+        /// affatto (nessuna mail). Il webhook arriva da Stripe una volta sola,
+        /// a pagamento avvenuto, anche se il cliente chiude il browser.
+        ///
+        /// Da configurare su Stripe: Developers -> Webhooks -> Add endpoint
+        ///   URL:     https://apiprojectheroicsite.onrender.com/api/dragon/stripe-webhook
+        ///   Evento:  checkout.session.completed
+        /// e mettere il "Signing secret" nella variabile STRIPE_WEBHOOK_SECRET.
+        /// </summary>
+        [HttpPost("stripe-webhook")]
+        [AllowAnonymous] // la chiama Stripe, non un utente: l'autenticita' la da' la firma
+        public async Task<IActionResult> StripeWebhook()
+        {
+            // Il corpo va letto grezzo: la firma si calcola sui byte esatti,
+            // quindi non si puo' usare il model binding di ASP.NET.
+            string json;
+            using (var reader = new StreamReader(Request.Body))
+                json = await reader.ReadToEndAsync();
+
+            var webhookSecret = Secret("STRIPE_WEBHOOK_SECRET");
+            if (string.IsNullOrWhiteSpace(webhookSecret))
+            {
+                _logger.LogError("STRIPE_WEBHOOK_SECRET non impostata: webhook ignorato");
+                return StatusCode(503, new { message = "Webhook not configured" });
+            }
+
+            // L'header va controllato prima: passarlo mancante a ConstructEvent
+            // provoca una NullReferenceException, che diventerebbe un 500.
+            // Una richiesta senza firma e' semplicemente una richiesta non valida.
+            var firma = Request.Headers["Stripe-Signature"].ToString();
+            if (string.IsNullOrWhiteSpace(firma))
+            {
+                _logger.LogWarning("Webhook senza header Stripe-Signature rifiutato");
+                return BadRequest(new { message = "Missing Stripe-Signature header" });
+            }
+
+            Event stripeEvent;
+            try
+            {
+                // Verifica la firma: senza questa chiunque potrebbe inviare
+                // finti eventi di pagamento e farsi mandare le ricevute.
+                //
+                // throwOnApiVersionMismatch: false e' voluto. Stripe.net e'
+                // compilato su una versione precisa dell'API Stripe; se la
+                // versione dell'account e' diversa, il default farebbe fallire
+                // OGNI webhook. La firma resta verificata, che e' cio' che conta
+                // per l'autenticita'.
+                stripeEvent = EventUtility.ConstructEvent(
+                    json, firma, webhookSecret, throwOnApiVersionMismatch: false);
+            }
+            catch (Exception ex)
+            {
+                // Si cattura Exception e non solo StripeException: un corpo
+                // malformato o un header storto possono lanciare altri tipi.
+                _logger.LogWarning("Webhook con firma non valida rifiutato: {Tipo} — {Motivo}",
+                    ex.GetType().Name, ex.Message);
+                return BadRequest(new { message = "Invalid signature" });
+            }
+
+            if (EventoGiaGestito(stripeEvent.Id))
+            {
+                _logger.LogInformation("Evento Stripe {EventId} gia' gestito, ignorato", stripeEvent.Id);
+                return Ok();
+            }
+
+            if (stripeEvent.Type != "checkout.session.completed")
+            {
+                _logger.LogInformation("Evento Stripe ignorato: {Tipo}", stripeEvent.Type);
+                return Ok();
+            }
+
+            if (stripeEvent.Data.Object is not Session session)
+            {
+                _logger.LogWarning("Evento checkout.session.completed senza sessione valida");
+                return Ok();
+            }
+
+            var importo = (session.AmountTotal ?? 0) / 100m;
+            var prodotto = ResolveModName(session);
+            var transazione = session.PaymentIntentId ?? session.Id;
+            var emailCliente = session.CustomerDetails?.Email ?? session.CustomerEmail;
+            var quando = session.Created == default ? DateTime.UtcNow : session.Created;
+
+            _logger.LogInformation(
+                "PAGAMENTO RICEVUTO: {Prodotto} {Importo} EUR da {Cliente} ({Transazione})",
+                prodotto, importo, emailCliente ?? "email non fornita", transazione);
+
+            // Notifica a te: parte sempre
+            await _email.SendSaleNotificationAsync(prodotto, importo, transazione, emailCliente, quando);
+
+            // Ricevuta al cliente: solo se Stripe ci ha dato la sua email
+            if (!string.IsNullOrWhiteSpace(emailCliente))
+                await _email.SendPaymentReceiptAsync(emailCliente, prodotto, importo, transazione, quando);
+            else
+                _logger.LogWarning("Nessuna email cliente nella sessione {SessionId}: ricevuta non inviata", session.Id);
+
+            // Rispondi 200 comunque: se le email falliscono, Stripe non deve
+            // riconsegnare l'evento in continuazione.
+            return Ok();
+        }
+
+        // ------------------------------------------------------------------
+        // REPORT GIORNALIERO
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// Calcola le visite di un giorno e le manda per email.
+        ///
+        /// La chiama un GitHub Action una volta al giorno. Non usa Auth0
+        /// perche' non c'e' nessun utente dietro: si autentica con un segreto
+        /// condiviso nell'header X-Cron-Secret (variabile CRON_SECRET).
+        ///
+        /// dayOffset: 0 = oggi, 1 = ieri (default, cosi' la giornata e' completa).
+        /// </summary>
+        [HttpPost("send-daily-report")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SendDailyReport(
+            [FromHeader(Name = "X-Cron-Secret")] string? cronSecret,
+            [FromQuery] int dayOffset = 1)
+        {
+            var atteso = Secret("CRON_SECRET");
+            if (string.IsNullOrWhiteSpace(atteso))
+            {
+                _logger.LogError("CRON_SECRET non impostata: report giornaliero disabilitato");
+                return StatusCode(503, new { message = "Report not configured" });
+            }
+
+            // Confronto a tempo costante: evita di far indovinare il segreto
+            // misurando quanto tempo ci mette a rispondere.
+            if (cronSecret is null ||
+                !System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(
+                    System.Text.Encoding.UTF8.GetBytes(cronSecret),
+                    System.Text.Encoding.UTF8.GetBytes(atteso)))
+            {
+                _logger.LogWarning("send-daily-report chiamato con segreto errato");
+                return Unauthorized();
+            }
+
+            dayOffset = Math.Clamp(dayOffset, 0, 365);
+
+            // Kind=Utc obbligatorio: visited_at e' timestamptz
+            var inizio = DateTime.SpecifyKind(DateTime.UtcNow.Date, DateTimeKind.Utc).AddDays(-dayOffset);
+            var fine = inizio.AddDays(1);
+
+            var visite = await _dragonListDbContext.PageVisits
+                .AsNoTracking()
+                .Where(v => v.VisitedAt >= inizio && v.VisitedAt < fine)
+                .Select(v => v.UserEmail)
+                .ToListAsync();
+
+            var totale = visite.Count;
+            var anonime = visite.Count(e => string.IsNullOrEmpty(e));
+            var loggate = totale - anonime;
+            var utentiDistinti = visite.Where(e => !string.IsNullOrEmpty(e)).Distinct().Count();
+
+            _logger.LogInformation(
+                "Report {Giorno}: {Totale} visite ({Anonime} anonime, {Loggate} con login, {Utenti} utenti diversi)",
+                inizio.ToString("yyyy-MM-dd"), totale, anonime, loggate, utentiDistinti);
+
+            var inviata = await _email.SendDailyVisitsReportAsync(
+                inizio, totale, anonime, loggate, utentiDistinti);
+
+            return Ok(new
+            {
+                giorno = inizio.ToString("yyyy-MM-dd"),
+                totale,
+                anonime,
+                loggate,
+                utentiDistinti,
+                emailInviata = inviata
+            });
         }
 
         /// <summary>

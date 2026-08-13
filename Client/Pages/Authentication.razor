@@ -33,15 +33,19 @@
 
     /// <summary>
     /// Costruisce l'URL di logout di Auth0.
-    /// ATTENZIONE: il valore di returnTo deve essere presente in
-    /// Auth0 → Applications → la tua app → Allowed Logout URLs,
-    /// altrimenti Auth0 blocca il redirect con un errore.
+    ///
+    /// ATTENZIONE: returnTo deve combaciare CARATTERE PER CARATTERE con uno
+    /// degli Allowed Logout URLs su Auth0 (Applications → la tua app →
+    /// Settings). Auth0 non normalizza l'indirizzo: verificato che con lo
+    /// slash finale risponde 302, senza risponde 400 e il logout si blocca.
+    /// Per questo il valore arriva da appsettings.json, in un posto solo.
     /// </summary>
     private string BuildAuth0LogoutUrl()
     {
         var authority = (Config["Auth0:Authority"] ?? "").TrimEnd('/');
         var clientId = Config["Auth0:ClientId"] ?? "";
-        var returnTo = "https://heroic853.github.io/Heroic853SiteV1";
+        var returnTo = Config["Auth0:PostLogoutRedirectUri"]
+                       ?? "https://heroic853.github.io/Heroic853SiteV1/";
 
         return $"{authority}/v2/logout"
              + $"?client_id={Uri.EscapeDataString(clientId)}"

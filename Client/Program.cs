@@ -34,8 +34,15 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.DefaultScopes.Add("openid");
     options.ProviderOptions.DefaultScopes.Add("profile");
     options.ProviderOptions.DefaultScopes.Add("email");
+    // Dove Auth0 rimanda dopo il logout. Il valore sta in appsettings.json
+    // perche' lo usa anche Authentication.razor: prima era scritto a mano nei
+    // due file e uno dei due era senza lo slash finale.
+    //
+    // Deve combaciare esattamente con un Allowed Logout URL su Auth0: senza lo
+    // slash finale Auth0 risponde 400 e il logout non si completa.
     options.ProviderOptions.PostLogoutRedirectUri =
-        "https://heroic853.github.io/Heroic853SiteV1";
+        builder.Configuration["Auth0:PostLogoutRedirectUri"]
+        ?? "https://heroic853.github.io/Heroic853SiteV1/";
 }).AddAccountClaimsPrincipalFactory<CustomUserFactory>();
 
 builder.Services.AddSingleton(new ApplicationManager());

@@ -190,6 +190,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// EmailService esisteva da tempo ma non era mai stato registrato, quindi non
+// veniva mai usato da nessuno. Ora serve al webhook Stripe e al report visite.
+builder.Services.AddScoped<EmailService>();
+
 // Scalda il database in background appena l'app e' su
 builder.Services.AddHostedService<DatabaseWarmupService>();
 
@@ -224,11 +228,23 @@ else
     logger.LogInformation("Stripe configurato in modalita': {Mode}", mode);
 }
 
-// Controlla anche le variabili Auth0 usate per cancellare l'account
-foreach (var name in new[] { "AUTH0_DOMAIN", "AUTH0_M2M_CLIENT_ID", "AUTH0_M2M_CLIENT_SECRET" })
+// Controlla le altre variabili, dicendo cosa smette di funzionare se mancano.
+// Meglio scoprirlo dal log all'avvio che quando un cliente paga.
+var richieste = new (string Nome, string A_cosa_serve)[]
 {
-    if (string.IsNullOrWhiteSpace(Secret(name)))
-        logger.LogWarning("{Name} non impostata — la cancellazione account non funzionera'", name);
+    ("AUTH0_DOMAIN",           "cancellazione account"),
+    ("AUTH0_M2M_CLIENT_ID",    "cancellazione account"),
+    ("AUTH0_M2M_CLIENT_SECRET","cancellazione account"),
+    ("STRIPE_WEBHOOK_SECRET",  "ricevuta al cliente e notifica di vendita"),
+    ("SENDGRID_API_KEY",       "invio di qualsiasi email"),
+    ("NOTIFY_EMAIL",           "destinatario di notifiche e report"),
+    ("CRON_SECRET",            "report giornaliero delle visite"),
+};
+
+foreach (var (nome, aCosaServe) in richieste)
+{
+    if (string.IsNullOrWhiteSpace(Secret(nome)))
+        logger.LogWarning("{Name} non impostata — non funzionera': {A}", nome, aCosaServe);
 }
 
 if (app.Environment.IsDevelopment())
