@@ -1,4 +1,7 @@
 ﻿    @page "/dragonList"
+    @* Serve l'accesso: prima si entrava forzando l'indirizzo, si compilava il
+       form e solo al momento dell'invio arrivava un errore. *@
+    @attribute [Microsoft.AspNetCore.Authorization.Authorize]
     @using static Client.Pages.FetchData
     @inject HttpClient Http
     @using static Client.Pages.MonsterList

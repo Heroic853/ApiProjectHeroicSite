@@ -1,0 +1,68 @@
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager NavManager
+
+@*
+    Manda al login chi apre una pagina protetta senza essere autenticato,
+    e si ricorda dove voleva andare.
+
+    Prima App.razor mostrava una scritta rossa con un link da cliccare a mano,
+    e dopo il login si finiva sulla home invece che sulla pagina richiesta.
+
+    NavigateToLogin passa ad Auth0 il returnUrl, quindi dopo l'accesso
+    l'utente torna esattamente dove stava andando.
+*@
+
+<div class="redirect-box">
+    <div class="redirect-spinner"></div>
+    <p class="redirect-text">Sign in required — taking you to the login...</p>
+</div>
+
+<style>
+    .redirect-box {
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .redirect-spinner {
+        width: 46px;
+        height: 46px;
+        border: 3px solid rgba(212, 175, 55, 0.25);
+        border-top-color: #ffd700;
+        border-radius: 50%;
+        animation: redirectSpin 0.9s linear infinite;
+    }
+
+    @@keyframes redirectSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .redirect-text {
+        margin: 0;
+        color: #c0c0c0;
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+</style>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Uri assoluto: serve a Blazor per ricostruire il ritorno dopo Auth0
+        var doveVoleva = NavManager.ToBaseRelativePath(NavManager.Uri);
+        NavManager.NavigateToLogin("authentication/login",
+            new InteractiveRequestOptions
+            {
+                Interaction = InteractionType.SignIn,
+                ReturnUrl = NavManager.Uri
+            });
+    }
+}

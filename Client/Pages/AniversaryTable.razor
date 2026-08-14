@@ -1,4 +1,8 @@
 ﻿@page "/aniversarytable"
+@* Riservata a te: senza il ruolo Admin la pagina non si apre nemmeno.
+   Prima si apriva e mostrava "Access Denied" dentro, quindi chi forzava
+   l'indirizzo vedeva comunque l'impaginazione dell'area riservata. *@
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
 @inject HttpClient Http
 @using Microsoft.AspNetCore.Components.Authorization
 @using ApexCharts
