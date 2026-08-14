@@ -55,8 +55,14 @@ namespace WebApi.Services
         // normale: Google non la accetta piu').
         private string? SmtpHost => Secret("EMAIL_SMTP_HOST");
         private string? SmtpUser => Secret("EMAIL_SMTP_USER");
-        private string? SmtpPassword => Secret("EMAIL_SMTP_PASSWORD");
         private int SmtpPort => int.TryParse(Secret("EMAIL_SMTP_PORT"), out var p) ? p : 587;
+
+        /// <summary>
+        /// La password per le app di Google. Gli spazi vengono togliti da soli:
+        /// Google la mostra come "abcd efgh ijkl mnop" e copiarla cosi' com'e'
+        /// e' l'errore piu' comune.
+        /// </summary>
+        private string? SmtpPassword => Secret("EMAIL_SMTP_PASSWORD")?.Replace(" ", "");
 
         private string? BrevoKey => Secret("BREVO_API_KEY");
 
@@ -210,95 +216,139 @@ namespace WebApi.Services
             }
         }
 
-        /// <summary>
-        /// Invio tramite un server SMTP normale.
-        ///
-        /// E' la via piu' semplice: nessun servizio da registrare, nessuna
-        /// verifica del mittente. Con Gmail servono:
-        ///   EMAIL_SMTP_HOST     smtp.gmail.com
-        ///   EMAIL_SMTP_PORT     587
-        ///   EMAIL_SMTP_USER     heroic853@gmail.com
-        ///   EMAIL_SMTP_PASSWORD la "password per le app" di Google, 16 caratteri
-        ///
-        /// La password normale dell'account NON funziona: Google ha smesso di
-        /// accettarla. La password per le app si genera solo con la verifica in
-        /// due passaggi attiva.
-        ///
-        /// Limite Gmail: circa 500 destinatari al giorno, piu' che sufficiente.
-        ///
-        /// Nota: si usa SmtpClient di .NET per non aggiungere pacchetti al
-        /// progetto. Microsoft lo considera superato in favore di MailKit, ma
-        /// con Gmail su porta 587 e STARTTLS funziona senza problemi. Se un
-        /// domani serve un server piu' esigente, la sostituzione riguarda solo
-        /// questo metodo.
-        /// </summary>
+        // ------------------------------------------------------------------
+        // INVIO SMTP
+        // ------------------------------------------------------------------
+        //
+        // Con Gmail servono solo:
+        //   EMAIL_SMTP_HOST     smtp.gmail.com
+        //   EMAIL_SMTP_USER     heroic853@gmail.com
+        //   EMAIL_SMTP_PASSWORD la "password per le app" di Google (16 caratteri)
+        //
+        // EMAIL_SMTP_PORT NON serve impostarla: le porte le prova il codice.
+        //
+        // Perche': gli hosting spesso bloccano una porta SMTP e non l'altra, e
+        // non c'e' modo di saperlo in anticipo. Invece di far cambiare la
+        // variabile a mano ogni volta, si tenta la 587 (STARTTLS) e se la
+        // connessione non parte si riprova sulla 465 (SSL). La porta che
+        // funziona viene ricordata, quindi il tentativo doppio avviene una
+        // volta sola.
+        //
+        // La password normale dell'account Google NON funziona: serve quella
+        // per le app, generabile solo con la verifica in due passaggi attiva.
+        // Limite Gmail: circa 500 destinatari al giorno.
+
+        /// <summary>Porta risultata funzionante, per non ritentare ogni volta.</summary>
+        private static int? _portaFunzionante;
+
         private async Task<bool> InviaConSmtpAsync(string to, string subject, string html, string tipo)
         {
-            using var smtp = new System.Net.Mail.SmtpClient(SmtpHost, SmtpPort)
-            {
-                EnableSsl = true, // su 587 significa STARTTLS
-                Credentials = new System.Net.NetworkCredential(SmtpUser, SmtpPassword),
-                DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network,
-                Timeout = 20_000
-            };
+            // Se l'utente ha imposto una porta, si rispetta e non si prova altro.
+            var portaImposta = Secret("EMAIL_SMTP_PORT");
+            if (!string.IsNullOrWhiteSpace(portaImposta) && int.TryParse(portaImposta, out var fissa))
+                return (await ProvaInvioSmtpAsync(fissa, to, subject, html, tipo)).Riuscito;
 
-            using var messaggio = new System.Net.Mail.MailMessage
+            // Ordine: prima quella che ha funzionato l'ultima volta, poi le altre
+            var daProvare = _portaFunzionante is int nota
+                ? new[] { nota, nota == 587 ? 465 : 587 }
+                : new[] { 587, 465 };
+
+            (bool Riuscito, bool ValePenaRiprovare) esito = default;
+
+            foreach (var porta in daProvare)
             {
-                // Molti server rifiutano un mittente diverso dall'utente
-                // autenticato: si usa SmtpUser, non FromEmail.
-                From = new System.Net.Mail.MailAddress(SmtpUser!, "Heroic853 Mods"),
-                Subject = subject,
-                Body = html,
-                IsBodyHtml = true
-            };
-            messaggio.To.Add(to);
+                esito = await ProvaInvioSmtpAsync(porta, to, subject, html, tipo);
+
+                if (esito.Riuscito)
+                {
+                    _portaFunzionante = porta;
+                    return true;
+                }
+
+                // Se il server ha risposto ma ha rifiutato (password sbagliata),
+                // cambiare porta non serve a niente: si esce subito.
+                if (!esito.ValePenaRiprovare)
+                    return false;
+            }
+
+            _logger.LogError(
+                "SMTP: nessuna porta utilizzabile verso {Host} (provate 587 e 465). " +
+                "L'hosting blocca il traffico SMTP in uscita: da qui l'SMTP non e' utilizzabile. " +
+                "Imposta BREVO_API_KEY, che passa dalla porta 443 come una normale chiamata web, " +
+                "e togli le variabili EMAIL_SMTP_*.",
+                SmtpHost);
+
+            return false;
+        }
+
+        /// <summary>
+        /// Un singolo tentativo su una porta.
+        /// ValePenaRiprovare dice se ha senso provare un'altra porta: vero solo
+        /// se non si e' riusciti nemmeno a connettersi.
+        /// </summary>
+        private async Task<(bool Riuscito, bool ValePenaRiprovare)> ProvaInvioSmtpAsync(
+            int porta, string to, string subject, string html, string tipo)
+        {
+            var messaggio = new MimeKit.MimeMessage();
+            // Molti server rifiutano un mittente diverso dall'utente
+            // autenticato: si usa SmtpUser, non FromEmail.
+            messaggio.From.Add(new MimeKit.MailboxAddress("Heroic853 Mods", SmtpUser));
+            messaggio.To.Add(MimeKit.MailboxAddress.Parse(to));
+            messaggio.Subject = subject;
+            messaggio.Body = new MimeKit.BodyBuilder { HtmlBody = html }.ToMessageBody();
+
+            // 465 nasce cifrata, 587 parte in chiaro e poi si cifra con STARTTLS.
+            // SmtpClient di .NET sapeva fare solo la seconda: MailKit fa entrambe.
+            var sicurezza = porta == 465
+                ? MailKit.Security.SecureSocketOptions.SslOnConnect
+                : MailKit.Security.SecureSocketOptions.StartTls;
+
+            using var smtp = new MailKit.Net.Smtp.SmtpClient { Timeout = 25_000 };
 
             try
             {
-                await smtp.SendMailAsync(messaggio);
-                _logger.LogInformation("Email inviata via SMTP ({Tipo}) a {To}", tipo, to);
-                return true;
+                await smtp.ConnectAsync(SmtpHost, porta, sicurezza);
+                await smtp.AuthenticateAsync(SmtpUser, SmtpPassword);
+                await smtp.SendAsync(messaggio);
+                await smtp.DisconnectAsync(true);
+
+                _logger.LogInformation("Email inviata via SMTP ({Tipo}) a {To} — {Host}:{Porta}",
+                    tipo, to, SmtpHost, porta);
+                return (true, false);
             }
-            catch (System.Net.Mail.SmtpException ex)
+            catch (System.Net.Sockets.SocketException ex)
             {
-                // SmtpException dice sempre e solo "Failure sending mail":
-                // il motivo vero sta nella catena delle inner exception.
-                // Senza srotolarla il log non serviva a niente.
-                var catena = new List<string>();
-                for (Exception? e = ex; e is not null; e = e.InnerException)
-                    catena.Add($"{e.GetType().Name}: {e.Message}");
-
-                var dettaglio = string.Join(" <- ", catena);
-
-                // Distingue i due casi che si risolvono in modo opposto
-                var causa =
-                    dettaglio.Contains("SocketException", StringComparison.OrdinalIgnoreCase)
-                        ? "SEMBRA LA PORTA BLOCCATA: l'hosting non lascia uscire il traffico SMTP. " +
-                          "In questo caso l'SMTP non funzionera' mai da qui: usa BREVO_API_KEY, " +
-                          "che passa dalla porta 443 come una normale chiamata web."
-                    : dettaglio.Contains("5.7.0", StringComparison.Ordinal) ||
-                      dettaglio.Contains("Authentication", StringComparison.OrdinalIgnoreCase) ||
-                      dettaglio.Contains("not accepted", StringComparison.OrdinalIgnoreCase)
-                        ? "SEMBRA LA PASSWORD: rigenera la password per le app di Google e " +
-                          "incollala senza spazi in EMAIL_SMTP_PASSWORD."
-                    : "causa non riconosciuta, vedi la catena qui sopra.";
-
+                // Connessione non aperta: ha senso provare l'altra porta
+                _logger.LogWarning("SMTP: {Host}:{Porta} non raggiungibile ({Errore}), provo un'altra porta",
+                    SmtpHost, porta, ex.SocketErrorCode);
+                return (false, true);
+            }
+            catch (System.OperationCanceledException)
+            {
+                // Timeout: di solito e' un blocco silenzioso, vale l'altra porta
+                _logger.LogWarning("SMTP: {Host}:{Porta} in timeout, provo un'altra porta", SmtpHost, porta);
+                return (false, true);
+            }
+            catch (MailKit.Security.AuthenticationException ex)
+            {
+                // Il server risponde ma rifiuta le credenziali: cambiare porta
+                // non risolve, il problema e' la password.
                 _logger.LogError(
-                    "SMTP ha rifiutato la {Tipo}. Stato: {Stato}. Catena: {Dettaglio}. Ipotesi: {Causa}",
-                    tipo, ex.StatusCode, dettaglio, causa);
-
-                return false;
+                    "SMTP: {Host}:{Porta} raggiunto, credenziali RIFIUTATE ({Motivo}). " +
+                    "Rigenera la password per le app su myaccount.google.com/apppasswords " +
+                    "e controlla che la verifica in due passaggi sia attiva.",
+                    SmtpHost, porta, ex.Message);
+                return (false, false);
             }
             catch (Exception ex)
             {
-                // Anche fuori da SmtpException il motivo puo' essere annidato
                 var catena = new List<string>();
                 for (Exception? e = ex; e is not null; e = e.InnerException)
                     catena.Add($"{e.GetType().Name}: {e.Message}");
 
-                _logger.LogError("SMTP: errore inatteso sulla {Tipo}. Catena: {Dettaglio}",
-                    tipo, string.Join(" <- ", catena));
-                return false;
+                _logger.LogWarning("SMTP: errore su {Host}:{Porta}. Catena: {Dettaglio}",
+                    SmtpHost, porta, string.Join(" <- ", catena));
+                return (false, true);
             }
         }
 
