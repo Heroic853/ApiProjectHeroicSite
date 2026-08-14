@@ -35,4 +35,15 @@ ENV ASPNETCORE_URLS=http://+:8080
 ENV DOTNET_hostBuilder__reloadConfigOnChange=false
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 
+# Colori nei log di Render.
+#
+# Non basta ColorBehavior.Enabled in Program.cs: quando l'output non e' un
+# terminale vero (ed e' il caso di un container), .NET intercetta le sequenze
+# ANSI e le RIMUOVE, provando a usare Console.ForegroundColor, che su un
+# output rediretto non fa niente. Risultato: log tutti grigi.
+#
+# Questa variabile gli dice di lasciare passare l'ANSI. Verificato in locale:
+# senza -> 0 righe colorate, con -> 27.
+ENV DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION=1
+
 ENTRYPOINT ["dotnet", "WebApi.dll"]
