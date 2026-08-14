@@ -134,6 +134,193 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        /* riferimento per posizionare la tendina sotto al nome */
+        position: relative;
+    }
+
+    /* ---- Tendina utente ------------------------------------------------
+       Prima il nome era un link diretto al profilo e accanto c'era una X
+       che faceva logout immediato, senza chiedere niente. */
+
+    .user-caret {
+        margin-left: 2px;
+        color: #d4af37;
+        font-size: 0.6rem;
+        transition: transform 0.2s;
+    }
+
+    .user-caret-open {
+        transform: rotate(180deg);
+    }
+
+    /* Fondale invisibile: cliccando fuori la tendina si chiude, senza
+       bisogno di JavaScript per intercettare il click esterno. */
+    .user-menu-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 2500;
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: default;
+    }
+
+    .user-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        z-index: 2600;
+        min-width: 210px;
+        padding: 8px;
+        background: #160a03;
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        border-radius: 10px;
+        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.75);
+        animation: userMenuIn 0.16s ease;
+    }
+
+    @@keyframes userMenuIn {
+        from {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .user-menu-header {
+        padding: 8px 12px 10px;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+        margin-bottom: 6px;
+        color: #8a8a8a;
+        font-size: 0.72rem;
+        word-break: break-all;
+    }
+
+    .user-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        /* 46px: sopra la soglia dei 44px, cosi' funziona anche col dito */
+        min-height: 46px;
+        padding: 0 12px;
+        background: transparent;
+        border: none;
+        border-radius: 7px;
+        color: #e8e8e8;
+        font-family: inherit;
+        font-size: 0.88rem;
+        text-align: left;
+        text-decoration: none !important;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+    }
+
+    .user-menu-item:hover {
+        background: rgba(139, 0, 0, 0.45);
+        color: #ffd700;
+    }
+
+    .user-menu-item-danger:hover {
+        background: rgba(139, 0, 0, 0.6);
+        color: #ff9c9c;
+    }
+
+    .user-menu-sep {
+        height: 1px;
+        margin: 6px 8px;
+        background: rgba(212, 175, 55, 0.18);
+    }
+
+    /* ---- Conferma di uscita ----
+       Un modale del sito invece del confirm() grigio del browser, cosi' e'
+       uguale su telefono e su desktop. */
+
+    .logout-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        animation: userMenuIn 0.18s ease;
+    }
+
+    .logout-box {
+        width: 100%;
+        max-width: 400px;
+        padding: 28px 24px;
+        background: #160a03;
+        border: 1px solid rgba(212, 175, 55, 0.45);
+        border-radius: 12px;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.85);
+        text-align: center;
+    }
+
+    .logout-title {
+        margin: 0 0 10px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1.25rem;
+        letter-spacing: 1px;
+    }
+
+    .logout-text {
+        margin: 0 0 24px;
+        color: #c0c0c0;
+        font-size: 0.92rem;
+        line-height: 1.55;
+    }
+
+    .logout-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .logout-btn {
+        flex: 1;
+        min-height: 48px;
+        border-radius: 8px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.88rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .logout-btn-cancel {
+        background: transparent;
+        border: 1px solid rgba(212, 175, 55, 0.45);
+        color: #d4af37;
+    }
+
+    .logout-btn-cancel:hover {
+        background: rgba(212, 175, 55, 0.12);
+    }
+
+    .logout-btn-confirm {
+        background: linear-gradient(135deg, #8b0000, #b01818);
+        border: 1px solid #ffd700;
+        color: #ffd700;
+        font-weight: bold;
+    }
+
+    .logout-btn-confirm:hover {
+        background: linear-gradient(135deg, #a81010, #d02020);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+
+    @@media (max-width: 520px) {
+        .logout-actions {
+            flex-direction: column-reverse;
+        }
     }
 
     .nav-user-chip {
@@ -280,13 +467,38 @@
         gap: 12px;
     }
 
+    /* Da div e' diventato un bottone per aprire la tendina: serve larghezza
+       piena e cursore a manina.
+       NB: mai scrivere nomi di tag tra parentesi angolari nei commenti CSS
+       di un file .razor: Razor li legge come tag HTML veri e il build
+       fallisce con "Unclosed tag". */
     .drawer-user {
         display: flex;
         align-items: center;
         gap: 8px;
+        width: 100%;
+        min-height: 48px;
         padding: 10px 14px;
         background: rgba(139, 0, 0, 0.3);
         border: 1px solid #8b0000;
+        border-radius: 8px;
+        color: inherit;
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .drawer-user .user-caret {
+        margin-left: auto;
+    }
+
+    /* La tendina nel drawer non e' sovrapposta: si espande in linea, cosi'
+       su schermi piccoli non finisce mai fuori dal bordo. */
+    .drawer-user-menu {
+        margin-top: 8px;
+        padding: 6px;
+        background: rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(212, 175, 55, 0.25);
         border-radius: 8px;
     }
 
@@ -463,12 +675,56 @@
             <div class="nav-auth">
                 <AuthorizeView>
                     <Authorized>
+                        @* Il fondale sta PRIMA della tendina e copre tutto lo
+                           schermo: un click fuori la chiude. *@
+                        @if (userMenuOpen)
+                        {
+                            <button class="user-menu-backdrop"
+                                    aria-label="Close menu"
+                                    @onclick="ChiudiMenuUtente"></button>
+                        }
+
                         <div class="nav-user-zone">
-                            <NavLink href="UserProfile" class="nav-user-chip">
+                            <button class="nav-user-chip"
+                                    @onclick="ToggleMenuUtente"
+                                    aria-haspopup="true"
+                                    aria-expanded="@userMenuOpen"
+                                    title="Account">
                                 <span class="user-icon">⚔️</span>
-                                <span class="user-email">@context.User.FindFirst("email")?.Value</span>
-                            </NavLink>
-                            <button class="nav-signout-btn" @onclick="SignOut" title="Sign Out">✕</button>
+                                <span class="user-email">@NomeUtente(context.User)</span>
+                                <span class="user-caret @(userMenuOpen ? "user-caret-open" : "")">▼</span>
+                            </button>
+
+                            @if (userMenuOpen)
+                            {
+                                <div class="user-menu">
+                                    <div class="user-menu-header">
+                                        @(context.User.FindFirst("email")?.Value ?? "Signed in")
+                                    </div>
+
+                                    <NavLink href="UserProfile"
+                                             class="user-menu-item"
+                                             @onclick="ChiudiMenuUtente">
+                                        <span>⚙</span><span>Settings</span>
+                                    </NavLink>
+
+                                    @if (context.User.IsInRole("Admin"))
+                                    {
+                                        <NavLink href="aniversarytable"
+                                                 class="user-menu-item"
+                                                 @onclick="ChiudiMenuUtente">
+                                            <span>📊</span><span>Admin</span>
+                                        </NavLink>
+                                    }
+
+                                    <div class="user-menu-sep"></div>
+
+                                    <button class="user-menu-item user-menu-item-danger"
+                                            @onclick="ChiediConfermaUscita">
+                                        <span>⏻</span><span>Sign Out</span>
+                                    </button>
+                                </div>
+                            }
                         </div>
                     </Authorized>
                     <NotAuthorized>
@@ -495,10 +751,41 @@
             <div class="mobile-drawer">
                 <AuthorizeView>
                     <Authorized>
-                        <div class="drawer-user">
+                        @* Anche sul telefono il nome apre la tendina, con le
+                           stesse voci del desktop: cliccandolo si espandono
+                           Settings e Sign Out. *@
+                        <button class="drawer-user" @onclick="ToggleMenuUtente">
                             <span class="drawer-user-icon">⚔️</span>
                             <span class="drawer-user-email">@context.User.FindFirst("email")?.Value</span>
-                        </div>
+                            <span class="user-caret @(userMenuOpen ? "user-caret-open" : "")">▼</span>
+                        </button>
+
+                        @if (userMenuOpen)
+                        {
+                            <div class="drawer-user-menu">
+                                <NavLink href="UserProfile"
+                                         class="user-menu-item"
+                                         @onclick="ChiudiMenuEDrawer">
+                                    <span>⚙</span><span>Settings</span>
+                                </NavLink>
+
+                                @if (context.User.IsInRole("Admin"))
+                                {
+                                    <NavLink href="aniversarytable"
+                                             class="user-menu-item"
+                                             @onclick="ChiudiMenuEDrawer">
+                                        <span>📊</span><span>Admin</span>
+                                    </NavLink>
+                                }
+
+                                <div class="user-menu-sep"></div>
+
+                                <button class="user-menu-item user-menu-item-danger"
+                                        @onclick="ChiediConfermaUscita">
+                                    <span>⏻</span><span>Sign Out</span>
+                                </button>
+                            </div>
+                        }
                         <ul class="drawer-links">
                             <li><NavLink href="" Match="NavLinkMatch.All" @onclick="CloseMenu">Introduction</NavLink></li>
                             <li><NavLink href="commissions" @onclick="CloseMenu">Commissions</NavLink></li>
@@ -509,13 +796,13 @@
                             <li><NavLink href="musicproj" @onclick="CloseMenu">Soundtrack</NavLink></li>
                             <li><NavLink href="forbiddenMonsters" @onclick="CloseMenu">Forbidden Monsters</NavLink></li>
                             <li><NavLink href="dragonList" @onclick="CloseMenu">Monster Choice</NavLink></li>
-                            <li><NavLink href="UserProfile" @onclick="CloseMenu">User Settings</NavLink></li>
                             @if (context.User.IsInRole("Admin"))
                             {
                                 <li><NavLink href="aniversarytable" @onclick="CloseMenu">⚙ Admin</NavLink></li>
                             }
                         </ul>
-                        <button class="drawer-signout" @onclick="SignOut">Sign Out</button>
+                        @* Settings e Sign Out sono nella tendina sotto il nome,
+                           qui erano duplicati. *@
                     </Authorized>
                     <NotAuthorized>
                         <ul class="drawer-links">
@@ -570,11 +857,90 @@
     </footer>
 </div>
 
+@* ---- Conferma di uscita ----
+   Un modale del sito invece del confirm() del browser: si vede uguale su
+   telefono e desktop, e non si puo' bloccare come i popup nativi. *@
+@if (confermaUscita)
+{
+    <div class="logout-overlay" @onclick="AnnullaUscita">
+        <div class="logout-box" @onclick:stopPropagation="true">
+            <h2 class="logout-title">Leaving already?</h2>
+            <p class="logout-text">
+                Are you sure you want to sign out?<br />
+                You will need to sign in again to leave ratings or reach your settings.
+            </p>
+            <div class="logout-actions">
+                <button class="logout-btn logout-btn-cancel" @onclick="AnnullaUscita">
+                    Stay
+                </button>
+                <button class="logout-btn logout-btn-confirm" @onclick="ConfermaUscita">
+                    Sign Out
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     bool menuOpen = false;
 
-    void ToggleMenu() => menuOpen = !menuOpen;
-    void CloseMenu() => menuOpen = false;
+    // Tendina sotto il nome utente e modale di conferma uscita
+    bool userMenuOpen = false;
+    bool confermaUscita = false;
+
+    void ToggleMenu()
+    {
+        menuOpen = !menuOpen;
+        // Chiudendo il drawer si chiude anche la tendina, altrimenti
+        // riaprendolo la ritrovi aperta da prima
+        if (!menuOpen) userMenuOpen = false;
+    }
+
+    void CloseMenu()
+    {
+        menuOpen = false;
+        userMenuOpen = false;
+    }
+
+    void ToggleMenuUtente() => userMenuOpen = !userMenuOpen;
+
+    void ChiudiMenuUtente() => userMenuOpen = false;
+
+    /// <summary>Sul telefono, aprire una voce chiude anche il drawer.</summary>
+    void ChiudiMenuEDrawer()
+    {
+        userMenuOpen = false;
+        menuOpen = false;
+    }
+
+    void ChiediConfermaUscita()
+    {
+        userMenuOpen = false;
+        confermaUscita = true;
+    }
+
+    void AnnullaUscita() => confermaUscita = false;
+
+    void ConfermaUscita()
+    {
+        confermaUscita = false;
+        menuOpen = false;
+        SignOut();
+    }
+
+    /// <summary>
+    /// Nome da mostrare nel chip. L'email intera e' troppo lunga per la barra:
+    /// mostra solo la parte prima della chiocciola.
+    /// </summary>
+    static string NomeUtente(System.Security.Claims.ClaimsPrincipal user)
+    {
+        var email = user.FindFirst("email")?.Value;
+        if (string.IsNullOrWhiteSpace(email))
+            return user.Identity?.Name ?? "Hunter";
+
+        var chiocciola = email.IndexOf('@');
+        return chiocciola > 0 ? email[..chiocciola] : email;
+    }
 
     // Era "async void" e chiamava una funzione JS "forceLogout" che non esiste
     // in nessun file del progetto: il bottone Sign Out lanciava un errore JS
