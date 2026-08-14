@@ -230,6 +230,92 @@
         justify-content: center;
     }
 
+    /* ---- Recensioni dentro il modale ----
+       L'altezza e' limitata con lo scorrimento interno: con molte recensioni
+       il modale non deve diventare piu' alto dello schermo. */
+    .overlay-reviews {
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .overlay-reviews-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 12px;
+        color: #d4af37;
+        font-family: 'Cinzel', serif;
+        font-size: 0.82rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .overlay-reviews-count {
+        padding: 1px 8px;
+        background: rgba(139, 0, 0, 0.6);
+        border-radius: 12px;
+        color: #ffd700;
+        font-size: 0.7rem;
+    }
+
+    .overlay-reviews-empty {
+        margin: 0;
+        color: #8a8a8a;
+        font-size: 0.82rem;
+        font-style: italic;
+    }
+
+    .overlay-reviews-link {
+        color: #d4af37;
+        text-decoration: underline;
+    }
+
+    .overlay-reviews-scroll {
+        max-height: 190px;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+
+    .overlay-review {
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+
+    .overlay-review:last-child {
+        border-bottom: none;
+    }
+
+    .overlay-review-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 5px;
+    }
+
+    .overlay-review-author {
+        color: #ffd700;
+        font-size: 0.78rem;
+        font-weight: bold;
+    }
+
+    .overlay-review-vote {
+        padding: 1px 8px;
+        background: rgba(139, 0, 0, 0.45);
+        border-radius: 10px;
+        color: #d4af37;
+        font-size: 0.68rem;
+    }
+
+    .overlay-review-text {
+        margin: 0;
+        color: #d8d8d8;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        overflow-wrap: break-word;
+        white-space: pre-line;
+    }
+
     .overlay-free-image img {
         display: block;
         /* width/height auto + i due max: il browser rimpicciolisce in
@@ -502,6 +588,46 @@
                         Download on Nexus Mods
                     </a>
                 }
+
+                @* Recensioni di questo mostro. Il nome con cui sono salvate
+                   arriva da ModKeyPerMostro: le due liste di nomi non
+                   combaciavano. *@
+                <div class="overlay-reviews">
+                    <div class="overlay-reviews-title">
+                        Hunter reviews
+                        @if (recensioni.Count > 0)
+                        {
+                            <span class="overlay-reviews-count">@recensioni.Count</span>
+                        }
+                    </div>
+
+                    @if (recensioniInCaricamento)
+                    {
+                        <p class="overlay-reviews-empty">Loading...</p>
+                    }
+                    else if (recensioni.Count == 0)
+                    {
+                        <p class="overlay-reviews-empty">
+                            No reviews yet.
+                            <NavLink href="dragonList" class="overlay-reviews-link">Write the first one</NavLink>
+                        </p>
+                    }
+                    else
+                    {
+                        <div class="overlay-reviews-scroll">
+                            @foreach (var r in recensioni)
+                            {
+                                <div class="overlay-review">
+                                    <div class="overlay-review-top">
+                                        <span class="overlay-review-author">@r.AuthorLabel</span>
+                                        <span class="overlay-review-vote">@r.Feedback</span>
+                                    </div>
+                                    <p class="overlay-review-text">@r.Review</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>

@@ -12,12 +12,107 @@ namespace Client.Pages
         private int currentIndex = 0;
         private MonsterEntry currentMonster => monsters[currentIndex];
 
-        private void OpenModal(int index) { currentIndex = index; showModal = true; }
-        private void CloseModal() { showModal = false; }
-        private void NextMonster() { currentIndex = (currentIndex + 1) % monsters.Count; }
-        private void PrevMonster() { currentIndex = (currentIndex - 1 + monsters.Count) % monsters.Count; }
+        [Inject] private IHttpClientFactory HttpClientFactory { get; set; } = default!;
+
+        private List<ReviewDto> recensioni = new();
+        private bool recensioniInCaricamento;
+
+        private async Task OpenModal(int index)
+        {
+            currentIndex = index;
+            showModal = true;
+            await CaricaRecensioni();
+        }
+
+        private void CloseModal()
+        {
+            showModal = false;
+            recensioni.Clear();
+        }
+
+        private async Task NextMonster()
+        {
+            currentIndex = (currentIndex + 1) % monsters.Count;
+            await CaricaRecensioni();
+        }
+
+        private async Task PrevMonster()
+        {
+            currentIndex = (currentIndex - 1 + monsters.Count) % monsters.Count;
+            await CaricaRecensioni();
+        }
+
+        /// <summary>
+        /// Nome con cui le recensioni di questo mostro sono salvate.
+        /// Se manca dalla mappa ripiega sul nome della galleria: peggio che
+        /// puo' capitare e' una sezione vuota, non un errore.
+        /// </summary>
+        private string ModKeyCorrente =>
+            ModKeyPerMostro.TryGetValue(currentMonster.Name, out var chiave)
+                ? chiave
+                : currentMonster.Name;
+
+        private async Task CaricaRecensioni()
+        {
+            recensioniInCaricamento = true;
+            recensioni.Clear();
+            StateHasChanged();
+
+            try
+            {
+                // Client "Anonymous": l'endpoint e' pubblico e i visitatori non
+                // loggati devono poter leggere le recensioni.
+                var anon = HttpClientFactory.CreateClient("Anonymous");
+                var url = $"api/dragon/reviews?monster={Uri.EscapeDataString(ModKeyCorrente)}&limit=20";
+                recensioni = await anon.GetFromJsonAsync<List<ReviewDto>>(url) ?? new();
+            }
+            catch (Exception ex)
+            {
+                recensioni = new();
+                Console.WriteLine($"[reviews] {ex.Message}");
+            }
+            finally
+            {
+                recensioniInCaricamento = false;
+            }
+        }
 
         private record MonsterEntry(string Name, string ThumbnailPath, string LargeImagePath, string? NexusLink, string Description = "[DESCRIPTION]");
+
+        /// <summary>
+        /// Collega il nome della galleria a quello usato nel menu del voto
+        /// (DragonsInfo.Moded).
+        ///
+        /// Le due liste sono nate separate e i nomi non combaciano: 4 su 17
+        /// coincidono, gli altri differiscono per parole in piu' ("DESTROID
+        /// TIGREX XENO") o per errori di battitura ("Khusala" invece di
+        /// "Kushala", "Simbol" invece di "Symbol").
+        ///
+        /// Senza questa mappa le recensioni non si potrebbero mostrare sotto il
+        /// mostro giusto. Una corrispondenza automatica "parziale" arrivava solo
+        /// a 10 su 17 e con abbinamenti fragili, per questo qui sono scritte a
+        /// mano: se aggiungi un mod nuovo, aggiungi anche la sua riga.
+        /// </summary>
+        private static readonly Dictionary<string, string> ModKeyPerMostro = new()
+        {
+            ["Destroid Tigrex"] = "DESTROID TIGREX XENO",
+            ["God Alatreon"] = "God Alatreon",
+            ["Shara Ishava Demon"] = "Shara Demon Ice Revive",
+            ["Destruction Rathalos"] = "DESTRUCTION WYVERN RATHALOS FROM MHXR",
+            ["Blinking Nargacuga"] = "Blinking Nargacuga from MHFZ",
+            ["UNKNOWN"] = "TRUE UNKNOWN SOLTRICE WAR THE DEMON",
+            ["Primordial Risen Alatreon"] = "Primordial Risen Alatreon",
+            ["Configuration Glavenus"] = "Configuration Hellblade Glavenus",
+            ["Zenith Gore Magala"] = "Zenith Gore Magala True frenzy",
+            ["Beast of Berserk"] = "Beast of darkness Berserk",
+            ["True Symbol of Fatalis Velkhana"] = "True Simbol of fatalis Velkana",
+            ["Thunderlord Zinogre"] = "Thunderlord Zinogre",
+            ["A52-Galaxy Nergigante"] = "A52-Galaxy Nergigante new universe",
+            ["Thunder Emperor Kirin"] = "Thunder Emperor Kirin",
+            ["Zenith Shagaru Magala"] = "Zenith Shagaru Magala True Frenzy",
+            ["Viking Khusala Doara"] = "Viking Kushala doara",
+            ["Ebony Khusala Doara"] = "Ebony Kushala Doara",
+        };
 
         private List<MonsterEntry> monsters = new()
         {
