@@ -1,4 +1,6 @@
 ﻿    @page "/UserTable"
+    @* Riservata a te: contiene l'elenco degli utenti registrati *@
+    @attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
     @using SharedLibrary.Dto
     @inject HttpClient Http
 

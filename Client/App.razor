@@ -1,14 +1,97 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 
+<style>
+    /* Schermata per chi apre una pagina riservata */
+    .denied-box {
+        min-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .denied-icon {
+        font-size: 3.4rem;
+    }
+
+    .denied-title {
+        margin: 0;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1.7rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+    }
+
+    .denied-text {
+        margin: 0;
+        max-width: 440px;
+        color: #c0c0c0;
+        font-size: 0.95rem;
+        line-height: 1.65;
+    }
+
+    .denied-btn {
+        margin-top: 8px;
+        padding: 13px 30px;
+        background: linear-gradient(135deg, #8b0000, #b01818);
+        border: 1px solid #ffd700;
+        border-radius: 8px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 0.88rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .denied-btn:hover {
+        background: linear-gradient(135deg, #a81010, #d02020);
+        box-shadow: 0 0 22px rgba(255, 215, 0, 0.3);
+        color: #ffd700;
+        text-decoration: none;
+    }
+</style>
+
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
+            @* Due situazioni diverse, prima trattate allo stesso modo con una
+               scritta rossa e un link da cliccare a mano:
+
+               - non sei entrato        -> ti manda al login e ti riporta qui dopo
+               - sei entrato ma la pagina e' riservata (ruolo Admin)
+                                       -> messaggio chiaro, senza mandarti al login
+                                          che non risolverebbe niente *@
             <AuthorizeRouteView RouteData="@routeData"
                                 DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized>
-                    <p style="color:red;">You are not authorized to see this page.</p>
-                    <a href="authentication/login">Login</a>
+                <NotAuthorized Context="authState">
+                    @if (authState.User.Identity?.IsAuthenticated != true)
+                    {
+                        <RedirectToLogin />
+                    }
+                    else
+                    {
+                        <div class="denied-box">
+                            <div class="denied-icon">🚫</div>
+                            <h1 class="denied-title">Reserved area</h1>
+                            <p class="denied-text">
+                                You are signed in, but this page is restricted.<br />
+                                If you think you should have access, contact Heroic853.
+                            </p>
+                            <a class="denied-btn" href="">Go back to Home</a>
+                        </div>
+                    }
                 </NotAuthorized>
+                <Authorizing>
+                    <div class="denied-box">
+                        <p class="denied-text">Checking your access...</p>
+                    </div>
+                </Authorizing>
             </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>

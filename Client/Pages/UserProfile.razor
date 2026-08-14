@@ -1,4 +1,6 @@
 ﻿@page "/UserProfile"
+@* Le impostazioni dell'account hanno senso solo per chi e' entrato *@
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @using SharedLibrary.Dto
 @using System.Text.RegularExpressions
 @inject Client.Service.ApplicationManager ApplicationManager
