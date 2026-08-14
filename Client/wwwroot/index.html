@@ -4,7 +4,49 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Heroic853 Site</title>
+
+    <!-- ==========================================================
+         DATI PER I MOTORI DI RICERCA
+         ==========================================================
+         Prima qui non c'era niente oltre al title: nessuna description,
+         nessun Open Graph. Google e Bing non avevano nulla da mostrare nei
+         risultati, e condividendo il link su WhatsApp o Discord non usciva
+         nessuna anteprima.
+
+         Il titolo contiene le parole che una persona cerca davvero
+         ("Monster Hunter mods"), non solo il nome del sito. -->
+    <title>Heroic853 — Monster Hunter Mods, Custom Monsters &amp; Commissions</title>
+
+    <meta name="description"
+          content="Custom Monster Hunter mods by Heroic853: reworked monsters for World Iceborne, Rise Sunbreak and Wilds, with 4K textures, custom quests, effects and video montages. Browse the mod gallery or commission your own monster." />
+
+    <meta name="keywords"
+          content="Monster Hunter mods, Monster Hunter World Iceborne mods, Monster Hunter Rise Sunbreak mods, Monster Hunter Wilds mods, custom monster mod, Alatreon mod, Fatalis mod, Nargacuga mod, Heroic853" />
+
+    <meta name="author" content="Heroic853" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0500" />
+
+    <!-- Dice a Google quale indirizzo e' quello "ufficiale" della pagina -->
+    <link rel="canonical" href="https://heroic853.github.io/Heroic853SiteV1/" />
+
+    <!-- Open Graph: l'anteprima quando il link viene incollato su
+         WhatsApp, Discord, Facebook, Telegram -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Heroic853" />
+    <meta property="og:title" content="Heroic853 — Monster Hunter Mods &amp; Custom Monsters" />
+    <meta property="og:description"
+          content="Custom Monster Hunter mods: reworked monsters with 4K textures, custom quests and effects. Browse the gallery or commission your own." />
+    <meta property="og:url" content="https://heroic853.github.io/Heroic853SiteV1/" />
+    <meta property="og:image" content="https://heroic853.github.io/Heroic853SiteV1/images/Heroic853Icon.webp" />
+
+    <!-- Anteprima su X/Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Heroic853 — Monster Hunter Mods" />
+    <meta name="twitter:description"
+          content="Custom Monster Hunter mods: reworked monsters, 4K textures, custom quests and effects." />
+    <meta name="twitter:image" content="https://heroic853.github.io/Heroic853SiteV1/images/Heroic853Icon.webp" />
+
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
@@ -49,18 +91,53 @@
 </head>
 
 <body>
+    <!-- Il contenuto di #app viene sostituito da Blazor quando l'app parte.
+         Fino a quel momento e' l'unica cosa che esiste nella pagina, ed e'
+         anche l'unica che vedono i motori di ricerca che non eseguono
+         JavaScript (Bing, quindi Edge, e le anteprime dei social).
+
+         Prima qui c'era solo "Loading Assets...", cioe' zero informazioni.
+         Il testo qui sotto e' lo stesso che vede l'utente: nessun trucco,
+         solo contenuto reale mostrato per un attimo. -->
     <div id="app">
         <div class="heroic-loader">
             <div class="loader-content">
                 <div class="dragon-pulse"></div>
-                <h1 class="loader-title">Heroic853Site</h1>
+                <h1 class="loader-title">Heroic853 — Monster Hunter Mods</h1>
                 <div class="loader-bar">
                     <div class="loader-progress"></div>
                 </div>
                 <p class="loader-text">Loading Assets...</p>
+                <p class="loader-about">
+                    Custom Monster Hunter monsters for World Iceborne, Rise Sunbreak
+                    and Wilds: 4K textures, custom quests, effects and video montages.
+                </p>
             </div>
         </div>
     </div>
+
+    <!-- Per chi ha JavaScript disattivato e per i crawler piu' semplici:
+         almeno il sito si presenta e offre dei link da seguire. -->
+    <noscript>
+        <div style="max-width:640px;margin:40px auto;padding:24px;color:#e0e0e0;font-family:Georgia,serif;">
+            <h1 style="color:#ffd700;">Heroic853 — Monster Hunter Mods</h1>
+            <p>
+                This site showcases custom Monster Hunter monster mods for
+                Monster Hunter World Iceborne, Monster Hunter Rise Sunbreak and
+                Monster Hunter Wilds: reworked monsters with 4K textures, custom
+                quests, custom effects, custom icons and video montages.
+            </p>
+            <p>
+                It needs JavaScript to run. In the meantime you can find the mods
+                and the videos here:
+            </p>
+            <ul>
+                <li><a style="color:#d4af37;" href="https://www.nexusmods.com/profile/Heroic853">Mods on Nexus Mods</a></li>
+                <li><a style="color:#d4af37;" href="https://www.youtube.com/channel/UCm-gjwogiS1Nf6L2hoI5sJA">Videos on YouTube</a></li>
+                <li><a style="color:#d4af37;" href="https://github.com/Heroic853">GitHub</a></li>
+            </ul>
+        </div>
+    </noscript>
 
     <style>
         .heroic-loader {
@@ -119,6 +196,19 @@
             font-size: 0.8rem;
             margin-top: 10px;
             letter-spacing: 2px;
+        }
+
+        /* Descrizione del sito: e' qui per i motori di ricerca, ma resta
+           leggibile anche dall'utente durante il caricamento. */
+        .loader-about {
+            max-width: 420px;
+            margin: 18px auto 0;
+            padding: 0 16px;
+            color: #8a8a8a;
+            font-family: Georgia, serif;
+            font-size: 0.78rem;
+            line-height: 1.6;
+            letter-spacing: 0;
         }
 
         @keyframes pulse {

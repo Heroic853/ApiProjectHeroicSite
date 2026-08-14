@@ -1,0 +1,15 @@
+# Dice ai motori di ricerca che possono indicizzare tutto il sito.
+# Senza questo file non e' vietato niente, ma indicare la sitemap qui e' il
+# modo standard per farla trovare anche ai crawler a cui non l'hai mandata
+# a mano.
+
+User-agent: *
+Allow: /
+
+# Le pagine di autenticazione non hanno contenuto da indicizzare: sono solo
+# passaggi tecnici verso Auth0, e nei risultati di ricerca farebbero brutta
+# figura.
+Disallow: /authentication/
+Disallow: /payment-success
+
+Sitemap: https://heroic853.github.io/Heroic853SiteV1/sitemap.xml
