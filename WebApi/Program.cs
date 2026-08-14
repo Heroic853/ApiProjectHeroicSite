@@ -18,10 +18,30 @@ builder.Logging.AddSimpleConsole(options =>
     options.SingleLine = true;
     options.TimestampFormat = "HH:mm:ss ";
     options.UseUtcTimestamp = true;
+
+    // COLORI NEI LOG DI RENDER.
+    //
+    // Di default .NET spegne i colori quando l'output non e' un terminale
+    // vero, e su Render non lo e': per questo i log erano tutti grigi.
+    // Enabled li forza sempre, e il pannello di Render interpreta l'ANSI.
+    //
+    // Il colore lo da' il livello del messaggio:
+    //   verde   = info  -> tutto bene (200, visita registrata, email inviata)
+    //   giallo  = warn  -> qualcosa non torna ma il server regge
+    //                      (401, chiamata lenta, variabile mancante)
+    //   rosso   = fail  -> errore vero (500, eccezione, pagamento fallito)
+    //
+    // In RequestLoggingMiddleware il livello e' scelto in base allo stato
+    // HTTP della risposta, quindi il colore corrisponde all'esito reale.
+    options.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Enabled;
 });
 
-// Metti LOG_SQL=true tra le env var di Render per vedere l'SQL che EF genera
-var logSql = string.Equals(Environment.GetEnvironmentVariable("LOG_SQL"), "true", StringComparison.OrdinalIgnoreCase);
+// SQL delle query.
+//
+// Adesso e' ATTIVO per default: serve per vedere cosa succede davvero sul
+// database, con la durata di ogni comando ("Executed DbCommand (41ms)").
+// Se i log diventano troppi, metti LOG_SQL=false tra le env var di Render.
+var logSql = !string.Equals(Environment.GetEnvironmentVariable("LOG_SQL"), "false", StringComparison.OrdinalIgnoreCase);
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command",
     logSql ? LogLevel.Information : LogLevel.Warning);
 
@@ -42,10 +62,17 @@ var startupLogger = LoggerFactory.Create(b =>
         o.SingleLine = true;
         o.TimestampFormat = "HH:mm:ss ";
         o.UseUtcTimestamp = true;
+        o.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Enabled;
     });
 }).CreateLogger("Startup");
 
 startupLogger.LogInformation("Fatalis STARTING to fly...");
+
+// Legenda dei colori, stampata una volta all'avvio: nei log di Render la
+// trovi in cima e sai subito come leggere il resto.
+startupLogger.LogInformation("LEGENDA COLORI --> verde: ok | giallo: da guardare | rosso: errore");
+startupLogger.LogInformation("SQL delle query: {Stato} (si cambia con la variabile LOG_SQL)",
+    logSql ? "attivo, con la durata di ogni comando" : "disattivo");
 
 // ---------------------------------------------------------------------------
 // DATABASE
