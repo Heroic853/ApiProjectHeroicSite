@@ -219,6 +219,8 @@ builder.Services.AddSwaggerGen();
 
 // EmailService esisteva da tempo ma non era mai stato registrato, quindi non
 // veniva mai usato da nessuno. Ora serve al webhook Stripe e al report visite.
+// AddHttpClient gli serve per parlare con Brevo via HTTP.
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<EmailService>();
 
 // Scalda il database in background appena l'app e' su
@@ -263,7 +265,6 @@ var richieste = new (string Nome, string A_cosa_serve)[]
     ("AUTH0_M2M_CLIENT_ID",    "cancellazione account"),
     ("AUTH0_M2M_CLIENT_SECRET","cancellazione account"),
     ("STRIPE_WEBHOOK_SECRET",  "ricevuta al cliente e notifica di vendita"),
-    ("SENDGRID_API_KEY",       "invio di qualsiasi email"),
     ("NOTIFY_EMAIL",           "destinatario di notifiche e report"),
     ("CRON_SECRET",            "report giornaliero delle visite"),
 };
@@ -272,6 +273,22 @@ foreach (var (nome, aCosaServe) in richieste)
 {
     if (string.IsNullOrWhiteSpace(Secret(nome)))
         logger.LogWarning("{Name} non impostata — non funzionera': {A}", nome, aCosaServe);
+}
+
+// Le email hanno DUE possibili chiavi: basta una delle due.
+// Un controllo secco su SENDGRID_API_KEY darebbe un falso allarme a chi usa Brevo.
+using (var scopeEmail = app.Services.CreateScope())
+{
+    var email = scopeEmail.ServiceProvider.GetRequiredService<EmailService>();
+    if (email.IsConfigured)
+        logger.LogInformation("Email: fornitore attivo {Fornitore}", email.Fornitore);
+    else
+        logger.LogWarning(
+            "Email non configurate — non funzioneranno ricevute, notifiche di vendita e report. " +
+            "Serve UNA di queste tre opzioni: " +
+            "(1) EMAIL_SMTP_HOST + EMAIL_SMTP_USER + EMAIL_SMTP_PASSWORD, " +
+            "(2) BREVO_API_KEY, " +
+            "(3) SENDGRID_API_KEY");
 }
 
 if (app.Environment.IsDevelopment())
