@@ -91,6 +91,31 @@ jobs:
           echo "::error::CRON_SECRET non visibile. Vedi i punti qui sopra."
           exit 1
 
+      # Svegliare il container PRIMA, con una chiamata che non fa niente.
+      #
+      # Sul piano gratuito di Render il container si spegne senza traffico e
+      # ci mette fino a un minuto e mezzo a ripartire (misurato: 72s di
+      # avvio piu' 11s di warm-up del database). Facendo tutto in una sola
+      # richiesta, curl andava in timeout: "exit code 28".
+      #
+      # Qui il risveglio e' un passo a parte, con tempo abbondante e senza
+      # far fallire il job: quello che conta e' che al passo dopo il
+      # container sia acceso.
+      - name: Sveglia l'API
+        run: |
+          echo "Risveglio del container (puo' richiedere oltre un minuto)..."
+          for tentativo in 1 2 3; do
+            codice=$(curl -s -o /dev/null -w "%{http_code}" --max-time 180 \
+              "https://apiprojectheroicsite.onrender.com/health" || echo "timeout")
+            echo "  tentativo $tentativo: $codice"
+            if [ "$codice" = "200" ]; then
+              echo "API sveglia."
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::warning::L'API non ha risposto al risveglio. Provo comunque il report."
+
       - name: Chiedi all'API di mandare il report
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
@@ -98,9 +123,10 @@ jobs:
         run: |
           URL="https://apiprojectheroicsite.onrender.com/api/dragon/send-daily-report?dayOffset=$DAY_OFFSET"
 
-          # Il container potrebbe essere spento: la prima richiesta deve avere
-          # il tempo di farlo risvegliare, altrimenti il report salta.
-          risposta=$(curl -s -w "\n%{http_code}" --max-time 120 \
+          # Il container e' gia' stato svegliato dal passo precedente, ma il
+          # margine resta ampio: l'invio via SMTP a Gmail puo' prendere
+          # qualche secondo in piu'.
+          risposta=$(curl -s -w "\n%{http_code}" --max-time 180 \
             -X POST "$URL" \
             -H "X-Cron-Secret: $CRON_SECRET")
 

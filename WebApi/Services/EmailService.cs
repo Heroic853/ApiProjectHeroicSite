@@ -261,10 +261,43 @@ namespace WebApi.Services
             }
             catch (System.Net.Mail.SmtpException ex)
             {
-                // I casi tipici: password per le app sbagliata, verifica in due
-                // passaggi non attiva, oppure porta bloccata.
-                _logger.LogError("SMTP ha rifiutato la {Tipo}: {Stato} — {Motivo}",
-                    tipo, ex.StatusCode, ex.Message);
+                // SmtpException dice sempre e solo "Failure sending mail":
+                // il motivo vero sta nella catena delle inner exception.
+                // Senza srotolarla il log non serviva a niente.
+                var catena = new List<string>();
+                for (Exception? e = ex; e is not null; e = e.InnerException)
+                    catena.Add($"{e.GetType().Name}: {e.Message}");
+
+                var dettaglio = string.Join(" <- ", catena);
+
+                // Distingue i due casi che si risolvono in modo opposto
+                var causa =
+                    dettaglio.Contains("SocketException", StringComparison.OrdinalIgnoreCase)
+                        ? "SEMBRA LA PORTA BLOCCATA: l'hosting non lascia uscire il traffico SMTP. " +
+                          "In questo caso l'SMTP non funzionera' mai da qui: usa BREVO_API_KEY, " +
+                          "che passa dalla porta 443 come una normale chiamata web."
+                    : dettaglio.Contains("5.7.0", StringComparison.Ordinal) ||
+                      dettaglio.Contains("Authentication", StringComparison.OrdinalIgnoreCase) ||
+                      dettaglio.Contains("not accepted", StringComparison.OrdinalIgnoreCase)
+                        ? "SEMBRA LA PASSWORD: rigenera la password per le app di Google e " +
+                          "incollala senza spazi in EMAIL_SMTP_PASSWORD."
+                    : "causa non riconosciuta, vedi la catena qui sopra.";
+
+                _logger.LogError(
+                    "SMTP ha rifiutato la {Tipo}. Stato: {Stato}. Catena: {Dettaglio}. Ipotesi: {Causa}",
+                    tipo, ex.StatusCode, dettaglio, causa);
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                // Anche fuori da SmtpException il motivo puo' essere annidato
+                var catena = new List<string>();
+                for (Exception? e = ex; e is not null; e = e.InnerException)
+                    catena.Add($"{e.GetType().Name}: {e.Message}");
+
+                _logger.LogError("SMTP: errore inatteso sulla {Tipo}. Catena: {Dettaglio}",
+                    tipo, string.Join(" <- ", catena));
                 return false;
             }
         }
