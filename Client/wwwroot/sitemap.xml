@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Elenco delle pagine del sito per i motori di ricerca.
+
+  ATTENZIONE, limite di GitHub Pages: essendo un'app a pagina singola, il
+  server risponde 404 su tutte le rotte tranne la radice (verificato:
+  /newmods e /commissions danno 404). Il file 404.html rimanda comunque
+  all'app, quindi per una persona funziona, ma un crawler vede prima il 404.
+
+  Di conseguenza la pagina che verra' indicizzata bene e' la radice, che ha
+  priorita' 1.0. Le altre sono elencate perche' Google le prova comunque e
+  segue il redirect, ma non aspettarsi che si posizionino come la home.
+  Per risolverlo davvero servirebbe un hosting con le riscritture lato
+  server (Netlify, Cloudflare Pages), che sono gratuiti come Pages.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://heroic853.github.io/Heroic853SiteV1/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://heroic853.github.io/Heroic853SiteV1/newmods</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://heroic853.github.io/Heroic853SiteV1/commissions</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://heroic853.github.io/Heroic853SiteV1/MessageOfGratitude</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://heroic853.github.io/Heroic853SiteV1/thedemonprincemods</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://heroic853.github.io/Heroic853SiteV1/videopage</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://heroic853.github.io/Heroic853SiteV1/musicproj</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://heroic853.github.io/Heroic853SiteV1/forbiddenMonsters</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://heroic853.github.io/Heroic853SiteV1/dragonList</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>
