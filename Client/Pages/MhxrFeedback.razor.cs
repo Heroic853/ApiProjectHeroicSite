@@ -29,9 +29,6 @@ namespace Client.Pages
         private async Task InviaTicket()
         {
             errore = "";
-
-            // Controlli qui davanti: evitano una chiamata inutile e danno un
-            // messaggio preciso invece di un errore generico dal server
             if (string.IsNullOrWhiteSpace(categoria))
             {
                 errore = "Choose what kind of problem it is.";
