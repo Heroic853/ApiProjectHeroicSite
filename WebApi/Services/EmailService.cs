@@ -149,6 +149,32 @@ namespace WebApi.Services
         }
 
         // ------------------------------------------------------------------
+        // NUOVO TICKET MHXR (a te)
+        // ------------------------------------------------------------------
+
+        public Task<bool> SendMhxrTicketNotificationAsync(
+            int idTicket, string categoria, string messaggio, bool anonimo, string? autore, DateTime data)
+        {
+            var body = Wrapper($"""
+                {Heading("Nuovo ticket MHXR", $"#{idTicket} — {categoria}")}
+                {Badge(anonimo ? "● ANONIMO" : "● UTENTE REGISTRATO", anonimo ? "#8b0000" : "#1a7f37")}
+                {Row("Categoria", categoria)}
+                {Row("Autore", autore ?? "non fornito")}
+                {Row("Data", data.ToString("dd/MM/yyyy HH:mm 'UTC'"))}
+                <div style="margin-top:16px;padding:14px 16px;background:rgba(0,0,0,0.35);border:1px solid rgba(212,175,55,0.25);border-radius:8px;color:#e0e0e0;font-size:13px;line-height:1.6;white-space:pre-line;">
+                  {System.Net.WebUtility.HtmlEncode(messaggio)}
+                </div>
+                """);
+
+            if (string.IsNullOrWhiteSpace(NotifyEmail))
+            {
+                _logger.LogWarning("NOTIFY_EMAIL non impostata: notifica ticket MHXR non inviata");
+                return Task.FromResult(false);
+            }
+
+            return SendAsync(NotifyEmail, $"Nuovo ticket MHXR #{idTicket}: {categoria}", body, "ticket MHXR");
+        }
+
         // REPORT GIORNALIERO DELLE VISITE
         // ------------------------------------------------------------------
 

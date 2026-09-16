@@ -1,0 +1,478 @@
+@page "/mhxr-feedback"
+@using SharedLibrary.Dto
+
+<PageTitle>MHXR Feedback — Heroic853</PageTitle>
+
+<style>
+    body {
+        background-image: url('images/ObscureSfondo.webp');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: #0d0500;
+        min-height: 100vh;
+    }
+
+    .mhxr-wrap {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 40px 18px 70px;
+    }
+
+    /* ---- Intestazione ---- */
+
+    .mhxr-hero {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .mhxr-kicker {
+        display: inline-block;
+        padding: 5px 14px;
+        margin-bottom: 14px;
+        background: rgba(139, 0, 0, 0.45);
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        border-radius: 20px;
+        color: #d4af37;
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+    }
+
+    .mhxr-title {
+        margin: 0 0 10px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 2.4rem;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        text-shadow: 0 0 28px rgba(255, 215, 0, 0.35);
+    }
+
+    .mhxr-sub {
+        margin: 0 auto;
+        max-width: 480px;
+        color: #c0c0c0;
+        font-size: 0.95rem;
+        line-height: 1.65;
+    }
+
+    /* ---- Striscia donazione ---- */
+
+    .mhxr-donate {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 26px;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, rgba(139, 0, 0, 0.35), rgba(13, 5, 0, 0.75));
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        border-radius: 12px;
+    }
+
+    .mhxr-donate-icon {
+        flex: 0 0 auto;
+        font-size: 1.8rem;
+        line-height: 1;
+    }
+
+    .mhxr-donate-text {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .mhxr-donate-title {
+        margin: 0 0 3px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 0.95rem;
+        letter-spacing: 1px;
+    }
+
+    .mhxr-donate-sub {
+        margin: 0;
+        color: #b0b0b0;
+        font-size: 0.82rem;
+        line-height: 1.5;
+    }
+
+    .mhxr-donate-btn {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 46px;
+        padding: 0 20px;
+        background: #ffd700;
+        border: 1px solid #ffd700;
+        border-radius: 8px;
+        color: #2a1500 !important;
+        font-family: 'Cinzel', serif;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        text-decoration: none !important;
+        transition: all 0.2s;
+    }
+
+    .mhxr-donate-btn:hover {
+        background: #fff0a0;
+        box-shadow: 0 0 22px rgba(255, 215, 0, 0.45);
+        transform: translateY(-1px);
+    }
+
+    /* ---- Scheda ticket ---- */
+
+    .mhxr-card {
+        background: rgba(13, 5, 0, 0.86);
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        border-radius: 14px;
+        padding: 30px 26px;
+        box-shadow: 0 14px 46px rgba(0, 0, 0, 0.65);
+    }
+
+    .mhxr-card-title {
+        margin: 0 0 6px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1.35rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .mhxr-card-sub {
+        margin: 0 0 24px;
+        color: #a8a8a8;
+        font-size: 0.87rem;
+        line-height: 1.55;
+    }
+
+    .mhxr-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #d4af37;
+        font-size: 0.76rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .mhxr-field {
+        width: 100%;
+        min-height: 52px;
+        margin-bottom: 20px;
+        padding: 13px 15px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 8px;
+        color: #f0f0f0;
+        /* 16px impedisce a iOS di ingrandire la pagina quando si tocca il campo */
+        font-size: 16px;
+        font-family: inherit;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .mhxr-field:focus {
+        outline: none;
+        border-color: #ffd700;
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.14);
+    }
+
+    .mhxr-field option {
+        background: #0d0500;
+        color: #f0f0f0;
+    }
+
+    .mhxr-textarea {
+        min-height: 160px;
+        margin-bottom: 6px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .mhxr-counter {
+        margin-bottom: 20px;
+        color: #8a8a8a;
+        font-size: 0.72rem;
+        text-align: right;
+    }
+
+    .mhxr-counter-limite {
+        color: #ff9c9c;
+    }
+
+    /* ---- Chi sei ---- */
+
+    .mhxr-identita {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 22px;
+        padding: 12px 15px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(212, 175, 55, 0.18);
+        border-radius: 8px;
+        color: #b0b0b0;
+        font-size: 0.82rem;
+        line-height: 1.5;
+    }
+
+    .mhxr-identita-icona {
+        flex: 0 0 auto;
+        font-size: 1.1rem;
+    }
+
+    .mhxr-identita a {
+        color: #d4af37;
+        text-decoration: underline;
+    }
+
+    /* ---- Invio ---- */
+
+    .mhxr-submit {
+        width: 100%;
+        min-height: 56px;
+        background: linear-gradient(135deg, #8b0000, #b01818);
+        border: 1px solid #ffd700;
+        border-radius: 9px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.25s;
+    }
+
+    .mhxr-submit:hover:not(:disabled) {
+        background: linear-gradient(135deg, #a81010, #d02020);
+        box-shadow: 0 0 26px rgba(255, 215, 0, 0.35);
+    }
+
+    .mhxr-submit:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
+
+    .mhxr-msg {
+        margin: 18px 0 0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        text-align: center;
+        line-height: 1.55;
+    }
+
+    .mhxr-msg-errore {
+        background: rgba(139, 0, 0, 0.22);
+        border: 1px solid rgba(200, 40, 40, 0.5);
+        color: #ff9c9c;
+    }
+
+    /* ---- Conferma ---- */
+
+    .mhxr-ok {
+        text-align: center;
+        padding: 14px 0 6px;
+    }
+
+    .mhxr-ok-icona {
+        font-size: 3.2rem;
+        line-height: 1;
+        margin-bottom: 14px;
+    }
+
+    .mhxr-ok-titolo {
+        margin: 0 0 10px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+    }
+
+    .mhxr-ok-testo {
+        margin: 0 0 8px;
+        color: #c0c0c0;
+        font-size: 0.92rem;
+        line-height: 1.6;
+    }
+
+    .mhxr-ok-numero {
+        display: inline-block;
+        margin: 10px 0 20px;
+        padding: 7px 18px;
+        background: rgba(139, 0, 0, 0.5);
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        border-radius: 20px;
+        color: #ffd700;
+        font-family: Consolas, monospace;
+        font-size: 1rem;
+    }
+
+    .mhxr-ok-btn {
+        min-height: 48px;
+        padding: 0 26px;
+        background: transparent;
+        border: 1px solid rgba(212, 175, 55, 0.45);
+        border-radius: 8px;
+        color: #d4af37;
+        font-family: 'Cinzel', serif;
+        font-size: 0.85rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .mhxr-ok-btn:hover {
+        background: rgba(212, 175, 55, 0.12);
+    }
+
+    @@media (max-width: 600px) {
+        .mhxr-wrap {
+            padding: 28px 14px 50px;
+        }
+
+        .mhxr-title {
+            font-size: 1.6rem;
+            letter-spacing: 2px;
+        }
+
+        .mhxr-card {
+            padding: 22px 17px;
+            border-radius: 11px;
+        }
+
+        /* Su schermo stretto la striscia donazione va in colonna, altrimenti
+           il bottone schiaccia il testo */
+        .mhxr-donate {
+            flex-direction: column;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .mhxr-donate-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="mhxr-wrap">
+
+    <div class="mhxr-hero">
+        <span class="mhxr-kicker">Private Server</span>
+        <h1 class="mhxr-title">MHXR Feedback</h1>
+        <p class="mhxr-sub">
+            Found a bug, a crash, or a monster that should not be in that quest?
+            Tell me here and I will look into it.
+        </p>
+    </div>
+
+    @* La donazione sta sopra al modulo, come richiesto. E' volutamente una
+       striscia bassa e non una scheda grande: chi arriva qui vuole segnalare
+       un problema, il modulo deve restare la cosa principale. *@
+    <div class="mhxr-donate">
+        <span class="mhxr-donate-icon">🐉</span>
+        <div class="mhxr-donate-text">
+            <p class="mhxr-donate-title">Keep the server alive</p>
+            <p class="mhxr-donate-sub">
+                The MHXR server runs on my own hardware. Any help is welcome — but it is
+                completely optional, your report matters just as much.
+            </p>
+        </div>
+        <a class="mhxr-donate-btn"
+           href="https://www.paypal.com/paypalme/heroic853"
+           target="_blank"
+           rel="noopener">
+            Donate
+        </a>
+    </div>
+
+    <div class="mhxr-card">
+
+        @if (ticketInviato)
+        {
+            <div class="mhxr-ok">
+                <div class="mhxr-ok-icona">✅</div>
+                <h2 class="mhxr-ok-titolo">Ticket received</h2>
+                <p class="mhxr-ok-testo">
+                    Thank you! I got your report and I will read it as soon as I can.
+                </p>
+                <div class="mhxr-ok-numero">Ticket #@numeroTicket</div>
+                <p class="mhxr-ok-testo">
+                    @(inviatoComeAnonimo
+                        ? "You sent it anonymously, so I have no way to reply directly."
+                        : "You are signed in, so I can get back to you if I need more details.")
+                </p>
+                <button class="mhxr-ok-btn" @onclick="NuovoTicket">Send another one</button>
+            </div>
+        }
+        else
+        {
+            <h2 class="mhxr-card-title">Open a ticket</h2>
+            <p class="mhxr-card-sub">
+                Pick what kind of problem it is, then describe it. The more detail
+                you give (quest name, monster, what you were doing), the faster I can fix it.
+            </p>
+
+            <label class="mhxr-label" for="mhxr-cat">Type of issue</label>
+            <select id="mhxr-cat" class="mhxr-field" @bind="categoria">
+                <option value="">— choose a category —</option>
+                @foreach (var cat in MhxrTicketCategorie.Tutte)
+                {
+                    <option value="@cat">@cat</option>
+                }
+            </select>
+
+            <label class="mhxr-label" for="mhxr-msg">Describe the problem</label>
+            <textarea id="mhxr-msg"
+                      class="mhxr-field mhxr-textarea"
+                      rows="7"
+                      maxlength="4000"
+                      placeholder="What happened? Where? Can you make it happen again?"
+                      @bind="messaggio"
+                      @bind:event="oninput"></textarea>
+
+            <div class="mhxr-counter @(LunghezzaMessaggio > 3800 ? "mhxr-counter-limite" : "")">
+                @LunghezzaMessaggio / 4000
+            </div>
+
+            @* Dire a chi scrive se sara' riconoscibile o no: e' l'unica cosa
+               che cambia se fa login, ed e' giusto che lo sappia prima *@
+            <AuthorizeView>
+                <Authorized>
+                    <div class="mhxr-identita">
+                        <span class="mhxr-identita-icona">🛡️</span>
+                        <span>
+                            You are signed in — I will see who sent this, so I can reply to you.
+                        </span>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="mhxr-identita">
+                        <span class="mhxr-identita-icona">👤</span>
+                        <span>
+                            You are not signed in: this ticket will be <strong>anonymous</strong> and
+                            I will not be able to reply.
+                            <NavLink href="authentication/login">Sign in</NavLink> if you want an answer.
+                        </span>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+
+            <button class="mhxr-submit" @onclick="InviaTicket" disabled="@invioInCorso">
+                @(invioInCorso ? "Sending..." : "Send ticket")
+            </button>
+
+            @if (!string.IsNullOrEmpty(errore))
+            {
+                <p class="mhxr-msg mhxr-msg-errore">@errore</p>
+            }
+        }
+
+    </div>
+</div>
