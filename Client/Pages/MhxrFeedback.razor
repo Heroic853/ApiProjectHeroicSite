@@ -31,7 +31,7 @@
         display: inline-block;
         padding: 5px 14px;
         margin-bottom: 14px;
-        background: rgba(139, 0, 0, 0.45);
+        background: rgba(139, 0, 0, 0.7);
         border: 1px solid rgba(212, 175, 55, 0.4);
         border-radius: 20px;
         color: #d4af37;
@@ -48,15 +48,19 @@
         font-weight: 700;
         letter-spacing: 3px;
         text-transform: uppercase;
-        text-shadow: 0 0 28px rgba(255, 215, 0, 0.35);
+        /* Il bagliore dorato da solo si perdeva sulle parti chiare dello
+           sfondo (fulmini/cielo): questa ombra scura scura sotto lo tiene
+           leggibile ovunque la pagina scorra. */
+        text-shadow: 0 0 28px rgba(255, 215, 0, 0.35), 0 2px 10px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.95);
     }
 
     .mhxr-sub {
         margin: 0 auto;
         max-width: 480px;
-        color: #c0c0c0;
+        color: #d8d8d8;
         font-size: 0.95rem;
         line-height: 1.65;
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 0 4px rgba(0, 0, 0, 0.95);
     }
 
     /* ---- Striscia donazione ---- */
@@ -67,7 +71,7 @@
         gap: 16px;
         margin-bottom: 26px;
         padding: 16px 20px;
-        background: linear-gradient(135deg, rgba(139, 0, 0, 0.35), rgba(13, 5, 0, 0.75));
+        background: linear-gradient(135deg, rgba(139, 0, 0, 0.6), rgba(13, 5, 0, 0.92));
         border: 1px solid rgba(212, 175, 55, 0.35);
         border-radius: 12px;
     }
@@ -127,7 +131,7 @@
     /* ---- Scheda ticket ---- */
 
     .mhxr-card {
-        background: rgba(13, 5, 0, 0.86);
+        background: rgba(10, 4, 0, 0.96);
         border: 1px solid rgba(212, 175, 55, 0.35);
         border-radius: 14px;
         padding: 30px 26px;
@@ -211,7 +215,7 @@
         gap: 10px;
         margin-bottom: 22px;
         padding: 12px 15px;
-        background: rgba(0, 0, 0, 0.35);
+        background: rgba(0, 0, 0, 0.6);
         border: 1px solid rgba(212, 175, 55, 0.18);
         border-radius: 8px;
         color: #b0b0b0;
