@@ -1,0 +1,62 @@
+# Impedisce che GitHub disattivi da solo i job pianificati (Keep API warm,
+# Report visite giornaliero).
+#
+# PERCHE' "MUOIONO": GitHub spegne in automatico QUALUNQUE workflow con
+# "schedule" (cron) se il repository resta 60 giorni senza un commit vero e
+# proprio sul branch predefinito. Non conta che i job stessi girino: contano
+# solo i commit. Su un progetto personale che non si tocca tutti i giorni,
+# prima o poi si superano i 60 giorni e i due workflow sopra si spengono da
+# soli, senza nessun errore nei log — semplicemente non partono piu'.
+#
+# COME LO EVITA: questo job scrive la data corrente in un file e fa un
+# piccolo commit ogni volta che gira (due volte al mese). Un commit vero
+# resetta il conteggio dei 60 giorni per TUTTI i workflow del repo, questo
+# incluso: si mantiene vivo da solo, all'infinito, senza bisogno di
+# ricordarsene tu.
+#
+# CONFIGURAZIONE (una volta sola):
+#   GitHub, in questo repo -> Settings -> Actions -> General ->
+#   "Workflow permissions" -> seleziona "Read and write permissions" -> Save.
+#   Senza questo il push del commit viene rifiutato (403).
+
+name: Keep Actions alive
+
+on:
+  schedule:
+    # Il giorno 1 e il 15 di ogni mese: molto sotto la soglia dei 60 giorni,
+    # con ampio margine anche se un run viene saltato.
+    - cron: "0 3 1,15 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: keep-actions-alive
+  cancel-in-progress: false
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Aggiorna il timestamp
+        run: |
+          mkdir -p .github
+          date -u +"Ultimo heartbeat: %Y-%m-%d %H:%M:%S UTC" > .github/last-heartbeat.txt
+
+      - name: Commit (solo se e' davvero cambiato qualcosa)
+        run: |
+          git config user.name "Heroic853"
+          git config user.email "heroic853@noreply.invalid"
+          git add .github/last-heartbeat.txt
+
+          if git diff --cached --quiet; then
+            echo "Niente da commitare, i job pianificati restano comunque attivi."
+            exit 0
+          fi
+
+          git commit -m "chore: heartbeat automatico (mantiene attivi i job pianificati)"
+          git push
