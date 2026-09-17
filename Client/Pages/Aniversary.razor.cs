@@ -211,7 +211,7 @@ namespace Client.Pages
                 "You great hunter defeat this space danger and chase it away!"
             ),
             
-            new("Thunder Emperor Kirin", "images/17th.webp", "images/17th.webp", "https://www.nexusmods.com/monsterhunterworld/mods/5656", 
+            new("Thunder Emperor Kirin", "images/GoldenKirin.png", "images/GoldenKirin.png", "https://www.nexusmods.com/monsterhunterworld/mods/5656",
                 "It's body structure and overall look is similar to the one of a normal Kirin. " +
                 "Thunder Lord Kirin is bigger than its counterpart. Its body is colored with gradients of gold, " +
                 "its horn has a copper/red color and its mane has a pale grey and yellow gradient. " +

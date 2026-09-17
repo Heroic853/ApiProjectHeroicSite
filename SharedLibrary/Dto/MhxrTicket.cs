@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace SharedLibrary.Dto
 {
@@ -28,6 +29,13 @@ namespace SharedLibrary.Dto
             !string.IsNullOrWhiteSpace(categoria) && Array.IndexOf(Tutte, categoria) >= 0;
     }
 
+    /// <summary>Chi ha scritto un messaggio dentro un ticket.</summary>
+    public static class MhxrMittente
+    {
+        public const string Utente = "Utente";
+        public const string Admin = "Admin";
+    }
+
     /// <summary>Cosa manda il Client per aprire un nuovo ticket.</summary>
     public class MhxrTicketRequest
     {
@@ -35,44 +43,52 @@ namespace SharedLibrary.Dto
         public string Messaggio { get; set; } = string.Empty;
     }
 
-    /// <summary>Cosa manda l'Admin per rispondere a un ticket.</summary>
-    public class MhxrTicketRispostaRequest
+    /// <summary>Cosa manda l'utente o l'admin per aggiungere un messaggio a un ticket gia' aperto.</summary>
+    public class MhxrTicketMessaggioRequest
     {
-        public string Risposta { get; set; } = string.Empty;
+        public string Testo { get; set; } = string.Empty;
+    }
+
+    /// <summary>Un singolo messaggio della conversazione di un ticket.</summary>
+    public class MhxrTicketMessaggioDto
+    {
+        public int Id { get; set; }
+        public string Mittente { get; set; } = string.Empty;
+        public string Testo { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
     }
 
     /// <summary>
-    /// Un ticket come lo vedi tu nella pagina admin.
-    ///
-    /// A differenza delle recensioni pubbliche, qui l'Autore SI vede:
-    /// questo endpoint e' protetto (solo Admin), non pubblico, quindi non
-    /// c'e' bisogno di mascherare l'email — anzi ti serve per capire chi ti
-    /// scrive quando non e' anonimo.
+    /// Un ticket con l'intera conversazione. Lo stesso DTO serve sia al
+    /// Client (il proprio ticket) sia all'Admin (l'elenco di tutti): qui
+    /// l'Autore non viene mai mascherato, e chi lo legge decide da solo
+    /// se e' autorizzato in base a quale endpoint ha chiamato.
     /// </summary>
     public class MhxrTicketDto
     {
         public int Id { get; set; }
         public string Categoria { get; set; } = string.Empty;
-        public string Messaggio { get; set; } = string.Empty;
         public bool Anonimo { get; set; }
         public string? Autore { get; set; }
         public string Stato { get; set; } = "Aperto";
         public DateTime CreatedAt { get; set; }
-        public string? Risposta { get; set; }
-        public DateTime? RispostoAt { get; set; }
+        public List<MhxrTicketMessaggioDto> Messaggi { get; set; } = new();
     }
 
     /// <summary>
-    /// Il ticket come sta sul database (tabella "MhxrTickets").
-    /// La tabella si crea con WebApi/Migrations/SQL-manuale-mhxr-tickets.sql
+    /// Il ticket come sta sul database (tabella "MhxrTickets"). I messaggi
+    /// (apertura, risposte, richieste di chiarimento) stanno nella tabella
+    /// figlia "MhxrTicketMessaggi" (entita' <see cref="MhxrTicketMessaggio"/>),
+    /// non qui: prima il primo messaggio e l'unica risposta erano due colonne
+    /// fisse su questa riga, ma una conversazione vera puo' avere piu' scambi
+    /// in entrambe le direzioni.
+    /// La tabella si crea/aggiorna con WebApi/Migrations/SQL-manuale-mhxr-tickets.sql
     /// </summary>
     public class MhxrTicket
     {
         public int Id { get; set; }
 
         public string Categoria { get; set; } = string.Empty;
-
-        public string Messaggio { get; set; } = string.Empty;
 
         /// <summary>true se chi ha scritto NON era loggato.</summary>
         public bool Anonimo { get; set; } = true;
@@ -83,16 +99,14 @@ namespace SharedLibrary.Dto
         /// </summary>
         public string? Autore { get; set; }
 
-        /// <summary>Aperto / Preso in carico / Risposto / Chiuso.</summary>
+        /// <summary>
+        /// Aperto (in attesa di te) / Preso in carico / Risposto (in attesa
+        /// di lui) / Chiuso. Solo tu puoi chiudere un ticket: lo decide
+        /// sempre e solo <see cref="MhxrTicketController.CambiaStato"/>.
+        /// </summary>
         public string Stato { get; set; } = "Aperto";
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        /// <summary>La risposta scritta dall'admin, null finche' non risponde.</summary>
-        public string? Risposta { get; set; }
-
-        /// <summary>Quando e' stata scritta la risposta.</summary>
-        public DateTime? RispostoAt { get; set; }
 
         /// <summary>
         /// Solo per i ticket anonimi: il "biglietto" che il Client salva in
@@ -107,5 +121,20 @@ namespace SharedLibrary.Dto
         /// non ha un account da controllare.
         /// </summary>
         public string? IndirizzoIp { get; set; }
+    }
+
+    /// <summary>Un messaggio della conversazione, sulla tabella "MhxrTicketMessaggi".</summary>
+    public class MhxrTicketMessaggio
+    {
+        public int Id { get; set; }
+
+        public int IdTicket { get; set; }
+
+        /// <summary>"Utente" o "Admin" — vedi <see cref="MhxrMittente"/>.</summary>
+        public string Mittente { get; set; } = string.Empty;
+
+        public string Testo { get; set; } = string.Empty;
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

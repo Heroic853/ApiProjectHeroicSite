@@ -189,11 +189,35 @@ namespace WebApi.Services
                   {System.Net.WebUtility.HtmlEncode(risposta)}
                 </div>
                 <p style="margin:24px 0 0;color:#c0c0c0;font-size:13px;line-height:1.6;">
-                  You can see the full conversation and close the ticket on the MHXR Feedback page.
+                  You can see the full conversation on the MHXR Feedback page.
                 </p>
                 """);
 
             return SendAsync(toEmail, $"Reply to your MHXR ticket #{idTicket}", body, "risposta ticket MHXR");
+        }
+
+        // ------------------------------------------------------------------
+        // NUOVO MESSAGGIO DELL'UTENTE SU UN TICKET MHXR (a te)
+        // ------------------------------------------------------------------
+
+        public Task<bool> SendMhxrTicketFollowUpNotificationAsync(
+            int idTicket, string categoria, string testo, string chi)
+        {
+            var body = Wrapper($"""
+                {Heading("New message on an MHXR ticket", $"#{idTicket} — {categoria}")}
+                {Row("From", chi)}
+                <div style="margin-top:16px;padding:14px 16px;background:rgba(0,0,0,0.35);border:1px solid rgba(212,175,55,0.25);border-radius:8px;color:#e0e0e0;font-size:13px;line-height:1.6;white-space:pre-line;">
+                  {System.Net.WebUtility.HtmlEncode(testo)}
+                </div>
+                """);
+
+            if (string.IsNullOrWhiteSpace(NotifyEmail))
+            {
+                _logger.LogWarning("NOTIFY_EMAIL non impostata: notifica nuovo messaggio ticket MHXR non inviata");
+                return Task.FromResult(false);
+            }
+
+            return SendAsync(NotifyEmail, $"New message on MHXR ticket #{idTicket}", body, "nuovo messaggio ticket MHXR");
         }
 
         // REPORT GIORNALIERO DELLE VISITE

@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace Client.Pages
 {
-    public partial class MhxrFeedback
+    public partial class MhxrFeedback : IDisposable
     {
         [Inject] private IHttpClientFactory HttpClientFactory { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
@@ -25,6 +25,9 @@ namespace Client.Pages
         private const string ChiaveTicketId = "mhxr_ticket_id";
         private const string ChiaveTicketToken = "mhxr_ticket_token";
 
+        /// <summary>Ogni quanto la pagina si aggiorna da sola mentre un ticket e' aperto.</summary>
+        private static readonly TimeSpan IntervalloAggiornamento = TimeSpan.FromSeconds(6);
+
         private string categoria = "";
         private string messaggio = "";
 
@@ -35,24 +38,29 @@ namespace Client.Pages
         /// L'ultimo ticket ancora aperto: di chi e' loggato (letto dal token)
         /// oppure, per chi non lo e', quello salvato in localStorage. Se non e'
         /// null il modulo di invio resta nascosto: un solo ticket alla volta,
-        /// finche' non e' risposto/chiuso.
+        /// finche' l'ADMIN non lo chiude (l'utente non ha questo potere).
         /// </summary>
         private MhxrTicketDto? ticketAttivo;
 
         /// <summary>
         /// true se ticketAttivo viene dal percorso anonimo (localStorage):
-        /// serve a ChiudiTicket per sapere quale endpoint chiamare, visto che
-        /// per chi non e' loggato non c'e' un token da mandare, serve invece
-        /// il "biglietto" salvato.
+        /// serve a InviaMessaggio per sapere quale endpoint chiamare, visto
+        /// che per chi non e' loggato non c'e' un token da mandare, serve
+        /// invece il "biglietto" salvato.
         /// </summary>
         private bool ticketAttivoEAnonimo;
 
         private bool caricamentoIniziale = true;
-        private bool chiusuraInCorso;
+
+        private string nuovoMessaggio = "";
+        private bool invioMessaggioInCorso;
 
         private bool MostraModulo => ticketAttivo is null;
 
         private int LunghezzaMessaggio => messaggio?.Length ?? 0;
+
+        private PeriodicTimer? _timerAggiornamento;
+        private CancellationTokenSource? _ctsAggiornamento;
 
         protected override async Task OnInitializedAsync()
         {
@@ -63,6 +71,49 @@ namespace Client.Pages
                 await CaricaTicketAnonimoAsync();
 
             caricamentoIniziale = false;
+
+            // Parte una volta e resta attivo per tutta la vita della pagina:
+            // ogni giro controlla da solo se c'e' davvero un ticket da
+            // aggiornare, quindi non serve fermarlo/riavviarlo quando si apre
+            // o si chiude un ticket.
+            _ctsAggiornamento = new CancellationTokenSource();
+            _ = CicloAggiornamentoAsync(_ctsAggiornamento.Token);
+        }
+
+        /// <summary>
+        /// Rilegge il ticket attivo a intervalli regolari, cosi' un nuovo
+        /// messaggio (mio o dell'admin) compare senza dover ricaricare la
+        /// pagina a mano.
+        /// </summary>
+        private async Task CicloAggiornamentoAsync(CancellationToken ct)
+        {
+            _timerAggiornamento = new PeriodicTimer(IntervalloAggiornamento);
+            try
+            {
+                while (await _timerAggiornamento.WaitForNextTickAsync(ct))
+                {
+                    if (ticketAttivo is null)
+                        continue;
+
+                    if (ticketAttivoEAnonimo)
+                        await CaricaTicketAnonimoAsync();
+                    else
+                        await CaricaTicketAttivoAsync();
+
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Normale quando si lascia la pagina, vedi Dispose
+            }
+        }
+
+        public void Dispose()
+        {
+            _ctsAggiornamento?.Cancel();
+            _ctsAggiornamento?.Dispose();
+            _timerAggiornamento?.Dispose();
         }
 
         private async Task CaricaTicketAttivoAsync()
@@ -83,9 +134,10 @@ namespace Client.Pages
 
         /// <summary>
         /// Legge id+token salvati in localStorage (se ci sono) e chiede al
-        /// server lo stato di quel ticket. Se il ticket e' stato chiuso, o il
-        /// biglietto non e' piu' valido, lo si dimentica: cosi' la pagina
-        /// torna a mostrare il modulo per un ticket nuovo.
+        /// server lo stato di quel ticket. Se il ticket e' stato chiuso (solo
+        /// l'admin puo' farlo), o il biglietto non e' piu' valido, lo si
+        /// dimentica: cosi' la pagina torna a mostrare il modulo per un
+        /// ticket nuovo.
         /// </summary>
         private async Task CaricaTicketAnonimoAsync()
         {
@@ -109,6 +161,7 @@ namespace Client.Pages
                 if (ticket is null || ticket.Stato == "Chiuso")
                 {
                     await DimenticaBigliettoAnonimoAsync();
+                    ticketAttivo = null;
                     return;
                 }
 
@@ -167,49 +220,6 @@ namespace Client.Pages
             }
         }
 
-        private async Task ChiudiTicket()
-        {
-            if (ticketAttivo is null || chiusuraInCorso)
-                return;
-
-            chiusuraInCorso = true;
-            try
-            {
-                HttpResponseMessage risposta;
-
-                if (ticketAttivoEAnonimo)
-                {
-                    var (_, token) = await LeggiBigliettoAnonimoAsync();
-                    var anonClient = HttpClientFactory.CreateClient("Anonymous");
-                    risposta = await anonClient.PostAsync(
-                        $"api/mhxr/ticket-anonimo/{ticketAttivo.Id}/chiudi?token={Uri.EscapeDataString(token ?? "")}",
-                        null);
-
-                    if (risposta.IsSuccessStatusCode)
-                        await DimenticaBigliettoAnonimoAsync();
-                }
-                else
-                {
-                    risposta = await Http.PostAsync($"api/mhxr/ticket/{ticketAttivo.Id}/chiudi", null);
-                }
-
-                if (risposta.IsSuccessStatusCode)
-                {
-                    ticketAttivo = null;
-                    ticketAttivoEAnonimo = false;
-                    NuovoTicket();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[mhxr-ticket] chiusura fallita: {ex.Message}");
-            }
-            finally
-            {
-                chiusuraInCorso = false;
-            }
-        }
-
         private async Task InviaTicket()
         {
             errore = "";
@@ -257,10 +267,18 @@ namespace Client.Pages
                         {
                             Id = id,
                             Categoria = categoria,
-                            Messaggio = messaggio,
                             Anonimo = true,
                             Stato = "Aperto",
-                            CreatedAt = DateTime.UtcNow
+                            CreatedAt = DateTime.UtcNow,
+                            Messaggi = new List<MhxrTicketMessaggioDto>
+                            {
+                                new()
+                                {
+                                    Mittente = MhxrMittente.Utente,
+                                    Testo = messaggio,
+                                    CreatedAt = DateTime.UtcNow
+                                }
+                            }
                         };
                         ticketAttivoEAnonimo = true;
                     }
@@ -269,7 +287,7 @@ namespace Client.Pages
                         // Chi e' loggato passa direttamente alla schermata di stato:
                         // e' anche il modo in cui la pagina applica "un ticket alla
                         // volta", perche' MostraModulo torna false finche' non e'
-                        // chiuso.
+                        // chiuso dall'admin.
                         await CaricaTicketAttivoAsync();
                     }
 
@@ -318,6 +336,63 @@ namespace Client.Pages
         }
 
         /// <summary>
+        /// Aggiunge un messaggio al ticket gia' aperto. Non chiude/riapre
+        /// nulla lato Client: lo stato che torna dal server (che intanto ha
+        /// rimesso il ticket ad "Aperto", il tuo turno) e' quello che conta.
+        /// </summary>
+        private async Task InviaMessaggio()
+        {
+            if (ticketAttivo is null || invioMessaggioInCorso)
+                return;
+
+            var testo = nuovoMessaggio.Trim();
+            if (string.IsNullOrWhiteSpace(testo))
+                return;
+
+            invioMessaggioInCorso = true;
+            try
+            {
+                HttpResponseMessage risposta;
+
+                if (ticketAttivoEAnonimo)
+                {
+                    var (_, token) = await LeggiBigliettoAnonimoAsync();
+                    var anonClient = HttpClientFactory.CreateClient("Anonymous");
+                    risposta = await anonClient.PostAsJsonAsync(
+                        $"api/mhxr/ticket-anonimo/{ticketAttivo.Id}/messaggi?token={Uri.EscapeDataString(token ?? "")}",
+                        new MhxrTicketMessaggioRequest { Testo = testo });
+                }
+                else
+                {
+                    risposta = await Http.PostAsJsonAsync(
+                        $"api/mhxr/ticket/{ticketAttivo.Id}/messaggi",
+                        new MhxrTicketMessaggioRequest { Testo = testo });
+                }
+
+                if (risposta.IsSuccessStatusCode)
+                {
+                    var aggiornato = await risposta.Content.ReadFromJsonAsync<MhxrTicketDto>();
+                    if (aggiornato is not null)
+                        ticketAttivo = aggiornato;
+
+                    nuovoMessaggio = "";
+                }
+                else
+                {
+                    Console.WriteLine($"[mhxr-ticket] invio messaggio fallito: {(int)risposta.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[mhxr-ticket] invio messaggio fallito: {ex.Message}");
+            }
+            finally
+            {
+                invioMessaggioInCorso = false;
+            }
+        }
+
+        /// <summary>
         /// Sceglie con quale client mandare la richiesta.
         ///
         /// L'endpoint accetta tutti, ma il server deve poter capire CHI scrive
@@ -346,13 +421,6 @@ namespace Client.Pages
             {
                 return null;
             }
-        }
-
-        private void NuovoTicket()
-        {
-            categoria = "";
-            messaggio = "";
-            errore = "";
         }
 
         /// <summary>Etichetta in inglese per il badge di stato del ticket.</summary>

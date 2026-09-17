@@ -210,14 +210,13 @@
                             <span class="ticket-meta">@t.Categoria · @t.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
                         </div>
 
-                        <div class="ticket-msg">@t.Messaggio</div>
-
-                        @if (!string.IsNullOrWhiteSpace(t.Risposta))
+                        @foreach (var msg in t.Messaggi)
                         {
-                            <div class="ticket-risposta">
-                                <strong>Your reply</strong>
-                                (@(t.RispostoAt.HasValue ? t.RispostoAt.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm") : "")):
-                                @t.Risposta
+                            var delAdmin = msg.Mittente == MhxrMittente.Admin;
+                            <div class="@(delAdmin ? "ticket-risposta" : "ticket-msg")">
+                                <strong>@(delAdmin ? "You" : "Them")</strong>
+                                (@msg.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")):
+                                @msg.Testo
                             </div>
                         }
 
@@ -225,7 +224,7 @@
                         {
                             <div class="ticket-azioni">
                                 <button class="ticket-btn" @onclick="() => ToggleRisposta(t.Id)">
-                                    @(rigaAperta.Contains(t.Id) ? "Cancel" : (string.IsNullOrWhiteSpace(t.Risposta) ? "Reply" : "Edit reply"))
+                                    @(rigaAperta.Contains(t.Id) ? "Cancel" : "Reply")
                                 </button>
                                 <button class="ticket-btn ticket-btn-danger"
                                         @onclick="() => ChiudiTicket(t.Id)"

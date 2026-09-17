@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 
 namespace Client.Pages
 {
-    public partial class MhxrTicketsAdmin
+    public partial class MhxrTicketsAdmin : IDisposable
     {
         private List<MhxrTicketDto>? Tickets;
         private string? loadError;
@@ -28,7 +28,42 @@ namespace Client.Pages
 
         private readonly Dictionary<int, string> erroreRiga = new();
 
-        protected override async Task OnInitializedAsync() => await CaricaTicketsAsync();
+        private PeriodicTimer? _timerAggiornamento;
+        private CancellationTokenSource? _ctsAggiornamento;
+
+        protected override async Task OnInitializedAsync()
+        {
+            await CaricaTicketsAsync();
+
+            // Cosi' un nuovo messaggio dell'utente compare da solo, senza
+            // dover ricaricare la pagina per accorgersene.
+            _ctsAggiornamento = new CancellationTokenSource();
+            _ = CicloAggiornamentoAsync(_ctsAggiornamento.Token);
+        }
+
+        private async Task CicloAggiornamentoAsync(CancellationToken ct)
+        {
+            _timerAggiornamento = new PeriodicTimer(TimeSpan.FromSeconds(8));
+            try
+            {
+                while (await _timerAggiornamento.WaitForNextTickAsync(ct))
+                {
+                    await CaricaTicketsAsync();
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Normale quando si lascia la pagina, vedi Dispose
+            }
+        }
+
+        public void Dispose()
+        {
+            _ctsAggiornamento?.Cancel();
+            _ctsAggiornamento?.Dispose();
+            _timerAggiornamento?.Dispose();
+        }
 
         private async Task CaricaTicketsAsync()
         {
@@ -73,7 +108,7 @@ namespace Client.Pages
             {
                 var risposta = await Http.PostAsJsonAsync(
                     $"api/mhxr/tickets/{id}/rispondi",
-                    new MhxrTicketRispostaRequest { Risposta = testo });
+                    new MhxrTicketMessaggioRequest { Testo = testo });
 
                 if (risposta.IsSuccessStatusCode)
                 {

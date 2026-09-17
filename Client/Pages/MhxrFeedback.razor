@@ -5,7 +5,7 @@
 
 <style>
     body {
-        background-image: url('images/ObscureSfondo.webp');
+        background-image: url('images/WallpaperMHXR.png');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: top center;
@@ -408,70 +408,6 @@
         text-align: center;
     }
 
-    .mhxr-status-actions {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    /* ---- Conferma ---- */
-
-    .mhxr-ok {
-        text-align: center;
-        padding: 14px 0 6px;
-    }
-
-    .mhxr-ok-icona {
-        font-size: 3.2rem;
-        line-height: 1;
-        margin-bottom: 14px;
-    }
-
-    .mhxr-ok-titolo {
-        margin: 0 0 10px;
-        color: #ffd700;
-        font-family: 'Cinzel', serif;
-        font-size: 1.4rem;
-        letter-spacing: 2px;
-    }
-
-    .mhxr-ok-testo {
-        margin: 0 0 8px;
-        color: #c0c0c0;
-        font-size: 0.92rem;
-        line-height: 1.6;
-    }
-
-    .mhxr-ok-numero {
-        display: inline-block;
-        margin: 10px 0 20px;
-        padding: 7px 18px;
-        background: rgba(139, 0, 0, 0.5);
-        border: 1px solid rgba(212, 175, 55, 0.4);
-        border-radius: 20px;
-        color: #ffd700;
-        font-family: Consolas, monospace;
-        font-size: 1rem;
-    }
-
-    .mhxr-ok-btn {
-        min-height: 48px;
-        padding: 0 26px;
-        background: transparent;
-        border: 1px solid rgba(212, 175, 55, 0.45);
-        border-radius: 8px;
-        color: #d4af37;
-        font-family: 'Cinzel', serif;
-        font-size: 0.85rem;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .mhxr-ok-btn:hover {
-        background: rgba(212, 175, 55, 0.12);
-    }
-
     @@media (max-width: 600px) {
         .mhxr-wrap {
             padding: 28px 14px 50px;
@@ -572,42 +508,35 @@
 
             <p class="mhxr-convo-title">Conversation</p>
             <div class="mhxr-convo">
-                <div>
-                    <div class="mhxr-bubble mhxr-bubble-user">@ticketAttivo.Messaggio</div>
-                    <div class="mhxr-bubble-meta mhxr-bubble-meta-user">
-                        You, @ticketAttivo.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
-                    </div>
-                </div>
-
-                @if (!string.IsNullOrWhiteSpace(ticketAttivo.Risposta))
+                @foreach (var msg in ticketAttivo.Messaggi)
                 {
+                    var daTe = msg.Mittente == MhxrMittente.Utente;
                     <div>
-                        <div class="mhxr-bubble mhxr-bubble-staff">@ticketAttivo.Risposta</div>
-                        <div class="mhxr-bubble-meta">
-                            Heroic853,
-                            @(ticketAttivo.RispostoAt.HasValue
-                                ? ticketAttivo.RispostoAt.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
-                                : "")
+                        <div class="mhxr-bubble @(daTe ? "mhxr-bubble-user" : "mhxr-bubble-staff")">@msg.Testo</div>
+                        <div class="mhxr-bubble-meta @(daTe ? "mhxr-bubble-meta-user" : "")">
+                            @(daTe ? "You" : "Heroic853"), @msg.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
                         </div>
                     </div>
                 }
             </div>
 
-            @if (!string.IsNullOrWhiteSpace(ticketAttivo.Risposta))
-            {
-                <div class="mhxr-status-actions">
-                    <button class="mhxr-ok-btn" @onclick="ChiudiTicket" disabled="@chiusuraInCorso">
-                        @(chiusuraInCorso ? "Closing…" : "Close ticket & open a new one")
-                    </button>
-                </div>
-            }
-            else
-            {
-                <p class="mhxr-status-note">
-                    Waiting for a reply. You can only have one open ticket at a time —
-                    once I answer, you will be able to close it and send a new one if needed.
-                </p>
-            }
+            <p class="mhxr-status-note">
+                Only I can close this ticket, once it's resolved — you can keep writing here
+                in the meantime.
+            </p>
+
+            <label class="mhxr-label" for="mhxr-newmsg">Add a message</label>
+            <textarea id="mhxr-newmsg"
+                      class="mhxr-field mhxr-textarea"
+                      style="min-height:90px;"
+                      maxlength="4000"
+                      placeholder="Add more details, or answer a question..."
+                      @bind="nuovoMessaggio"
+                      @bind:event="oninput"></textarea>
+
+            <button class="mhxr-submit" @onclick="InviaMessaggio" disabled="@(invioMessaggioInCorso || string.IsNullOrWhiteSpace(nuovoMessaggio))">
+                @(invioMessaggioInCorso ? "Sending..." : "Send message")
+            </button>
         }
         else
         {

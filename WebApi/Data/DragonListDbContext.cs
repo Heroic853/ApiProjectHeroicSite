@@ -10,6 +10,7 @@ namespace WebApi.Data
         public DbSet<Clasification> Clasification { get; set; }
         public DbSet<PageVisit> PageVisits { get; set; }
         public DbSet<MhxrTicket> MhxrTickets { get; set; } // tabella "MhxrTickets", creata a mano su Supabase
+        public DbSet<MhxrTicketMessaggio> MhxrTicketMessaggi { get; set; } // tabella "MhxrTicketMessaggi", idem
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
