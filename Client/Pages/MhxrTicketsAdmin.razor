@@ -1,0 +1,266 @@
+@page "/admin/mhxr-tickets"
+@* Riservata a te: qui rispondi ai ticket aperti dalla pagina /mhxr-feedback *@
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+@using SharedLibrary.Dto
+@inject HttpClient Http
+
+<style>
+    body {
+        background-image: url('images/sfondoadmin.webp');
+        background-size: cover;
+        background-position: top center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-color: black;
+        min-height: 100vh;
+    }
+
+    .title-tickets {
+        text-align: center;
+        color: gold;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        font-size: 2.6rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        margin: 2rem 0 0.5rem;
+    }
+
+    .tickets-wrap {
+        max-width: 940px;
+        margin: 0 auto;
+        padding: 0 16px 60px;
+    }
+
+    .tickets-sub {
+        text-align: center;
+        color: #c0c0c0;
+        margin-bottom: 24px;
+    }
+
+    .tickets-filtro {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 22px;
+    }
+
+    .tickets-filtro select {
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        background: #1a1a1a;
+        color: #f0f0f0;
+    }
+
+    .ticket-card {
+        margin-bottom: 16px;
+        padding: 16px 18px;
+        background: rgba(20, 20, 20, 0.9);
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        border-radius: 10px;
+    }
+
+    .ticket-card-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .ticket-id {
+        color: gold;
+        font-weight: 700;
+        font-family: Consolas, monospace;
+    }
+
+    .ticket-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 14px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .ticket-badge-pending { background: rgba(212,175,55,0.2); border: 1px solid rgba(212,175,55,0.5); color: #ffd700; }
+    .ticket-badge-progress { background: rgba(70,130,180,0.22); border: 1px solid rgba(120,170,220,0.5); color: #9ecbf0; }
+    .ticket-badge-answered { background: rgba(26,127,55,0.25); border: 1px solid rgba(60,180,100,0.5); color: #8fe6a8; }
+    .ticket-badge-closed { background: rgba(120,120,120,0.2); border: 1px solid rgba(160,160,160,0.35); color: #b0b0b0; }
+    .ticket-badge-anon { background: rgba(139,0,0,0.3); border: 1px solid rgba(200,60,60,0.5); color: #ff9c9c; }
+    .ticket-badge-user { background: rgba(26,127,55,0.2); border: 1px solid rgba(60,180,100,0.4); color: #8fe6a8; }
+
+    .ticket-meta {
+        color: #999;
+        font-size: 0.8rem;
+    }
+
+    .ticket-msg {
+        margin: 10px 0;
+        padding: 10px 12px;
+        background: rgba(0,0,0,0.35);
+        border-radius: 6px;
+        color: #e0e0e0;
+        font-size: 0.9rem;
+        line-height: 1.55;
+        white-space: pre-line;
+    }
+
+    .ticket-risposta {
+        margin: 10px 0;
+        padding: 10px 12px;
+        background: rgba(212,175,55,0.08);
+        border: 1px solid rgba(212,175,55,0.3);
+        border-radius: 6px;
+        color: #fff3cc;
+        font-size: 0.9rem;
+        line-height: 1.55;
+        white-space: pre-line;
+    }
+
+    .ticket-azioni {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .ticket-btn {
+        padding: 7px 16px;
+        border-radius: 6px;
+        border: 1px solid rgba(212, 175, 55, 0.45);
+        background: transparent;
+        color: #d4af37;
+        font-size: 0.82rem;
+        cursor: pointer;
+    }
+
+    .ticket-btn:hover:not(:disabled) {
+        background: rgba(212, 175, 55, 0.12);
+    }
+
+    .ticket-btn:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
+
+    .ticket-btn-danger {
+        border-color: rgba(200, 60, 60, 0.5);
+        color: #ff9c9c;
+    }
+
+    .ticket-reply-box {
+        margin-top: 10px;
+    }
+
+    .ticket-reply-box textarea {
+        width: 100%;
+        min-height: 90px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        background: rgba(0,0,0,0.5);
+        color: #f0f0f0;
+        font-family: inherit;
+        font-size: 0.9rem;
+    }
+</style>
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <p class="title-tickets">MHXR Tickets</p>
+        <div class="tickets-wrap">
+            <p class="tickets-sub">Reports sent from the MHXR Feedback page.</p>
+
+            <div class="tickets-filtro">
+                <select @bind="filtroStato" @bind:after="ApplicaFiltro">
+                    <option value="">All statuses</option>
+                    <option value="Aperto">Pending</option>
+                    <option value="Preso in carico">In progress</option>
+                    <option value="Risposto">Answered</option>
+                    <option value="Chiuso">Closed</option>
+                </select>
+            </div>
+
+            @if (loadError is not null)
+            {
+                <p style="color:#ff6b6b;text-align:center;">@loadError</p>
+            }
+            else if (Tickets is null)
+            {
+                <p style="color:white;text-align:center;"><em>Loading please...</em></p>
+            }
+            else if (TicketsFiltrati.Count == 0)
+            {
+                <p style="color:#999;text-align:center;">No tickets here.</p>
+            }
+            else
+            {
+                @foreach (var t in TicketsFiltrati)
+                {
+                    <div class="ticket-card">
+                        <div class="ticket-card-head">
+                            <span class="ticket-id">#@t.Id</span>
+                            <span class="ticket-badge @ClasseStato(t.Stato)">@EtichettaStato(t.Stato)</span>
+                            <span class="ticket-badge @(t.Anonimo ? "ticket-badge-anon" : "ticket-badge-user")">
+                                @(t.Anonimo ? "Anonymous" : t.Autore)
+                            </span>
+                            <span class="ticket-meta">@t.Categoria · @t.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
+                        </div>
+
+                        <div class="ticket-msg">@t.Messaggio</div>
+
+                        @if (!string.IsNullOrWhiteSpace(t.Risposta))
+                        {
+                            <div class="ticket-risposta">
+                                <strong>Your reply</strong>
+                                (@(t.RispostoAt.HasValue ? t.RispostoAt.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm") : "")):
+                                @t.Risposta
+                            </div>
+                        }
+
+                        @if (t.Stato != "Chiuso")
+                        {
+                            <div class="ticket-azioni">
+                                <button class="ticket-btn" @onclick="() => ToggleRisposta(t.Id)">
+                                    @(rigaAperta.Contains(t.Id) ? "Cancel" : (string.IsNullOrWhiteSpace(t.Risposta) ? "Reply" : "Edit reply"))
+                                </button>
+                                <button class="ticket-btn ticket-btn-danger"
+                                        @onclick="() => ChiudiTicket(t.Id)"
+                                        disabled="@operazioneInCorso.Contains(t.Id)">
+                                    Close
+                                </button>
+                            </div>
+
+                            @if (rigaAperta.Contains(t.Id))
+                            {
+                                <div class="ticket-reply-box">
+                                    <textarea @bind="bozzeRisposta[t.Id]" @bind:event="oninput"
+                                              placeholder="Write your reply..."></textarea>
+                                    <div class="ticket-azioni">
+                                        <button class="ticket-btn"
+                                                @onclick="() => InviaRisposta(t.Id)"
+                                                disabled="@operazioneInCorso.Contains(t.Id)">
+                                            @(operazioneInCorso.Contains(t.Id) ? "Sending..." : "Send reply")
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        @if (erroreRiga.TryGetValue(t.Id, out var erroreT) && !string.IsNullOrEmpty(erroreT))
+                        {
+                            <p style="color:#ff9c9c;font-size:0.82rem;margin-top:8px;">@erroreT</p>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+        <p style="text-align:center;color:white;margin-top:3rem;">Sorry you are not authorized</p>
+    </NotAuthorized>
+</AuthorizeView>

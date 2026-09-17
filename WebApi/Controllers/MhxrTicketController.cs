@@ -156,6 +156,26 @@ namespace WebApi.Controllers
 
             var autore = AutoreDalToken();
 
+            // Un utente loggato puo' avere UN SOLO ticket aperto alla volta:
+            // deve prima ricevere risposta (o chiuderlo lui stesso) prima di
+            // poterne aprire un altro. Per chi scrive anonimo questo controllo
+            // non ha senso: non c'e' un'identita' stabile da tracciare, e
+            // resta comunque coperto dal freno anti-abuso sopra.
+            if (autore is not null)
+            {
+                var haGiaUnTicketAperto = await _db.MhxrTickets
+                    .AsNoTracking()
+                    .AnyAsync(t => t.Autore == autore && t.Stato != "Chiuso");
+
+                if (haGiaUnTicketAperto)
+                {
+                    return Conflict(new
+                    {
+                        message = "You already have an open ticket. Wait for a reply or close it before sending a new one."
+                    });
+                }
+            }
+
             var ticket = new MhxrTicket
             {
                 Categoria = richiesta.Categoria,
@@ -200,6 +220,72 @@ namespace WebApi.Controllers
         }
 
         // ------------------------------------------------------------------
+        // IL MIO TICKET (utente loggato, non admin)
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// L'ultimo ticket aperto da CHI CHIAMA (letto dal token, mai da un
+        /// id passato dal Client). Il Client lo usa per decidere se mostrare
+        /// il modulo "nuovo ticket" oppure lo stato di quello gia' in corso.
+        /// Null se l'utente non ha mai scritto nulla.
+        /// </summary>
+        [HttpGet("mio-ticket")]
+        [Authorize]
+        public async Task<IActionResult> GetMioTicket()
+        {
+            var autore = AutoreDalToken();
+            if (autore is null)
+                return Ok((MhxrTicketDto?)null);
+
+            var ticket = await _db.MhxrTickets
+                .AsNoTracking()
+                .Where(t => t.Autore == autore)
+                .OrderByDescending(t => t.CreatedAt)
+                .Select(t => new MhxrTicketDto
+                {
+                    Id = t.Id,
+                    Categoria = t.Categoria,
+                    Messaggio = t.Messaggio,
+                    Anonimo = t.Anonimo,
+                    Autore = t.Autore,
+                    Stato = t.Stato,
+                    CreatedAt = t.CreatedAt,
+                    Risposta = t.Risposta,
+                    RispostoAt = t.RispostoAt
+                })
+                .FirstOrDefaultAsync();
+
+            return Ok(ticket);
+        }
+
+        /// <summary>
+        /// Chiude un TUO ticket, cosi' puoi aprirne uno nuovo. Solo il chiama
+        /// che l'ha aperto puo' chiuderlo: e' un controllo di proprieta', non
+        /// un permesso da admin.
+        /// </summary>
+        [HttpPost("ticket/{id:int}/chiudi")]
+        [Authorize]
+        public async Task<IActionResult> ChiudiMioTicket(int id)
+        {
+            var autore = AutoreDalToken();
+            if (autore is null)
+                return Forbid();
+
+            var ticket = await _db.MhxrTickets.FindAsync(id);
+            if (ticket is null || ticket.Autore != autore)
+                return NotFound(new { message = "Ticket not found" });
+
+            if (ticket.Stato == "Chiuso")
+                return Ok(new { message = "Already closed" });
+
+            ticket.Stato = "Chiuso";
+            await _db.SaveChangesAsync();
+
+            _logger.LogInformation("Ticket MHXR #{Id} chiuso dall'utente {Autore}", id, autore);
+            return Ok(new { message = "Ticket closed" });
+        }
+
+        // ------------------------------------------------------------------
         // LETTURA (solo tu)
         // ------------------------------------------------------------------
 
@@ -232,7 +318,9 @@ namespace WebApi.Controllers
                     Anonimo = t.Anonimo,
                     Autore = t.Autore,
                     Stato = t.Stato,
-                    CreatedAt = t.CreatedAt
+                    CreatedAt = t.CreatedAt,
+                    Risposta = t.Risposta,
+                    RispostoAt = t.RispostoAt
                 })
                 .ToListAsync();
 
@@ -240,12 +328,12 @@ namespace WebApi.Controllers
             return Ok(tickets);
         }
 
-        /// <summary>Cambia lo stato di un ticket.</summary>
+        /// <summary>Cambia lo stato di un ticket, senza scrivere una risposta.</summary>
         [HttpPost("tickets/{id:int}/stato")]
         [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> CambiaStato(int id, [FromBody] string nuovoStato)
         {
-            var ammessi = new[] { "Aperto", "Preso in carico", "Chiuso" };
+            var ammessi = new[] { "Aperto", "Preso in carico", "Risposto", "Chiuso" };
             if (!ammessi.Contains(nuovoStato))
                 return BadRequest(new { message = "Stato non valido" });
 
@@ -258,6 +346,43 @@ namespace WebApi.Controllers
 
             _logger.LogInformation("Ticket MHXR #{Id} passato a {Stato}", id, nuovoStato);
             return Ok(new { message = "Stato aggiornato" });
+        }
+
+        /// <summary>
+        /// Scrive la risposta al ticket. Imposta lo stato su "Risposto" da
+        /// solo: non serve chiamare anche CambiaStato dopo. Se chi ha aperto
+        /// il ticket ha un'email riconoscibile (non e' anonimo), gli arriva
+        /// anche una notifica — se fallisce non blocca comunque il salvataggio.
+        /// </summary>
+        [HttpPost("tickets/{id:int}/rispondi")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> Rispondi(int id, [FromBody] MhxrTicketRispostaRequest richiesta)
+        {
+            var risposta = richiesta?.Risposta?.Trim();
+            if (string.IsNullOrWhiteSpace(risposta))
+                return BadRequest(new { message = "Write a reply before sending" });
+
+            var ticket = await _db.MhxrTickets.FindAsync(id);
+            if (ticket is null)
+                return NotFound(new { message = "Ticket non trovato" });
+
+            ticket.Risposta = risposta;
+            ticket.RispostoAt = DateTime.UtcNow;
+            ticket.Stato = "Risposto";
+            await _db.SaveChangesAsync();
+
+            _logger.LogInformation("Ticket MHXR #{Id} risposto", id);
+
+            // Solo indirizzi che sembrano davvero un'email: AutoreDalToken puo'
+            // ripiegare su un id Auth0 (il "sub") quando il token non ha il
+            // claim email, e quello non e' un indirizzo a cui scrivere.
+            if (!ticket.Anonimo && ticket.Autore is { } autore && autore.Contains('@'))
+            {
+                await _email.SendMhxrTicketAnsweredNotificationAsync(
+                    ticket.Id, ticket.Categoria, risposta, autore);
+            }
+
+            return Ok(new { message = "Reply sent" });
         }
     }
 }

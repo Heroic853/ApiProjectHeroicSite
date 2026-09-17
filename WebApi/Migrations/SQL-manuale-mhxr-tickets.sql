@@ -36,11 +36,17 @@ CREATE TABLE IF NOT EXISTS "MhxrTickets" (
     -- puo' spacciarsi per un altro.
     "Autore"      text,
 
-    -- Serve a te per gestirli: Aperto / Preso in carico / Chiuso
+    -- Serve a te per gestirli: Aperto / Preso in carico / Risposto / Chiuso
     "Stato"       varchar(20) NOT NULL DEFAULT 'Aperto',
 
     -- Quando e' arrivato
-    "CreatedAt"   timestamp with time zone NOT NULL DEFAULT now()
+    "CreatedAt"   timestamp with time zone NOT NULL DEFAULT now(),
+
+    -- La tua risposta all'utente, NULL finche' non rispondi.
+    "Risposta"    text,
+
+    -- Quando hai risposto (serve al Client per mostrare la conversazione)
+    "RispostoAt"  timestamp with time zone
 );
 
 
@@ -49,9 +55,14 @@ CREATE TABLE IF NOT EXISTS "MhxrTickets" (
 CREATE INDEX IF NOT EXISTS "IX_MhxrTickets_Stato_CreatedAt"
     ON "MhxrTickets" ("Stato", "CreatedAt" DESC);
 
+-- Se la tabella esisteva gia' da un tentativo precedente senza queste due
+-- colonne, questo la mette in pari senza toccare le righe gia' presenti.
+ALTER TABLE "MhxrTickets" ADD COLUMN IF NOT EXISTS "Risposta" text;
+ALTER TABLE "MhxrTickets" ADD COLUMN IF NOT EXISTS "RispostoAt" timestamp with time zone;
+
 
 -- =====================================================================
--- VERIFICA: lancia anche questa, devi vedere le 7 colonne qui sopra
+-- VERIFICA: lancia anche questa, devi vedere le 9 colonne qui sopra
 -- =====================================================================
 SELECT column_name, data_type, is_nullable, column_default
 FROM information_schema.columns

@@ -272,6 +272,147 @@
         color: #ff9c9c;
     }
 
+    /* ---- Stato del ticket (chi e' loggato) ---- */
+
+    .mhxr-status-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .mhxr-status-id {
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1.15rem;
+        letter-spacing: 1px;
+    }
+
+    .mhxr-badge {
+        display: inline-block;
+        padding: 4px 13px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .mhxr-badge-pending {
+        background: rgba(212, 175, 55, 0.2);
+        border: 1px solid rgba(212, 175, 55, 0.5);
+        color: #ffd700;
+    }
+
+    .mhxr-badge-progress {
+        background: rgba(70, 130, 180, 0.22);
+        border: 1px solid rgba(120, 170, 220, 0.5);
+        color: #9ecbf0;
+    }
+
+    .mhxr-badge-answered {
+        background: rgba(26, 127, 55, 0.25);
+        border: 1px solid rgba(60, 180, 100, 0.5);
+        color: #8fe6a8;
+    }
+
+    .mhxr-badge-closed {
+        background: rgba(120, 120, 120, 0.2);
+        border: 1px solid rgba(160, 160, 160, 0.35);
+        color: #b0b0b0;
+    }
+
+    .mhxr-status-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 16px;
+        margin-bottom: 6px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+    }
+
+    .mhxr-status-meta-label {
+        display: block;
+        color: #8a8a8a;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+    }
+
+    .mhxr-status-meta-value {
+        color: #e0e0e0;
+        font-size: 0.9rem;
+    }
+
+    .mhxr-convo-title {
+        margin: 20px 0 14px;
+        color: #d4af37;
+        font-size: 0.78rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .mhxr-convo {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .mhxr-bubble {
+        max-width: 92%;
+        padding: 13px 16px;
+        border-radius: 12px;
+        font-size: 0.88rem;
+        line-height: 1.6;
+        white-space: pre-line;
+    }
+
+    .mhxr-bubble-user {
+        align-self: flex-end;
+        background: rgba(139, 0, 0, 0.28);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        color: #f5f0e6;
+        border-bottom-right-radius: 3px;
+    }
+
+    .mhxr-bubble-staff {
+        align-self: flex-start;
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        color: #fff3cc;
+        border-bottom-left-radius: 3px;
+    }
+
+    .mhxr-bubble-meta {
+        margin-top: 6px;
+        color: #888;
+        font-size: 0.7rem;
+    }
+
+    .mhxr-bubble-meta-user {
+        text-align: right;
+    }
+
+    .mhxr-status-note {
+        margin-top: 22px;
+        padding: 13px 15px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(212, 175, 55, 0.18);
+        border-radius: 8px;
+        color: #b0b0b0;
+        font-size: 0.85rem;
+        line-height: 1.55;
+        text-align: center;
+    }
+
+    .mhxr-status-actions {
+        margin-top: 20px;
+        text-align: center;
+    }
+
     /* ---- Conferma ---- */
 
     .mhxr-ok {
@@ -394,7 +535,71 @@
 
     <div class="mhxr-card">
 
-        @if (ticketInviato)
+        @if (caricamentoIniziale)
+        {
+            <p class="mhxr-card-sub" style="text-align:center;margin:0;">Loading your ticket…</p>
+        }
+        else if (ticketAttivo is not null)
+        {
+            @* Chi e' loggato e ha gia' un ticket non ancora chiuso vede questo
+               invece del modulo: e' cosi' che la pagina applica "un ticket alla
+               volta", ed e' anche il posto dove si vede se/quando ho risposto. *@
+            <div class="mhxr-status-head">
+                <span class="mhxr-status-id">Ticket #@ticketAttivo.Id</span>
+                <span class="mhxr-badge @ClasseStato(ticketAttivo.Stato)">@EtichettaStato(ticketAttivo.Stato)</span>
+            </div>
+
+            <div class="mhxr-status-meta">
+                <div>
+                    <span class="mhxr-status-meta-label">Type of issue</span>
+                    <span class="mhxr-status-meta-value">@ticketAttivo.Categoria</span>
+                </div>
+                <div>
+                    <span class="mhxr-status-meta-label">Sent on</span>
+                    <span class="mhxr-status-meta-value">@ticketAttivo.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
+                </div>
+            </div>
+
+            <p class="mhxr-convo-title">Conversation</p>
+            <div class="mhxr-convo">
+                <div>
+                    <div class="mhxr-bubble mhxr-bubble-user">@ticketAttivo.Messaggio</div>
+                    <div class="mhxr-bubble-meta mhxr-bubble-meta-user">
+                        You, @ticketAttivo.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(ticketAttivo.Risposta))
+                {
+                    <div>
+                        <div class="mhxr-bubble mhxr-bubble-staff">@ticketAttivo.Risposta</div>
+                        <div class="mhxr-bubble-meta">
+                            Heroic853,
+                            @(ticketAttivo.RispostoAt.HasValue
+                                ? ticketAttivo.RispostoAt.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                                : "")
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(ticketAttivo.Risposta))
+            {
+                <div class="mhxr-status-actions">
+                    <button class="mhxr-ok-btn" @onclick="ChiudiTicket" disabled="@chiusuraInCorso">
+                        @(chiusuraInCorso ? "Closing…" : "Close ticket & open a new one")
+                    </button>
+                </div>
+            }
+            else
+            {
+                <p class="mhxr-status-note">
+                    Waiting for a reply. You can only have one open ticket at a time —
+                    once I answer, you will be able to close it and send a new one if needed.
+                </p>
+            }
+        }
+        else if (ticketInviato)
         {
             <div class="mhxr-ok">
                 <div class="mhxr-ok-icona">✅</div>

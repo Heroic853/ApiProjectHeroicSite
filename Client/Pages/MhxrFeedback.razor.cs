@@ -24,7 +24,70 @@ namespace Client.Pages
         private int numeroTicket;
         private bool inviatoComeAnonimo;
 
+        /// <summary>
+        /// L'ultimo ticket di chi e' loggato. Se non e' "Chiuso" il modulo di
+        /// invio resta nascosto: un utente puo' avere un solo ticket aperto
+        /// alla volta, deve prima ricevere risposta o chiuderlo lui.
+        /// Per chi NON e' loggato resta sempre null: senza account non c'e'
+        /// modo di ritrovare un ticket dopo aver lasciato la pagina, quindi
+        /// per gli anonimi il limite "uno alla volta" non si puo' applicare.
+        /// </summary>
+        private MhxrTicketDto? ticketAttivo;
+        private bool caricamentoIniziale = true;
+        private bool chiusuraInCorso;
+
+        private bool MostraModulo => ticketAttivo is null;
+
         private int LunghezzaMessaggio => messaggio?.Length ?? 0;
+
+        protected override async Task OnInitializedAsync()
+        {
+            var stato = await AuthStateProvider.GetAuthenticationStateAsync();
+            if (stato.User.Identity?.IsAuthenticated == true)
+                await CaricaTicketAttivoAsync();
+
+            caricamentoIniziale = false;
+        }
+
+        private async Task CaricaTicketAttivoAsync()
+        {
+            try
+            {
+                var ultimo = await Http.GetFromJsonAsync<MhxrTicketDto?>("api/mhxr/mio-ticket");
+                ticketAttivo = ultimo is { Stato: not "Chiuso" } ? ultimo : null;
+            }
+            catch (Exception ex)
+            {
+                // Se questa chiamata fallisce si mostra comunque il modulo:
+                // meglio lasciar scrivere un ticket che bloccare la pagina.
+                Console.WriteLine($"[mhxr-ticket] impossibile leggere il ticket attivo: {ex.Message}");
+            }
+        }
+
+        private async Task ChiudiTicket()
+        {
+            if (ticketAttivo is null || chiusuraInCorso)
+                return;
+
+            chiusuraInCorso = true;
+            try
+            {
+                var risposta = await Http.PostAsync($"api/mhxr/ticket/{ticketAttivo.Id}/chiudi", null);
+                if (risposta.IsSuccessStatusCode)
+                {
+                    ticketAttivo = null;
+                    NuovoTicket();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[mhxr-ticket] chiusura fallita: {ex.Message}");
+            }
+            finally
+            {
+                chiusuraInCorso = false;
+            }
+        }
 
         private async Task InviaTicket()
         {
@@ -57,7 +120,21 @@ namespace Client.Pages
                     numeroTicket = dati.TryGetProperty("id", out var id) ? id.GetInt32() : 0;
                     inviatoComeAnonimo = !dati.TryGetProperty("anonimo", out var anon) || anon.GetBoolean();
 
-                    ticketInviato = true;
+                    if (inviatoComeAnonimo)
+                    {
+                        // Senza account non c'e' modo di ritrovare il ticket dopo:
+                        // resta la vecchia schermata "grazie, puoi mandarne un altro".
+                        ticketInviato = true;
+                    }
+                    else
+                    {
+                        // Chi e' loggato passa direttamente alla schermata di stato:
+                        // e' anche il modo in cui la pagina applica "un ticket alla
+                        // volta", perche' MostraModulo torna false finche' non e'
+                        // chiuso.
+                        await CaricaTicketAttivoAsync();
+                    }
+
                     return;
                 }
 
@@ -65,11 +142,19 @@ namespace Client.Pages
                 {
                     System.Net.HttpStatusCode.TooManyRequests =>
                         "You already sent several tickets. Please wait a bit before sending another one.",
+                    System.Net.HttpStatusCode.Conflict =>
+                        await LeggiMessaggio(response) ?? "You already have an open ticket.",
                     System.Net.HttpStatusCode.BadRequest =>
                         await LeggiMessaggio(response) ?? "Check the fields and try again.",
                     _ =>
                         $"Could not send the ticket (error {(int)response.StatusCode}). Please try again later."
                 };
+
+                // Se il server ha rifiutato perche' c'e' gia' un ticket aperto,
+                // si allinea la pagina con quello vero invece di lasciarla
+                // a mostrare un modulo che tanto verra' rifiutato di nuovo.
+                if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+                    await CaricaTicketAttivoAsync();
             }
             catch (AccessTokenNotAvailableException)
             {
@@ -127,5 +212,23 @@ namespace Client.Pages
             errore = "";
             numeroTicket = 0;
         }
+
+        /// <summary>Etichetta in inglese per il badge di stato del ticket.</summary>
+        private static string EtichettaStato(string stato) => stato switch
+        {
+            "Risposto" => "Answered",
+            "Chiuso" => "Closed",
+            "Preso in carico" => "In progress",
+            _ => "Pending"
+        };
+
+        /// <summary>Classe CSS del badge, coerente col colore dell'etichetta sopra.</summary>
+        private static string ClasseStato(string stato) => stato switch
+        {
+            "Risposto" => "mhxr-badge-answered",
+            "Chiuso" => "mhxr-badge-closed",
+            "Preso in carico" => "mhxr-badge-progress",
+            _ => "mhxr-badge-pending"
+        };
     }
 }

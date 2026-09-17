@@ -13,15 +13,15 @@ namespace SharedLibrary.Dto
     public static class MhxrTicketCategorie
     {
         public const string Bug = "Bug";
-        public const string MostroSbagliato = "Mostro sbagliato nella quest";
+        public const string WrongMonster = "Wrong monster in quest";
         public const string Crash = "Crash";
         public const string Multiplayer = "Multiplayer";
         public const string LanguagePatch = "Language patch bug";
-        public const string Altro = "Altro";
+        public const string Other = "Other";
 
         public static readonly string[] Tutte =
         {
-            Bug, MostroSbagliato, Crash, Multiplayer, LanguagePatch, Altro
+            Bug, WrongMonster, Crash, Multiplayer, LanguagePatch, Other
         };
 
         public static bool EValida(string? categoria) =>
@@ -33,6 +33,12 @@ namespace SharedLibrary.Dto
     {
         public string Categoria { get; set; } = string.Empty;
         public string Messaggio { get; set; } = string.Empty;
+    }
+
+    /// <summary>Cosa manda l'Admin per rispondere a un ticket.</summary>
+    public class MhxrTicketRispostaRequest
+    {
+        public string Risposta { get; set; } = string.Empty;
     }
 
     /// <summary>
@@ -52,6 +58,8 @@ namespace SharedLibrary.Dto
         public string? Autore { get; set; }
         public string Stato { get; set; } = "Aperto";
         public DateTime CreatedAt { get; set; }
+        public string? Risposta { get; set; }
+        public DateTime? RispostoAt { get; set; }
     }
 
     /// <summary>
@@ -75,9 +83,15 @@ namespace SharedLibrary.Dto
         /// </summary>
         public string? Autore { get; set; }
 
-        /// <summary>Aperto / Preso in carico / Chiuso.</summary>
+        /// <summary>Aperto / Preso in carico / Risposto / Chiuso.</summary>
         public string Stato { get; set; } = "Aperto";
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>La risposta scritta dall'admin, null finche' non risponde.</summary>
+        public string? Risposta { get; set; }
+
+        /// <summary>Quando e' stata scritta la risposta.</summary>
+        public DateTime? RispostoAt { get; set; }
     }
 }

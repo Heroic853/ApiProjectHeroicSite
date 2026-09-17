@@ -655,6 +655,7 @@
                         @if (context.User.IsInRole("Admin"))
                         {
                             <li><NavLink href="aniversarytable">⚙ Admin</NavLink></li>
+                            <li><NavLink href="admin/mhxr-tickets">🎫 Tickets</NavLink></li>
                         }
                     </ul>
                 </Authorized>
@@ -717,6 +718,11 @@
                                                  @onclick="ChiudiMenuUtente">
                                             <span>📊</span><span>Admin</span>
                                         </NavLink>
+                                        <NavLink href="admin/mhxr-tickets"
+                                                 class="user-menu-item"
+                                                 @onclick="ChiudiMenuUtente">
+                                            <span>🎫</span><span>MHXR Tickets</span>
+                                        </NavLink>
                                     }
 
                                     <div class="user-menu-sep"></div>
@@ -778,6 +784,11 @@
                                              @onclick="ChiudiMenuEDrawer">
                                         <span>📊</span><span>Admin</span>
                                     </NavLink>
+                                    <NavLink href="admin/mhxr-tickets"
+                                             class="user-menu-item"
+                                             @onclick="ChiudiMenuEDrawer">
+                                        <span>🎫</span><span>MHXR Tickets</span>
+                                    </NavLink>
                                 }
 
                                 <div class="user-menu-sep"></div>
@@ -802,6 +813,7 @@
                             @if (context.User.IsInRole("Admin"))
                             {
                                 <li><NavLink href="aniversarytable" @onclick="CloseMenu">⚙ Admin</NavLink></li>
+                                <li><NavLink href="admin/mhxr-tickets" @onclick="CloseMenu">🎫 Tickets</NavLink></li>
                             }
                         </ul>
                         @* Settings e Sign Out sono nella tendina sotto il nome,
