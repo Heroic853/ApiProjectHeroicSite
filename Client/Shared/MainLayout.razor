@@ -121,6 +121,39 @@
         border-bottom: 2px solid #d4af37;
     }
 
+    /* ---- Tendina "Special Videos" -> "Soundtrack" -----------------------
+       Prima erano due voci separate nella barra, che la allungavano senza
+       bisogno: Soundtrack ci sta dentro a comparsa, passandoci sopra col
+       mouse (o col focus da tastiera, per chi naviga senza mouse). */
+    .nav-dropdown {
+        position: relative;
+    }
+
+    .nav-dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 150px;
+        margin: 4px 0 0;
+        padding: 6px;
+        list-style: none;
+        background: #160a03;
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        border-radius: 8px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+        z-index: 60;
+    }
+
+    .nav-dropdown:hover .nav-dropdown-menu,
+    .nav-dropdown:focus-within .nav-dropdown-menu {
+        display: block;
+    }
+
+    .nav-dropdown-menu li a {
+        padding: 8px 12px;
+    }
+
     /* ── Auth zone ── */
     .nav-auth {
         display: flex;
@@ -642,13 +675,16 @@
             <AuthorizeView>
                 <Authorized>
                     <ul class="nav-links" id="nav-links">
-                        <li><NavLink href="" Match="NavLinkMatch.All">Introduction</NavLink></li>
                         <li><NavLink href="commissions">Commissions</NavLink></li>
                         <li><NavLink href="MessageOfGratitude">Mod History</NavLink></li>
                         <li><NavLink href="newmods">Updates Mods</NavLink></li>
                         <li><NavLink href="thedemonprincemods">The Demon Prince Mods</NavLink></li>
-                        <li><NavLink href="videopage">Special Videos</NavLink></li>
-                        <li><NavLink href="musicproj">Soundtrack</NavLink></li>
+                        <li class="nav-dropdown">
+                            <NavLink href="videopage">Special Videos</NavLink>
+                            <ul class="nav-dropdown-menu">
+                                <li><NavLink href="musicproj">Soundtrack</NavLink></li>
+                            </ul>
+                        </li>
                         <li><NavLink href="forbiddenMonsters">Forbidden Monsters</NavLink></li>
                         <li><NavLink href="mhxr-feedback">MHXR Feedback</NavLink></li>
                         <li><NavLink href="dragonList">Monster Choice</NavLink></li>
@@ -661,13 +697,16 @@
                 </Authorized>
                 <NotAuthorized>
                     <ul class="nav-links" id="nav-links">
-                        <li><NavLink href="" Match="NavLinkMatch.All">Introduction</NavLink></li>
                         <li><NavLink href="commissions">Commissions</NavLink></li>
                         <li><NavLink href="MessageOfGratitude">Mod History</NavLink></li>
                         <li><NavLink href="newmods">Updates Mods</NavLink></li>
                         <li><NavLink href="thedemonprincemods">The Demon Prince Mods</NavLink></li>
-                        <li><NavLink href="videopage">Special Videos</NavLink></li>
-                        <li><NavLink href="musicproj">Soundtrack</NavLink></li>
+                        <li class="nav-dropdown">
+                            <NavLink href="videopage">Special Videos</NavLink>
+                            <ul class="nav-dropdown-menu">
+                                <li><NavLink href="musicproj">Soundtrack</NavLink></li>
+                            </ul>
+                        </li>
                         <li><NavLink href="forbiddenMonsters">Forbidden Monsters</NavLink></li>
                         <li><NavLink href="mhxr-feedback">MHXR Feedback</NavLink></li>
                     </ul>
@@ -800,7 +839,6 @@
                             </div>
                         }
                         <ul class="drawer-links">
-                            <li><NavLink href="" Match="NavLinkMatch.All" @onclick="CloseMenu">Introduction</NavLink></li>
                             <li><NavLink href="commissions" @onclick="CloseMenu">Commissions</NavLink></li>
                             <li><NavLink href="MessageOfGratitude" @onclick="CloseMenu">Mod History</NavLink></li>
                             <li><NavLink href="newmods" @onclick="CloseMenu">Updates Mods</NavLink></li>
@@ -821,7 +859,6 @@
                     </Authorized>
                     <NotAuthorized>
                         <ul class="drawer-links">
-                            <li><NavLink href="" Match="NavLinkMatch.All" @onclick="CloseMenu">Introduction</NavLink></li>
                             <li><NavLink href="commissions" @onclick="CloseMenu">Commissions</NavLink></li>
                             <li><NavLink href="MessageOfGratitude" @onclick="CloseMenu">Mod History</NavLink></li>
                             <li><NavLink href="newmods" @onclick="CloseMenu">Updates Mods</NavLink></li>

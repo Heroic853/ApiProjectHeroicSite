@@ -93,5 +93,19 @@ namespace SharedLibrary.Dto
 
         /// <summary>Quando e' stata scritta la risposta.</summary>
         public DateTime? RispostoAt { get; set; }
+
+        /// <summary>
+        /// Solo per i ticket anonimi: il "biglietto" che il Client salva in
+        /// localStorage per ritrovare questo ticket senza un account. Null
+        /// per i ticket di chi e' loggato, che si riconosce dal token.
+        /// </summary>
+        public string? LookupToken { get; set; }
+
+        /// <summary>
+        /// Indirizzo IP di chi ha scritto, salvato SOLO per i ticket anonimi:
+        /// e' il modo con cui il server applica "un ticket alla volta" a chi
+        /// non ha un account da controllare.
+        /// </summary>
+        public string? IndirizzoIp { get; set; }
     }
 }

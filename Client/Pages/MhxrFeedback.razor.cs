@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.JSInterop;
 using SharedLibrary.Dto;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -13,6 +14,16 @@ namespace Client.Pages
         [Inject] private IHttpClientFactory HttpClientFactory { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
         [Inject] private HttpClient Http { get; set; } = default!;
+        [Inject] private IJSRuntime JS { get; set; } = default!;
+
+        // Chiavi in localStorage: e' il "biglietto" che permette a chi NON e'
+        // loggato di ritrovare il proprio ticket dopo aver lasciato la pagina.
+        // Non e' un cookie di sessione: sopravvive alla chiusura del browser,
+        // ma resta legato a QUESTO browser/dispositivo (cambiando browser o
+        // svuotando i dati del sito lo si perde, e non c'e' altro modo per
+        // recuperarlo senza fare login).
+        private const string ChiaveTicketId = "mhxr_ticket_id";
+        private const string ChiaveTicketToken = "mhxr_ticket_token";
 
         private string categoria = "";
         private string messaggio = "";
@@ -20,19 +31,22 @@ namespace Client.Pages
         private bool invioInCorso;
         private string errore = "";
 
-        private bool ticketInviato;
-        private int numeroTicket;
-        private bool inviatoComeAnonimo;
-
         /// <summary>
-        /// L'ultimo ticket di chi e' loggato. Se non e' "Chiuso" il modulo di
-        /// invio resta nascosto: un utente puo' avere un solo ticket aperto
-        /// alla volta, deve prima ricevere risposta o chiuderlo lui.
-        /// Per chi NON e' loggato resta sempre null: senza account non c'e'
-        /// modo di ritrovare un ticket dopo aver lasciato la pagina, quindi
-        /// per gli anonimi il limite "uno alla volta" non si puo' applicare.
+        /// L'ultimo ticket ancora aperto: di chi e' loggato (letto dal token)
+        /// oppure, per chi non lo e', quello salvato in localStorage. Se non e'
+        /// null il modulo di invio resta nascosto: un solo ticket alla volta,
+        /// finche' non e' risposto/chiuso.
         /// </summary>
         private MhxrTicketDto? ticketAttivo;
+
+        /// <summary>
+        /// true se ticketAttivo viene dal percorso anonimo (localStorage):
+        /// serve a ChiudiTicket per sapere quale endpoint chiamare, visto che
+        /// per chi non e' loggato non c'e' un token da mandare, serve invece
+        /// il "biglietto" salvato.
+        /// </summary>
+        private bool ticketAttivoEAnonimo;
+
         private bool caricamentoIniziale = true;
         private bool chiusuraInCorso;
 
@@ -45,6 +59,8 @@ namespace Client.Pages
             var stato = await AuthStateProvider.GetAuthenticationStateAsync();
             if (stato.User.Identity?.IsAuthenticated == true)
                 await CaricaTicketAttivoAsync();
+            else
+                await CaricaTicketAnonimoAsync();
 
             caricamentoIniziale = false;
         }
@@ -55,12 +71,99 @@ namespace Client.Pages
             {
                 var ultimo = await Http.GetFromJsonAsync<MhxrTicketDto?>("api/mhxr/mio-ticket");
                 ticketAttivo = ultimo is { Stato: not "Chiuso" } ? ultimo : null;
+                ticketAttivoEAnonimo = false;
             }
             catch (Exception ex)
             {
                 // Se questa chiamata fallisce si mostra comunque il modulo:
                 // meglio lasciar scrivere un ticket che bloccare la pagina.
                 Console.WriteLine($"[mhxr-ticket] impossibile leggere il ticket attivo: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Legge id+token salvati in localStorage (se ci sono) e chiede al
+        /// server lo stato di quel ticket. Se il ticket e' stato chiuso, o il
+        /// biglietto non e' piu' valido, lo si dimentica: cosi' la pagina
+        /// torna a mostrare il modulo per un ticket nuovo.
+        /// </summary>
+        private async Task CaricaTicketAnonimoAsync()
+        {
+            try
+            {
+                var (id, token) = await LeggiBigliettoAnonimoAsync();
+                if (id is null || string.IsNullOrEmpty(token))
+                    return;
+
+                var anonClient = HttpClientFactory.CreateClient("Anonymous");
+                var risposta = await anonClient.GetAsync(
+                    $"api/mhxr/ticket-anonimo/{id}?token={Uri.EscapeDataString(token)}");
+
+                if (!risposta.IsSuccessStatusCode)
+                {
+                    await DimenticaBigliettoAnonimoAsync();
+                    return;
+                }
+
+                var ticket = await risposta.Content.ReadFromJsonAsync<MhxrTicketDto>();
+                if (ticket is null || ticket.Stato == "Chiuso")
+                {
+                    await DimenticaBigliettoAnonimoAsync();
+                    return;
+                }
+
+                ticketAttivo = ticket;
+                ticketAttivoEAnonimo = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[mhxr-ticket] impossibile leggere il ticket anonimo: {ex.Message}");
+            }
+        }
+
+        private async Task<(int? Id, string? Token)> LeggiBigliettoAnonimoAsync()
+        {
+            try
+            {
+                var idTesto = await JS.InvokeAsync<string?>("localStorage.getItem", ChiaveTicketId);
+                var token = await JS.InvokeAsync<string?>("localStorage.getItem", ChiaveTicketToken);
+
+                return int.TryParse(idTesto, out var id) && !string.IsNullOrEmpty(token)
+                    ? (id, token)
+                    : (null, null);
+            }
+            catch
+            {
+                // localStorage puo' non essere disponibile (es. navigazione
+                // privata con dati bloccati): meglio un ticket non trovato
+                // che una pagina rotta.
+                return (null, null);
+            }
+        }
+
+        private async Task SalvaBigliettoAnonimoAsync(int id, string token)
+        {
+            try
+            {
+                await JS.InvokeVoidAsync("localStorage.setItem", ChiaveTicketId, id.ToString());
+                await JS.InvokeVoidAsync("localStorage.setItem", ChiaveTicketToken, token);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[mhxr-ticket] impossibile salvare il biglietto: {ex.Message}");
+            }
+        }
+
+        private async Task DimenticaBigliettoAnonimoAsync()
+        {
+            try
+            {
+                await JS.InvokeVoidAsync("localStorage.removeItem", ChiaveTicketId);
+                await JS.InvokeVoidAsync("localStorage.removeItem", ChiaveTicketToken);
+            }
+            catch
+            {
+                // niente da fare se anche questo fallisce
             }
         }
 
@@ -72,10 +175,28 @@ namespace Client.Pages
             chiusuraInCorso = true;
             try
             {
-                var risposta = await Http.PostAsync($"api/mhxr/ticket/{ticketAttivo.Id}/chiudi", null);
+                HttpResponseMessage risposta;
+
+                if (ticketAttivoEAnonimo)
+                {
+                    var (_, token) = await LeggiBigliettoAnonimoAsync();
+                    var anonClient = HttpClientFactory.CreateClient("Anonymous");
+                    risposta = await anonClient.PostAsync(
+                        $"api/mhxr/ticket-anonimo/{ticketAttivo.Id}/chiudi?token={Uri.EscapeDataString(token ?? "")}",
+                        null);
+
+                    if (risposta.IsSuccessStatusCode)
+                        await DimenticaBigliettoAnonimoAsync();
+                }
+                else
+                {
+                    risposta = await Http.PostAsync($"api/mhxr/ticket/{ticketAttivo.Id}/chiudi", null);
+                }
+
                 if (risposta.IsSuccessStatusCode)
                 {
                     ticketAttivo = null;
+                    ticketAttivoEAnonimo = false;
                     NuovoTicket();
                 }
             }
@@ -117,14 +238,31 @@ namespace Client.Pages
                 {
                     var dati = await response.Content.ReadFromJsonAsync<JsonElement>();
 
-                    numeroTicket = dati.TryGetProperty("id", out var id) ? id.GetInt32() : 0;
-                    inviatoComeAnonimo = !dati.TryGetProperty("anonimo", out var anon) || anon.GetBoolean();
+                    var id = dati.TryGetProperty("id", out var idProp) ? idProp.GetInt32() : 0;
+                    var anonimo = !dati.TryGetProperty("anonimo", out var anonProp) || anonProp.GetBoolean();
 
-                    if (inviatoComeAnonimo)
+                    if (anonimo)
                     {
-                        // Senza account non c'e' modo di ritrovare il ticket dopo:
-                        // resta la vecchia schermata "grazie, puoi mandarne un altro".
-                        ticketInviato = true;
+                        // Il server manda anche un "biglietto" solo per i ticket
+                        // anonimi: senza account e' l'unico modo per ritrovare
+                        // questo ticket dopo aver lasciato la pagina.
+                        var token = dati.TryGetProperty("lookupToken", out var tokenProp)
+                            ? tokenProp.GetString()
+                            : null;
+
+                        if (!string.IsNullOrEmpty(token))
+                            await SalvaBigliettoAnonimoAsync(id, token);
+
+                        ticketAttivo = new MhxrTicketDto
+                        {
+                            Id = id,
+                            Categoria = categoria,
+                            Messaggio = messaggio,
+                            Anonimo = true,
+                            Stato = "Aperto",
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        ticketAttivoEAnonimo = true;
                     }
                     else
                     {
@@ -154,7 +292,13 @@ namespace Client.Pages
                 // si allinea la pagina con quello vero invece di lasciarla
                 // a mostrare un modulo che tanto verra' rifiutato di nuovo.
                 if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
-                    await CaricaTicketAttivoAsync();
+                {
+                    var stato = await AuthStateProvider.GetAuthenticationStateAsync();
+                    if (stato.User.Identity?.IsAuthenticated == true)
+                        await CaricaTicketAttivoAsync();
+                    else
+                        await CaricaTicketAnonimoAsync();
+                }
             }
             catch (AccessTokenNotAvailableException)
             {
@@ -206,11 +350,9 @@ namespace Client.Pages
 
         private void NuovoTicket()
         {
-            ticketInviato = false;
             categoria = "";
             messaggio = "";
             errore = "";
-            numeroTicket = 0;
         }
 
         /// <summary>Etichetta in inglese per il badge di stato del ticket.</summary>

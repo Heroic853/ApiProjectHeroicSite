@@ -224,9 +224,18 @@ namespace WebApi.Controllers
             }
         }
 
-        // API per eliminare account
+        // Disattivata su richiesta: un utente non deve poter eliminarsi
+        // l'account da solo. Il resto del metodo (cancellazione vera su
+        // Auth0) resta sotto, nel caso serva riattivarla o farla fare
+        // solo all'Admin in futuro.
         [HttpDelete("delete-account")]
-        public async Task<IActionResult> DeleteAccount()
+        public Task<IActionResult> DeleteAccount()
+        {
+            return Task.FromResult<IActionResult>(
+                StatusCode(403, new { message = "Account deletion is disabled." }));
+        }
+
+        private async Task<IActionResult> DeleteAccountAuth0()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                          ?? User.FindFirst("sub")?.Value;

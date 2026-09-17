@@ -46,7 +46,15 @@ CREATE TABLE IF NOT EXISTS "MhxrTickets" (
     "Risposta"    text,
 
     -- Quando hai risposto (serve al Client per mostrare la conversazione)
-    "RispostoAt"  timestamp with time zone
+    "RispostoAt"  timestamp with time zone,
+
+    -- Solo per i ticket anonimi: il "biglietto" salvato nel browser di chi
+    -- scrive, per farsi riconoscere senza account. NULL per chi e' loggato.
+    "LookupToken" text,
+
+    -- Solo per i ticket anonimi: serve per il limite "un ticket alla volta"
+    -- quando non c'e' un account con cui riconoscere chi scrive.
+    "IndirizzoIp" text
 );
 
 
@@ -55,14 +63,18 @@ CREATE TABLE IF NOT EXISTS "MhxrTickets" (
 CREATE INDEX IF NOT EXISTS "IX_MhxrTickets_Stato_CreatedAt"
     ON "MhxrTickets" ("Stato", "CreatedAt" DESC);
 
--- Se la tabella esisteva gia' da un tentativo precedente senza queste due
+-- Se la tabella esisteva gia' da un tentativo precedente senza queste
 -- colonne, questo la mette in pari senza toccare le righe gia' presenti.
+-- Sicuro rilanciarlo anche se la tabella e' gia' completa: "IF NOT EXISTS"
+-- non fa nulla quando la colonna c'e' gia'.
 ALTER TABLE "MhxrTickets" ADD COLUMN IF NOT EXISTS "Risposta" text;
 ALTER TABLE "MhxrTickets" ADD COLUMN IF NOT EXISTS "RispostoAt" timestamp with time zone;
+ALTER TABLE "MhxrTickets" ADD COLUMN IF NOT EXISTS "LookupToken" text;
+ALTER TABLE "MhxrTickets" ADD COLUMN IF NOT EXISTS "IndirizzoIp" text;
 
 
 -- =====================================================================
--- VERIFICA: lancia anche questa, devi vedere le 9 colonne qui sopra
+-- VERIFICA: lancia anche questa, devi vedere le 11 colonne qui sopra
 -- =====================================================================
 SELECT column_name, data_type, is_nullable, column_default
 FROM information_schema.columns

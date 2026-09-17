@@ -541,13 +541,23 @@
         }
         else if (ticketAttivo is not null)
         {
-            @* Chi e' loggato e ha gia' un ticket non ancora chiuso vede questo
-               invece del modulo: e' cosi' che la pagina applica "un ticket alla
+            @* Sia chi e' loggato (letto dal token) sia chi non lo e' (letto dal
+               "biglietto" in localStorage) finisce qui se ha gia' un ticket non
+               ancora chiuso: e' cosi' che la pagina applica "un ticket alla
                volta", ed e' anche il posto dove si vede se/quando ho risposto. *@
             <div class="mhxr-status-head">
                 <span class="mhxr-status-id">Ticket #@ticketAttivo.Id</span>
                 <span class="mhxr-badge @ClasseStato(ticketAttivo.Stato)">@EtichettaStato(ticketAttivo.Stato)</span>
             </div>
+
+            @if (ticketAttivoEAnonimo)
+            {
+                <p class="mhxr-status-note" style="margin-top:0;margin-bottom:18px;">
+                    You sent this anonymously — I'm showing it to you because this browser
+                    remembered it. It will not show up if you clear this site's data or
+                    open the page on another device.
+                </p>
+            }
 
             <div class="mhxr-status-meta">
                 <div>
@@ -599,23 +609,6 @@
                 </p>
             }
         }
-        else if (ticketInviato)
-        {
-            <div class="mhxr-ok">
-                <div class="mhxr-ok-icona">✅</div>
-                <h2 class="mhxr-ok-titolo">Ticket received</h2>
-                <p class="mhxr-ok-testo">
-                    Thank you! I got your report and I will read it as soon as I can.
-                </p>
-                <div class="mhxr-ok-numero">Ticket #@numeroTicket</div>
-                <p class="mhxr-ok-testo">
-                    @(inviatoComeAnonimo
-                        ? "You sent it anonymously, so I have no way to reply directly."
-                        : "You are signed in, so I can get back to you if I need more details.")
-                </p>
-                <button class="mhxr-ok-btn" @onclick="NuovoTicket">Send another one</button>
-            </div>
-        }
         else
         {
             <h2 class="mhxr-card-title">Open a ticket</h2>
@@ -661,9 +654,11 @@
                     <div class="mhxr-identita">
                         <span class="mhxr-identita-icona">👤</span>
                         <span>
-                            You are not signed in: this ticket will be <strong>anonymous</strong> and
-                            I will not be able to reply.
-                            <NavLink href="authentication/login">Sign in</NavLink> if you want an answer.
+                            You are not signed in: this ticket will be <strong>anonymous</strong>, I will
+                            not know who you are. I can still reply — after sending, this page will show
+                            the status and my answer as long as you come back on this same browser.
+                            <NavLink href="authentication/login">Sign in</NavLink> if you want your ticket
+                            tied to your account instead.
                         </span>
                     </div>
                 </NotAuthorized>

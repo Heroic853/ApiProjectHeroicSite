@@ -156,25 +156,29 @@ namespace WebApi.Controllers
 
             var autore = AutoreDalToken();
 
-            // Un utente loggato puo' avere UN SOLO ticket aperto alla volta:
-            // deve prima ricevere risposta (o chiuderlo lui stesso) prima di
-            // poterne aprire un altro. Per chi scrive anonimo questo controllo
-            // non ha senso: non c'e' un'identita' stabile da tracciare, e
-            // resta comunque coperto dal freno anti-abuso sopra.
-            if (autore is not null)
-            {
-                var haGiaUnTicketAperto = await _db.MhxrTickets
-                    .AsNoTracking()
-                    .AnyAsync(t => t.Autore == autore && t.Stato != "Chiuso");
+            // Un solo ticket aperto alla volta: deve prima ricevere risposta
+            // (o chiuderlo da solo) prima di poterne aprire un altro. Chi e'
+            // loggato si riconosce dall'Autore; chi non lo e' non ha
+            // un'identita' stabile, quindi si usa l'indirizzo IP — piu' debole
+            // (una rete condivisa puo' bloccare piu' persone), ma senza
+            // account e' la sola cosa con cui il server puo' riconoscerlo.
+            var haGiaUnTicketAperto = autore is not null
+                ? await _db.MhxrTickets.AsNoTracking().AnyAsync(t => t.Autore == autore && t.Stato != "Chiuso")
+                : await _db.MhxrTickets.AsNoTracking().AnyAsync(t => t.Autore == null && t.IndirizzoIp == indirizzo && t.Stato != "Chiuso");
 
-                if (haGiaUnTicketAperto)
+            if (haGiaUnTicketAperto)
+            {
+                return Conflict(new
                 {
-                    return Conflict(new
-                    {
-                        message = "You already have an open ticket. Wait for a reply or close it before sending a new one."
-                    });
-                }
+                    message = "You already have an open ticket. Wait for a reply or close it before sending a new one."
+                });
             }
+
+            // Solo i ticket anonimi ricevono un "biglietto": e' l'unico modo
+            // con cui chi non e' loggato puo' dimostrare in seguito che quel
+            // ticket e' suo (il Client lo salva in localStorage). Chi e'
+            // loggato non ne ha bisogno, si riconosce dal token.
+            var lookupToken = autore is null ? Guid.NewGuid().ToString("N") : null;
 
             var ticket = new MhxrTicket
             {
@@ -183,7 +187,9 @@ namespace WebApi.Controllers
                 Anonimo = autore is null,
                 Autore = autore,
                 Stato = "Aperto",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                LookupToken = lookupToken,
+                IndirizzoIp = autore is null ? indirizzo : null
             };
 
             try
@@ -215,6 +221,7 @@ namespace WebApi.Controllers
             {
                 id = ticket.Id,
                 anonimo = ticket.Anonimo,
+                lookupToken,
                 message = "Ticket sent"
             });
         }
@@ -282,6 +289,64 @@ namespace WebApi.Controllers
             await _db.SaveChangesAsync();
 
             _logger.LogInformation("Ticket MHXR #{Id} chiuso dall'utente {Autore}", id, autore);
+            return Ok(new { message = "Ticket closed" });
+        }
+
+        // ------------------------------------------------------------------
+        // IL MIO TICKET, VERSIONE ANONIMA (col "biglietto" invece del token)
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// Legge lo stato di un ticket anonimo. Al posto del token (che chi
+        /// non e' loggato non ha) serve il "lookupToken" ricevuto alla
+        /// creazione: senza quello, o se il ticket non e' anonimo, risponde
+        /// 404 in entrambi i casi — cosi' non si scopre nemmeno se un id
+        /// esiste, indovinando token a caso.
+        /// </summary>
+        [HttpGet("ticket-anonimo/{id:int}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTicketAnonimo(int id, [FromQuery] string? token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return NotFound(new { message = "Ticket not found" });
+
+            var ticket = await _db.MhxrTickets.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
+            if (ticket is null || !ticket.Anonimo || ticket.LookupToken != token)
+                return NotFound(new { message = "Ticket not found" });
+
+            return Ok(new MhxrTicketDto
+            {
+                Id = ticket.Id,
+                Categoria = ticket.Categoria,
+                Messaggio = ticket.Messaggio,
+                Anonimo = true,
+                Autore = null,
+                Stato = ticket.Stato,
+                CreatedAt = ticket.CreatedAt,
+                Risposta = ticket.Risposta,
+                RispostoAt = ticket.RispostoAt
+            });
+        }
+
+        /// <summary>Chiude un ticket anonimo, stesso controllo col "biglietto" di sopra.</summary>
+        [HttpPost("ticket-anonimo/{id:int}/chiudi")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ChiudiTicketAnonimo(int id, [FromQuery] string? token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return NotFound(new { message = "Ticket not found" });
+
+            var ticket = await _db.MhxrTickets.FirstOrDefaultAsync(t => t.Id == id);
+            if (ticket is null || !ticket.Anonimo || ticket.LookupToken != token)
+                return NotFound(new { message = "Ticket not found" });
+
+            if (ticket.Stato == "Chiuso")
+                return Ok(new { message = "Already closed" });
+
+            ticket.Stato = "Chiuso";
+            await _db.SaveChangesAsync();
+
+            _logger.LogInformation("Ticket MHXR #{Id} chiuso dall'autore anonimo", id);
             return Ok(new { message = "Ticket closed" });
         }
 
