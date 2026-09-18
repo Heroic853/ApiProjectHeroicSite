@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
@@ -297,6 +298,28 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     logger.LogInformation("Swagger attivo su /swagger");
 }
+
+// FORWARDED HEADERS — senza questo, HttpContext.Connection.RemoteIpAddress
+// e' sempre 127.0.0.1 in produzione: Render (come Heroku e la maggior parte
+// dei PaaS) mette un suo proxy davanti al container, quindi la connessione
+// TCP vera che l'app vede e' quella del proxy, non del visitatore. L'IP
+// reale arriva nell'header "X-Forwarded-For", che questo middleware legge
+// e usa per RISCRIVERE RemoteIpAddress — da qui in poi tutto il resto
+// (incluso MhxrTicketController, che lo usa per "un ticket alla volta" e
+// per il freno anti-abuso) vede l'IP giusto senza saperlo.
+//
+// ForwardLimit=1 + KnownNetworks/KnownProxies vuoti: si fida di UN solo
+// proxy davanti a se', chiunque esso sia (non si conosce in anticipo
+// l'indirizzo del proxy di Render). Va messo PRIMA di qualunque altro
+// middleware che legga l'indirizzo IP.
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    ForwardLimit = 1
+};
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 app.UseResponseCompression();
 app.UseMiddleware<RequestLoggingMiddleware>();
