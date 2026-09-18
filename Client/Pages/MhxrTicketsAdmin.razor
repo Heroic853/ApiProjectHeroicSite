@@ -205,7 +205,9 @@
                             <span class="ticket-id">#@t.Id</span>
                             <span class="ticket-badge @ClasseStato(t.Stato)">@EtichettaStato(t.Stato)</span>
                             <span class="ticket-badge @(t.Anonimo ? "ticket-badge-anon" : "ticket-badge-user")">
-                                @(t.Anonimo ? "Anonymous" : t.Autore)
+                                @(t.Anonimo
+                                    ? (string.IsNullOrWhiteSpace(t.Autore) ? "Anonymous" : $"Anonymous ({t.Autore})")
+                                    : t.Autore)
                             </span>
                             <span class="ticket-meta">@t.Categoria · @t.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</span>
                         </div>

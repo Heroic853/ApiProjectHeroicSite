@@ -31,6 +31,15 @@ namespace Client.Pages
         private string categoria = "";
         private string messaggio = "";
 
+        /// <summary>
+        /// Facoltativo: solo per chi non e' loggato, cosi' so chi mi ha
+        /// scritto senza fargli fare un login vero (che dentro la webview
+        /// del gioco puo' non funzionare). Il server lo ignora comunque se
+        /// chi manda ha un token valido: non e' un modo per spacciarsi per
+        /// un altro account.
+        /// </summary>
+        private string nomeAnonimo = "";
+
         private bool invioInCorso;
         private string errore = "";
 
@@ -242,7 +251,12 @@ namespace Client.Pages
 
                 var response = await client.PostAsJsonAsync(
                     "api/mhxr/ticket",
-                    new MhxrTicketRequest { Categoria = categoria, Messaggio = messaggio });
+                    new MhxrTicketRequest
+                    {
+                        Categoria = categoria,
+                        Messaggio = messaggio,
+                        NomeAnonimo = nomeAnonimo
+                    });
 
                 if (response.IsSuccessStatusCode)
                 {

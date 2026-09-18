@@ -41,6 +41,16 @@ namespace SharedLibrary.Dto
     {
         public string Categoria { get; set; } = string.Empty;
         public string Messaggio { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Facoltativo, solo per chi NON e' loggato: un nome/account con cui
+        /// farsi riconoscere senza fare il login vero (utile da dentro la
+        /// webview del gioco, dove Auth0 e' fragile). Il server lo IGNORA
+        /// per chi ha gia' un token valido: non puo' mai sovrascrivere
+        /// un'identita' verificata. Non e' una prova d'identita', e' solo
+        /// un'etichetta scelta da chi scrive.
+        /// </summary>
+        public string? NomeAnonimo { get; set; }
     }
 
     /// <summary>Cosa manda l'utente o l'admin per aggiungere un messaggio a un ticket gia' aperto.</summary>
@@ -94,8 +104,12 @@ namespace SharedLibrary.Dto
         public bool Anonimo { get; set; } = true;
 
         /// <summary>
-        /// Email (o id Auth0) di chi ha scritto, null se anonimo.
-        /// Lo riempie il SERVER leggendo il token, mai il browser.
+        /// Chi ha scritto. Per chi e' loggato e' l'email (o id Auth0) letta
+        /// dal SERVER dal token, mai dal browser: verificata. Per chi non e'
+        /// loggato e' invece il "NomeAnonimo" facoltativo scelto da chi
+        /// scrive, se l'ha compilato: NON verificato, e' solo un'etichetta.
+        /// <see cref="Anonimo"/> e' sempre la fonte di verita' su quale dei
+        /// due casi sia — un Autore non-null non significa "verificato".
         /// </summary>
         public string? Autore { get; set; }
 

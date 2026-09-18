@@ -22,6 +22,9 @@ namespace WebApi.Controllers
         /// <summary>Oltre questa lunghezza un messaggio (apertura o risposta) viene rifiutato.</summary>
         private const int MaxLunghezzaMessaggio = 4000;
 
+        /// <summary>Oltre questa lunghezza il nome facoltativo di chi non e' loggato viene rifiutato.</summary>
+        private const int MaxLunghezzaNomeAnonimo = 60;
+
         /// <summary>Quanti ticket puo' aprire lo stesso indirizzo in un'ora.</summary>
         private const int MaxTicketPerOra = 5;
 
@@ -151,7 +154,10 @@ namespace WebApi.Controllers
         /// ricevere mai la segnalazione.
         ///
         /// Se pero' e' loggato, il server registra chi e': il campo Anonimo
-        /// lo decide il TOKEN, non quello che manda il browser.
+        /// lo decide il TOKEN, non quello che manda il browser. Chi non e'
+        /// loggato puo' scrivere un nome facoltativo (richiesta.NomeAnonimo)
+        /// solo per farsi riconoscere: resta comunque "Anonimo", perche'
+        /// quel nome non e' verificato.
         /// </summary>
         [HttpPost("ticket")]
         [AllowAnonymous]
@@ -183,18 +189,35 @@ namespace WebApi.Controllers
                 return StatusCode(429, new { message = "Too many tickets sent. Please try again later." });
             }
 
-            var autore = AutoreDalToken();
+            var autoreToken = AutoreDalToken();
+            var isAnonimo = autoreToken is null;
+
+            // Solo per chi NON e' loggato: un'etichetta scelta da lui,
+            // facoltativa, NON verificata (chiunque puo' scrivere un nome a
+            // caso). Per chi e' loggato viene ignorata di proposito: non
+            // deve mai poter scavalcare l'identita' vera letta dal token.
+            var nomeAnonimo = isAnonimo ? richiesta.NomeAnonimo?.Trim() : null;
+            if (!string.IsNullOrEmpty(nomeAnonimo) && nomeAnonimo.Length > MaxLunghezzaNomeAnonimo)
+            {
+                return BadRequest(new
+                {
+                    message = $"Name too long (max {MaxLunghezzaNomeAnonimo} characters)"
+                });
+            }
+
+            var autoreDaSalvare = isAnonimo ? (string.IsNullOrEmpty(nomeAnonimo) ? null : nomeAnonimo) : autoreToken;
 
             // Un solo ticket aperto alla volta: SOLO l'admin puo' chiuderlo
             // (vedi CambiaStato), quindi questo e' anche l'unico modo in cui
-            // se ne libera uno. Chi e' loggato si riconosce dall'Autore; chi
-            // non lo e' non ha un'identita' stabile, quindi si usa
-            // l'indirizzo IP — piu' debole (una rete condivisa puo' bloccare
+            // se ne libera uno. Chi e' loggato si riconosce dall'Autore
+            // (verificato); chi non lo e' non ha un'identita' stabile —
+            // anche se ha scritto un nome, non e' verificato — quindi si usa
+            // l'indirizzo IP: piu' debole (una rete condivisa puo' bloccare
             // piu' persone), ma senza account e' la sola cosa con cui il
             // server puo' riconoscerlo.
-            var haGiaUnTicketAperto = autore is not null
-                ? await _db.MhxrTickets.AsNoTracking().AnyAsync(t => t.Autore == autore && t.Stato != "Chiuso")
-                : await _db.MhxrTickets.AsNoTracking().AnyAsync(t => t.Autore == null && t.IndirizzoIp == indirizzo && t.Stato != "Chiuso");
+            var haGiaUnTicketAperto = !isAnonimo
+                ? await _db.MhxrTickets.AsNoTracking().AnyAsync(t => t.Autore == autoreToken && t.Stato != "Chiuso")
+                : await _db.MhxrTickets.AsNoTracking().AnyAsync(t => t.Anonimo && t.IndirizzoIp == indirizzo && t.Stato != "Chiuso");
 
             if (haGiaUnTicketAperto)
             {
@@ -208,17 +231,17 @@ namespace WebApi.Controllers
             // con cui chi non e' loggato puo' dimostrare in seguito che quel
             // ticket e' suo (il Client lo salva in localStorage). Chi e'
             // loggato non ne ha bisogno, si riconosce dal token.
-            var lookupToken = autore is null ? Guid.NewGuid().ToString("N") : null;
+            var lookupToken = isAnonimo ? Guid.NewGuid().ToString("N") : null;
 
             var ticket = new MhxrTicket
             {
                 Categoria = richiesta.Categoria,
-                Anonimo = autore is null,
-                Autore = autore,
+                Anonimo = isAnonimo,
+                Autore = autoreDaSalvare,
                 Stato = "Aperto",
                 CreatedAt = DateTime.UtcNow,
                 LookupToken = lookupToken,
-                IndirizzoIp = autore is null ? indirizzo : null
+                IndirizzoIp = isAnonimo ? indirizzo : null
             };
 
             try

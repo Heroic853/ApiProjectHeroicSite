@@ -565,30 +565,14 @@
                 @LunghezzaMessaggio / 4000
             </div>
 
-            @* Dire a chi scrive se sara' riconoscibile o no: e' l'unica cosa
-               che cambia se fa login, ed e' giusto che lo sappia prima *@
-            <AuthorizeView>
-                <Authorized>
-                    <div class="mhxr-identita">
-                        <span class="mhxr-identita-icona">🛡️</span>
-                        <span>
-                            You are signed in — I will see who sent this, so I can reply to you.
-                        </span>
-                    </div>
-                </Authorized>
-                <NotAuthorized>
-                    <div class="mhxr-identita">
-                        <span class="mhxr-identita-icona">👤</span>
-                        <span>
-                            You are not signed in: this ticket will be <strong>anonymous</strong>, I will
-                            not know who you are. I can still reply — after sending, this page will show
-                            the status and my answer as long as you come back on this same browser.
-                            <NavLink href="authentication/login">Sign in</NavLink> if you want your ticket
-                            tied to your account instead.
-                        </span>
-                    </div>
-                </NotAuthorized>
-            </AuthorizeView>
+            <label class="mhxr-label" for="mhxr-nome">Your name or account (optional)</label>
+            <input id="mhxr-nome"
+                   class="mhxr-field"
+                   type="text"
+                   maxlength="60"
+                   placeholder="So I know who's writing — not required"
+                   @bind="nomeAnonimo"
+                   @bind:event="oninput" />
 
             <button class="mhxr-submit" @onclick="InviaTicket" disabled="@invioInCorso">
                 @(invioInCorso ? "Sending..." : "Send ticket")
