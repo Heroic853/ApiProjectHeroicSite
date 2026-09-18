@@ -3,18 +3,28 @@
 # Perche' serve: sui piani gratuiti (Render, Railway) il container viene spento
 # dopo ~15 minuti senza traffico. La visita successiva deve aspettare che si
 # riaccenda: sono 30-60 secondi in cui il sito sembra rotto. Questo ping ogni
-# 10 minuti evita lo spegnimento.
+# 5 minuti evita lo spegnimento.
 #
-# Se passi a un piano a pagamento (senza spin-down) questo workflow non serve
-# piu' e puoi cancellarlo.
+# PERCHE' OGNI 5 E NON OGNI 10: GitHub NON garantisce la puntualita' dei
+# cron — nei momenti di carico un giro puo' ritardare anche di 10-15 minuti
+# (documentato da GitHub stesso). Con un intervallo di 10 minuti, un solo
+# ritardo bastava a far scattare comunque lo spegnimento di Render: 5 minuti
+# lascia molto piu' margine prima che si arrivi ai ~15 minuti di inattivita'.
+#
+# QUESTO NON E' UNA GARANZIA AL 100%: resta un cron "a tentativi", non un
+# server che non si spegne mai. Se un giorno vuoi la garanzia vera, le uniche
+# due strade sono un piano Render a pagamento (nessun spin-down, e' l'unica
+# soluzione definitiva) oppure un servizio di ping esterno come UptimeRobot o
+# cron-job.org, piu' puntuale di GitHub Actions perche' non condivide la
+# stessa coda di runner. Se passi al piano a pagamento questo workflow non
+# serve piu' e puoi cancellarlo.
 
 name: Keep API warm
 
 on:
   schedule:
-    # Ogni 10 minuti. GitHub non garantisce la puntualita' al minuto:
-    # nei momenti di carico puo' ritardare di qualche minuto.
-    - cron: "*/10 * * * *"
+    # Ogni 5 minuti: vedi il commento sopra sul perche' non ogni 10.
+    - cron: "*/5 * * * *"
   # Permette di lanciarlo a mano dalla tab Actions
   workflow_dispatch:
 
