@@ -102,30 +102,54 @@
         line-height: 1.5;
     }
 
+    .mhxr-donate-actions {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
     .mhxr-donate-btn {
         flex: 0 0 auto;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
-        min-height: 46px;
-        padding: 0 20px;
+        min-height: 40px;
+        padding: 0 18px;
         background: #ffd700;
         border: 1px solid #ffd700;
         border-radius: 8px;
         color: #2a1500 !important;
         font-family: 'Cinzel', serif;
-        font-size: 0.82rem;
+        font-size: 0.78rem;
         font-weight: 700;
         letter-spacing: 1.5px;
         text-transform: uppercase;
         text-decoration: none !important;
         transition: all 0.2s;
+        white-space: nowrap;
     }
 
     .mhxr-donate-btn:hover {
         background: #fff0a0;
         box-shadow: 0 0 22px rgba(255, 215, 0, 0.45);
         transform: translateY(-1px);
+    }
+
+    /* Secondo modo di pagare: stessa forma del bottone PayPal, cosi' si
+       capisce a colpo d'occhio che sono due alternative equivalenti, ma
+       col riquadro invece del riempimento pieno per non farli sembrare
+       la stessa identica azione. */
+    .mhxr-donate-btn-alt {
+        background: transparent;
+        border: 1px solid #ffd700;
+        color: #ffd700 !important;
+    }
+
+    .mhxr-donate-btn-alt:hover {
+        background: rgba(255, 215, 0, 0.15);
+        box-shadow: 0 0 22px rgba(255, 215, 0, 0.3);
     }
 
     /* ---- Scheda ticket ---- */
@@ -435,6 +459,10 @@
             gap: 12px;
         }
 
+        .mhxr-donate-actions {
+            width: 100%;
+        }
+
         .mhxr-donate-btn {
             width: 100%;
             justify-content: center;
@@ -465,12 +493,20 @@
                 your report matters just as much!
             </p>
         </div>
-        <a class="mhxr-donate-btn"
-           href="https://www.paypal.com/paypalme/heroic853"
-           target="_blank"
-           rel="noopener">
-            Donate
-        </a>
+        <div class="mhxr-donate-actions">
+            <a class="mhxr-donate-btn"
+               href="https://www.paypal.com/paypalme/heroic853"
+               target="_blank"
+               rel="noopener">
+                💰 PayPal
+            </a>
+            <a class="mhxr-donate-btn mhxr-donate-btn-alt"
+               href="https://buy.stripe.com/cNi8wP4Ki8250HYaYz8og00"
+               target="_blank"
+               rel="noopener">
+                💳 Card
+            </a>
+        </div>
     </div>
 
     <div class="mhxr-card">
