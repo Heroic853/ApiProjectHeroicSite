@@ -12,6 +12,29 @@ namespace Client.Pages
         private Clasification[]? ClasificationList;
         private Dragon[]? dragonList;
 
+        // --- IMPAGINAZIONE (tutta lato Client: le liste sono gia' intere in memoria) ---
+        private const int PageSize = 10;
+        private int feedbackPage = 1;
+        private int dragonPage = 1;
+
+        private IEnumerable<Clasification> ClasificationPagina =>
+            ClasificationList?.Skip((feedbackPage - 1) * PageSize).Take(PageSize) ?? Enumerable.Empty<Clasification>();
+
+        private int FeedbackTotalPages =>
+            ClasificationList is null ? 1 : Math.Max(1, (int)Math.Ceiling(ClasificationList.Length / (double)PageSize));
+
+        private IEnumerable<Dragon> DragonPagina =>
+            dragonList?.Skip((dragonPage - 1) * PageSize).Take(PageSize) ?? Enumerable.Empty<Dragon>();
+
+        private int DragonTotalPages =>
+            dragonList is null ? 1 : Math.Max(1, (int)Math.Ceiling(dragonList.Length / (double)PageSize));
+
+        private void CambiaPaginaFeedback(int delta) =>
+            feedbackPage = Math.Clamp(feedbackPage + delta, 1, FeedbackTotalPages);
+
+        private void CambiaPaginaDragon(int delta) =>
+            dragonPage = Math.Clamp(dragonPage + delta, 1, DragonTotalPages);
+
         // --- LOGICA PER IL GRAFICO ---
         private List<VisitStat> VisitStats = new();
         private ApexChart<VisitStat>? visitsChart;

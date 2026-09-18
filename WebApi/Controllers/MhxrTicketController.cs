@@ -143,6 +143,44 @@ namespace WebApi.Controllers
             };
         }
 
+        /// <summary>
+        /// Carica una lista di ticket con le loro conversazioni in due sole
+        /// query (una per i ticket, una per TUTTI i loro messaggi), invece di
+        /// una query per ogni ticket: evita N+1 chiamate al database quando
+        /// la lista e' lunga.
+        /// </summary>
+        private async Task<List<MhxrTicketDto>> CaricaListaDtoAsync(IQueryable<MhxrTicket> query)
+        {
+            var tickets = await query.ToListAsync();
+
+            var idTicket = tickets.Select(t => t.Id).ToList();
+            var messaggiPerTicket = await _db.MhxrTicketMessaggi
+                .AsNoTracking()
+                .Where(m => idTicket.Contains(m.IdTicket))
+                .OrderBy(m => m.CreatedAt)
+                .ToListAsync();
+
+            return tickets.Select(t => new MhxrTicketDto
+            {
+                Id = t.Id,
+                Categoria = t.Categoria,
+                Anonimo = t.Anonimo,
+                Autore = t.Autore,
+                Stato = t.Stato,
+                CreatedAt = t.CreatedAt,
+                Messaggi = messaggiPerTicket
+                    .Where(m => m.IdTicket == t.Id)
+                    .Select(m => new MhxrTicketMessaggioDto
+                    {
+                        Id = m.Id,
+                        Mittente = m.Mittente,
+                        Testo = m.Testo,
+                        CreatedAt = m.CreatedAt
+                    })
+                    .ToList()
+            }).ToList();
+        }
+
         // ------------------------------------------------------------------
         // APERTURA TICKET (pubblica)
         // ------------------------------------------------------------------
@@ -362,6 +400,28 @@ namespace WebApi.Controllers
             return Ok(await CaricaDtoAsync(ticket));
         }
 
+        /// <summary>
+        /// I TUOI ticket gia' chiusi (l'attivo, se c'e', lo da' mio-ticket).
+        /// Serve per lo storico in fondo alla pagina: "cosa avevo scritto le
+        /// altre volte e come e' andata a finire".
+        /// </summary>
+        [HttpGet("mio-storico")]
+        [Authorize]
+        public async Task<IActionResult> GetMioStorico()
+        {
+            var autore = AutoreDalToken();
+            if (autore is null)
+                return Ok(new List<MhxrTicketDto>());
+
+            var query = _db.MhxrTickets
+                .AsNoTracking()
+                .Where(t => t.Autore == autore && t.Stato == "Chiuso")
+                .OrderByDescending(t => t.CreatedAt)
+                .Take(20);
+
+            return Ok(await CaricaListaDtoAsync(query));
+        }
+
         // ------------------------------------------------------------------
         // IL MIO TICKET, VERSIONE ANONIMA (col "biglietto" invece del token)
         // ------------------------------------------------------------------
@@ -430,6 +490,33 @@ namespace WebApi.Controllers
             return Ok(await CaricaDtoAsync(ticket));
         }
 
+        /// <summary>
+        /// Storico dei ticket anonimi GIA' CHIUSI aperti dallo stesso
+        /// indirizzo IP di chi chiama — senza "biglietto", perche' dopo un
+        /// nuovo ticket il Client sovrascrive quello salvato in localStorage
+        /// e quelli vecchi non sarebbero piu' raggiungibili altrimenti.
+        ///
+        /// COMPROMESSO DA CONOSCERE: una rete condivisa (WiFi pubblico,
+        /// scuola, ufficio) mostra lo storico di chiunque abbia scritto da
+        /// quella stessa rete, non solo il tuo. Per un modulo di feedback
+        /// senza dati sensibili e' un compromesso accettabile — lo stesso
+        /// giа accettato per il limite "un ticket alla volta" — ma va saputo.
+        /// </summary>
+        [HttpGet("storico-anonimo")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetStoricoAnonimo()
+        {
+            var indirizzo = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "sconosciuto";
+
+            var query = _db.MhxrTickets
+                .AsNoTracking()
+                .Where(t => t.Anonimo && t.IndirizzoIp == indirizzo && t.Stato == "Chiuso")
+                .OrderByDescending(t => t.CreatedAt)
+                .Take(20);
+
+            return Ok(await CaricaListaDtoAsync(query));
+        }
+
         // ------------------------------------------------------------------
         // LETTURA E GESTIONE (solo tu)
         // ------------------------------------------------------------------
@@ -453,39 +540,9 @@ namespace WebApi.Controllers
             if (!string.IsNullOrWhiteSpace(stato))
                 query = query.Where(t => t.Stato == stato);
 
-            var tickets = await query
-                .OrderByDescending(t => t.CreatedAt)
-                .Take(limit)
-                .ToListAsync();
+            query = query.OrderByDescending(t => t.CreatedAt).Take(limit);
 
-            // Un'unica query per i messaggi di TUTTI i ticket della pagina,
-            // invece di una per ticket: evita N+1 chiamate al database.
-            var idTicket = tickets.Select(t => t.Id).ToList();
-            var messaggiPerTicket = await _db.MhxrTicketMessaggi
-                .AsNoTracking()
-                .Where(m => idTicket.Contains(m.IdTicket))
-                .OrderBy(m => m.CreatedAt)
-                .ToListAsync();
-
-            var risultato = tickets.Select(t => new MhxrTicketDto
-            {
-                Id = t.Id,
-                Categoria = t.Categoria,
-                Anonimo = t.Anonimo,
-                Autore = t.Autore,
-                Stato = t.Stato,
-                CreatedAt = t.CreatedAt,
-                Messaggi = messaggiPerTicket
-                    .Where(m => m.IdTicket == t.Id)
-                    .Select(m => new MhxrTicketMessaggioDto
-                    {
-                        Id = m.Id,
-                        Mittente = m.Mittente,
-                        Testo = m.Testo,
-                        CreatedAt = m.CreatedAt
-                    })
-                    .ToList()
-            }).ToList();
+            var risultato = await CaricaListaDtoAsync(query);
 
             _logger.LogInformation("Admin ha letto {Count} ticket MHXR", risultato.Count);
             return Ok(risultato);

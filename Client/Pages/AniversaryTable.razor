@@ -90,9 +90,44 @@
         font-family: 'Cinzel', serif;
     }
 
+    /* Contenitore con lo scorrimento: la tabella sotto ha una larghezza
+       minima fissa, quindi su schermi stretti (telefono) semplicemente
+       sborda e si scorre di lato invece di schiacciarsi o spezzarsi. */
+    .table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .admin-table {
         width: 100%;
+        min-width: 560px;
         border-collapse: collapse;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        white-space: nowrap;
+    }
+
+    /* Il feedback e' testo libero, spesso lungo: l'unica colonna a cui
+       conviene andare a capo invece di allungare la tabella all'infinito. */
+    .wrap-cell {
+        white-space: normal;
+    }
+
+    .pager {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        padding: 14px 0 4px;
+    }
+
+    .pager-info {
+        color: #c0c0c0;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
     }
 
     .admin-table thead tr {
@@ -199,54 +234,24 @@
 
     /* Gestione per Mobile */
     @@media (max-width: 900px) {
-        .tables-grid
+        .tables-grid {
+            grid-template-columns: 1fr; /* Una tabella sotto l'altra */
+        }
 
-    {
-        grid-template-columns: 1fr; /* Una tabella sotto l'altra */
-    }
+        .table-card {
+            grid-column: span 1 !important; /* Forza il grafico a stare in una colonna */
+        }
 
-    .table-card {
-        grid-column: span 1 !important; /* Forza il grafico a stare in una colonna */
-    }
+        .page-title {
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+        }
 
-    .page-title {
-        font-size: 1.8rem;
-        letter-spacing: 2px;
-    }
-
-    .admin-table thead {
-        display: none; 
-    }
-
-    .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
-        display: block; /* Tutto diventa un blocco verticale */
-        width: 100%;
-    }
-
-    .admin-table tr {
-        margin-bottom: 15px;
-        border-bottom: 2px solid #8b0000;
-        padding: 10px 0;
-    }
-
-    .admin-table td {
-        text-align: right; /* Il valore a destra */
-        padding-left: 50%; /* Spazio per il titolo a sinistra */
-        position: relative;
-        border-bottom: 1px solid rgba(139, 0, 0, 0.1);
-    }
-
-    .admin-table td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 15px;
-        width: 45%;
-        white-space: nowrap;
-        text-align: left;
-        font-weight: bold;
-        color: #d4af37;
-        text-transform: uppercase;
-        font-size: 0.8rem;
+        /* Prima la tabella si spezzava in blocchi verticali sul telefono e
+           non si vedeva "il grid" intero. Ora resta una tabella vera: se non
+           ci sta in larghezza, .table-scroll la fa scorrere di lato invece
+           di deformarla — le regole di scroll sono definite sopra, qui non
+           serve altro. */
     }
 
     /* Bottoni per scegliere la finestra temporale del grafico */
@@ -302,25 +307,33 @@
                     }
                     else
                     {
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Monster</th>
-                                    <th>Feedback</th>
-                                    <th>User</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in ClasificationList)
-                                {
+                        <div class="table-scroll">
+                            <table class="admin-table">
+                                <thead>
                                     <tr>
-                                        <td>@item.Monster</td>
-                                        <td>@item.Feedback</td>
-                                        <td class="email-cell">@(item.UserEmail ?? "—")</td>
+                                        <th>Monster</th>
+                                        <th>Feedback</th>
+                                        <th>User</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in ClasificationPagina)
+                                    {
+                                        <tr>
+                                            <td>@item.Monster</td>
+                                            <td class="wrap-cell">@item.Feedback</td>
+                                            <td class="email-cell">@(item.UserEmail ?? "—")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pager">
+                            <button class="range-btn" @onclick="() => CambiaPaginaFeedback(-1)" disabled="@(feedbackPage <= 1)">‹ Prev</button>
+                            <span class="pager-info">Page @feedbackPage / @FeedbackTotalPages</span>
+                            <button class="range-btn" @onclick="() => CambiaPaginaFeedback(1)" disabled="@(feedbackPage >= FeedbackTotalPages)">Next ›</button>
+                        </div>
                     }
                 </div>
 
@@ -343,31 +356,39 @@
                     }
                     else
                     {
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Element</th>
-                                    <th>Class</th>
-                                    <th>Def</th>
-                                    <th>Map</th>
-                                    <th>User</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in dragonList)
-                                {
+                        <div class="table-scroll">
+                            <table class="admin-table">
+                                <thead>
                                     <tr>
-                                        <td>@item.Name</td>
-                                        <td>@item.Element</td>
-                                        <td>@item.Class</td>
-                                        <td><span class="defence-badge">@item.Defence</span></td>
-                                        <td>@item.Map</td>
-                                        <td class="email-cell">@(item.UserEmail ?? "—")</td>
+                                        <th>Name</th>
+                                        <th>Element</th>
+                                        <th>Class</th>
+                                        <th>Def</th>
+                                        <th>Map</th>
+                                        <th>User</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in DragonPagina)
+                                    {
+                                        <tr>
+                                            <td>@item.Name</td>
+                                            <td>@item.Element</td>
+                                            <td>@item.Class</td>
+                                            <td><span class="defence-badge">@item.Defence</span></td>
+                                            <td>@item.Map</td>
+                                            <td class="email-cell">@(item.UserEmail ?? "—")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pager">
+                            <button class="range-btn" @onclick="() => CambiaPaginaDragon(-1)" disabled="@(dragonPage <= 1)">‹ Prev</button>
+                            <span class="pager-info">Page @dragonPage / @DragonTotalPages</span>
+                            <button class="range-btn" @onclick="() => CambiaPaginaDragon(1)" disabled="@(dragonPage >= DragonTotalPages)">Next ›</button>
+                        </div>
                     }
                 </div>
                 

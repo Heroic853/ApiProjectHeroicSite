@@ -59,6 +59,18 @@ namespace Client.Pages
         /// </summary>
         private bool ticketAttivoEAnonimo;
 
+        /// <summary>I TUOI ticket gia' chiusi, per lo storico in fondo alla pagina.</summary>
+        private List<MhxrTicketDto> storico = new();
+
+        /// <summary>Quali righe dello storico sono aperte per leggere la conversazione.</summary>
+        private readonly HashSet<int> storicoEspanso = new();
+
+        private void ToggleStorico(int idTicket)
+        {
+            if (!storicoEspanso.Add(idTicket))
+                storicoEspanso.Remove(idTicket);
+        }
+
         private bool caricamentoIniziale = true;
 
         private string nuovoMessaggio = "";
@@ -74,10 +86,14 @@ namespace Client.Pages
         protected override async Task OnInitializedAsync()
         {
             var stato = await AuthStateProvider.GetAuthenticationStateAsync();
-            if (stato.User.Identity?.IsAuthenticated == true)
+            var loggato = stato.User.Identity?.IsAuthenticated == true;
+
+            if (loggato)
                 await CaricaTicketAttivoAsync();
             else
                 await CaricaTicketAnonimoAsync();
+
+            await CaricaStoricoAsync(loggato);
 
             caricamentoIniziale = false;
 
@@ -104,10 +120,19 @@ namespace Client.Pages
                     if (ticketAttivo is null)
                         continue;
 
-                    if (ticketAttivoEAnonimo)
+                    var eraAnonimo = ticketAttivoEAnonimo;
+
+                    if (eraAnonimo)
                         await CaricaTicketAnonimoAsync();
                     else
                         await CaricaTicketAttivoAsync();
+
+                    // Se e' appena passato a null e' perche' l'admin lo ha
+                    // chiuso proprio ora: rinfresca anche lo storico, cosi'
+                    // il ticket ci compare subito invece che al prossimo
+                    // caricamento della pagina.
+                    if (ticketAttivo is null)
+                        await CaricaStoricoAsync(!eraAnonimo);
 
                     await InvokeAsync(StateHasChanged);
                 }
@@ -180,6 +205,27 @@ namespace Client.Pages
             catch (Exception ex)
             {
                 Console.WriteLine($"[mhxr-ticket] impossibile leggere il ticket anonimo: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// I ticket gia' chiusi: di chi e' loggato (per Autore) oppure, per
+        /// chi non lo e', quelli scritti dallo stesso indirizzo IP (nessun
+        /// "biglietto" qui: dopo il ticket successivo il Client sovrascrive
+        /// quello salvato, quelli vecchi non sarebbero piu' raggiungibili).
+        /// </summary>
+        private async Task CaricaStoricoAsync(bool loggato)
+        {
+            try
+            {
+                storico = loggato
+                    ? await Http.GetFromJsonAsync<List<MhxrTicketDto>>("api/mhxr/mio-storico") ?? new()
+                    : await HttpClientFactory.CreateClient("Anonymous")
+                        .GetFromJsonAsync<List<MhxrTicketDto>>("api/mhxr/storico-anonimo") ?? new();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[mhxr-ticket] impossibile leggere lo storico: {ex.Message}");
             }
         }
 

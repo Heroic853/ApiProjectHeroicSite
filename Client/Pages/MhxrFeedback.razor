@@ -436,6 +436,43 @@
         text-align: center;
     }
 
+    /* ---- Storico dei ticket chiusi ---- */
+
+    .mhxr-history-item {
+        border-top: 1px solid rgba(212, 175, 55, 0.18);
+    }
+
+    .mhxr-history-item:first-of-type {
+        border-top: none;
+    }
+
+    .mhxr-history-head {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+        padding: 14px 4px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+    }
+
+    .mhxr-history-head:hover .mhxr-status-id {
+        color: #fff0a0;
+    }
+
+    .mhxr-history-meta {
+        flex: 1 1 auto;
+        color: #8a8a8a;
+        font-size: 0.82rem;
+    }
+
+    .mhxr-history-convo {
+        padding: 0 4px 18px;
+    }
+
     @@media (max-width: 600px) {
         .mhxr-wrap {
             padding: 28px 14px 50px;
@@ -621,4 +658,43 @@
         }
 
     </div>
+
+    @* Storico: SOLO ticket gia' chiusi (l'attivo lo mostra la scheda sopra).
+       Per chi e' loggato e' per Autore, per chi non lo e' per indirizzo IP —
+       vedi il commento su GetStoricoAnonimo nel controller per il compromesso
+       che questo comporta su una rete condivisa. *@
+    @if (storico.Count > 0)
+    {
+        <div class="mhxr-card" style="margin-top: 22px;">
+            <h2 class="mhxr-card-title">Your closed tickets</h2>
+            <p class="mhxr-card-sub">Tap one to see the full conversation.</p>
+
+            @foreach (var t in storico)
+            {
+                <div class="mhxr-history-item">
+                    <button class="mhxr-history-head" @onclick="() => ToggleStorico(t.Id)">
+                        <span class="mhxr-status-id">Ticket #@t.Id</span>
+                        <span class="mhxr-history-meta">@t.Categoria · @t.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</span>
+                        <span class="mhxr-badge mhxr-badge-closed">Closed</span>
+                    </button>
+
+                    @if (storicoEspanso.Contains(t.Id))
+                    {
+                        <div class="mhxr-convo mhxr-history-convo">
+                            @foreach (var msg in t.Messaggi)
+                            {
+                                var daTe = msg.Mittente == MhxrMittente.Utente;
+                                <div>
+                                    <div class="mhxr-bubble @(daTe ? "mhxr-bubble-user" : "mhxr-bubble-staff")">@msg.Testo</div>
+                                    <div class="mhxr-bubble-meta @(daTe ? "mhxr-bubble-meta-user" : "")">
+                                        @(daTe ? "You" : "Heroic853"), @msg.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
 </div>
