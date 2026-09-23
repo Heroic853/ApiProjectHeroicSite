@@ -139,7 +139,8 @@ namespace WebApi.Controllers
                 Autore = ticket.Autore,
                 Stato = ticket.Stato,
                 CreatedAt = ticket.CreatedAt,
-                Messaggi = messaggi
+                Messaggi = messaggi,
+                LookupToken = ticket.LookupToken
             };
         }
 
@@ -177,7 +178,8 @@ namespace WebApi.Controllers
                         Testo = m.Testo,
                         CreatedAt = m.CreatedAt
                     })
-                    .ToList()
+                    .ToList(),
+                LookupToken = t.LookupToken
             }).ToList();
         }
 
@@ -514,7 +516,16 @@ namespace WebApi.Controllers
                 .OrderByDescending(t => t.CreatedAt)
                 .Take(20);
 
-            return Ok(await CaricaListaDtoAsync(query));
+            var risultato = await CaricaListaDtoAsync(query);
+
+            // Qui il chiamante ha dimostrato solo di scrivere dallo stesso IP,
+            // non di possedere il biglietto di OGNI ticket restituito (vedi il
+            // commento sul compromesso, sopra): il token e' una credenziale
+            // vera, non va consegnato a chi potrebbe non essere il proprietario.
+            foreach (var t in risultato)
+                t.LookupToken = null;
+
+            return Ok(risultato);
         }
 
         // ------------------------------------------------------------------

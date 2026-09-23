@@ -15,6 +15,7 @@ namespace Client.Pages
         [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
         [Inject] private HttpClient Http { get; set; } = default!;
         [Inject] private IJSRuntime JS { get; set; } = default!;
+        [Inject] private NavigationManager Nav { get; set; } = default!;
 
         // Chiavi in localStorage: e' il "biglietto" che permette a chi NON e'
         // loggato di ritrovare il proprio ticket dopo aver lasciato la pagina.
@@ -85,6 +86,12 @@ namespace Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            // Se sei arrivato da un link di recupero che ti ho mandato io
+            // (dopo che me lo hai chiesto perche' hai cambiato dispositivo o
+            // svuotato i dati del sito), salva subito il biglietto: cosi' da
+            // qui in poi funziona come se non l'avessi mai perso.
+            await ApplicaLinkRecuperoDaUrlAsync();
+
             var stato = await AuthStateProvider.GetAuthenticationStateAsync();
             var loggato = stato.User.Identity?.IsAuthenticated == true;
 
@@ -260,6 +267,37 @@ namespace Client.Pages
             {
                 Console.WriteLine($"[mhxr-ticket] impossibile salvare il biglietto: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Legge "?ticket=ID&amp;token=XXX" dall'URL (il link che l'admin
+        /// manda a mano quando un utente anonimo chiede di recuperare il suo
+        /// ticket) e lo salva come se fosse il biglietto normale. Poi ripulisce
+        /// l'URL: non deve restare in giro un link che da' accesso al ticket
+        /// a chiunque lo veda (screenshot, cronologia condivisa...).
+        /// </summary>
+        private async Task ApplicaLinkRecuperoDaUrlAsync()
+        {
+            var uri = new Uri(Nav.Uri);
+            if (string.IsNullOrEmpty(uri.Query))
+                return;
+
+            // Parsing a mano invece di Microsoft.AspNetCore.WebUtilities:
+            // servono solo due chiavi semplici, non vale la pena aggiungere
+            // un pacchetto in piu' al Client per questo.
+            var parametri = uri.Query.TrimStart('?')
+                .Split('&', StringSplitOptions.RemoveEmptyEntries)
+                .Select(p => p.Split('=', 2))
+                .Where(p => p.Length == 2)
+                .ToDictionary(p => Uri.UnescapeDataString(p[0]), p => Uri.UnescapeDataString(p[1]));
+
+            if (!parametri.TryGetValue("ticket", out var ticketVal) || !parametri.TryGetValue("token", out var tokenVal))
+                return;
+
+            if (int.TryParse(ticketVal, out var id) && !string.IsNullOrWhiteSpace(tokenVal))
+                await SalvaBigliettoAnonimoAsync(id, tokenVal);
+
+            Nav.NavigateTo(uri.GetLeftPart(UriPartial.Path), replace: true);
         }
 
         private async Task DimenticaBigliettoAnonimoAsync()

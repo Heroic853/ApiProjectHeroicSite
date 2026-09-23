@@ -3,6 +3,7 @@
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
 @using SharedLibrary.Dto
 @inject HttpClient Http
+@inject IJSRuntime JS
 
 <style>
     body {
@@ -219,6 +220,19 @@
                                 <strong>@(delAdmin ? "You" : "Them")</strong>
                                 (@msg.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")):
                                 @msg.Testo
+                            </div>
+                        }
+
+                        @if (t.Anonimo && !string.IsNullOrEmpty(t.LookupToken))
+                        {
+                            @* Per quando l'utente ti chiede a parte (Discord, di persona...) di
+                               recuperare un ticket anonimo perso cambiando dispositivo o
+                               svuotando i dati del sito — vedi "Richiedi credenziali" su
+                               MhxrFeedback. Il link porta dritto al ticket su quel browser. *@
+                            <div class="ticket-azioni" style="margin-top:8px;">
+                                <button class="ticket-btn" @onclick="() => CopiaLinkRecupero(t)">
+                                    @(linkCopiato == t.Id ? "✅ Copied!" : "📋 Copy recovery link")
+                                </button>
                             </div>
                         }
 

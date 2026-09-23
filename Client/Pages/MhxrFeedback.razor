@@ -78,8 +78,9 @@
 
     .mhxr-donate-icon {
         flex: 0 0 auto;
-        font-size: 1.8rem;
-        line-height: 1;
+        width: 38px;
+        height: 38px;
+        object-fit: contain;
     }
 
     .mhxr-donate-text {
@@ -424,6 +425,51 @@
         text-align: right;
     }
 
+    /* ---- Caricamento ---- */
+
+    .mhxr-loading {
+        text-align: center;
+        padding: 10px 0 4px;
+    }
+
+    .mhxr-spinner {
+        width: 32px;
+        height: 32px;
+        margin: 0 auto 16px;
+        border: 3px solid rgba(212, 175, 55, 0.22);
+        border-top-color: #ffd700;
+        border-radius: 50%;
+        animation: mhxr-spin 0.8s linear infinite;
+    }
+
+    @@keyframes mhxr-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* ---- Richiedi credenziali ---- */
+
+    .mhxr-credentials-box {
+        margin-bottom: 18px;
+        padding: 13px 15px;
+        background: rgba(212, 175, 55, 0.12);
+        border: 1px solid rgba(212, 175, 55, 0.5);
+        border-radius: 8px;
+        color: #f0e0b0;
+        font-size: 0.85rem;
+        line-height: 1.55;
+    }
+
+    .mhxr-credentials-box strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #ffd700;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
     .mhxr-status-note {
         margin-top: 22px;
         padding: 13px 15px;
@@ -522,7 +568,7 @@
        striscia bassa e non una scheda grande: chi arriva qui vuole segnalare
        un problema, il modulo deve restare la cosa principale. *@
     <div class="mhxr-donate">
-        <span class="mhxr-donate-icon">🐉</span>
+        <img src="images/Forb1.png" alt="" class="mhxr-donate-icon" />
         <div class="mhxr-donate-text">
             <p class="mhxr-donate-title">Keep the server alive</p>
             <p class="mhxr-donate-sub">
@@ -550,7 +596,13 @@
 
         @if (caricamentoIniziale)
         {
-            <p class="mhxr-card-sub" style="text-align:center;margin:0;">Loading your ticket…</p>
+            <div class="mhxr-loading">
+                <div class="mhxr-spinner"></div>
+                <p class="mhxr-card-sub" style="margin:0;">
+                    Loading your ticket… my server sleeps when nobody visits, so the
+                    first request can take a few seconds to wake it up.
+                </p>
+            </div>
         }
         else if (ticketAttivo is not null)
         {
@@ -565,9 +617,16 @@
 
             @if (ticketAttivoEAnonimo)
             {
-                <p class="mhxr-status-note" style="margin-top:0;margin-bottom:18px;">
-                    You sent this ticket anonymously 
+                <p class="mhxr-status-note" style="margin-top:0;margin-bottom:14px;">
+                    You sent this ticket anonymously
                 </p>
+
+                <div class="mhxr-credentials-box">
+                    <strong>⚠️ Request credentials</strong>
+                    This page remembers your ticket only on this browser/device — I can't
+                    recover it automatically if you switch. If that happens, just message
+                    me directly and I'll send you the link back.
+                </div>
             }
 
             <div class="mhxr-status-meta">

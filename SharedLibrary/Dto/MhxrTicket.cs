@@ -83,6 +83,14 @@ namespace SharedLibrary.Dto
         public string Stato { get; set; } = "Aperto";
         public DateTime CreatedAt { get; set; }
         public List<MhxrTicketMessaggioDto> Messaggi { get; set; } = new();
+
+        /// <summary>
+        /// Solo per i ticket anonimi: serve all'Admin per costruire il link
+        /// di recupero da mandare a mano a chi ha perso l'accesso (vedi
+        /// "Richiedi credenziali" in MhxrFeedback). Per chi e' loggato e'
+        /// sempre null, non serve — si riconosce dal token.
+        /// </summary>
+        public string? LookupToken { get; set; }
     }
 
     /// <summary>

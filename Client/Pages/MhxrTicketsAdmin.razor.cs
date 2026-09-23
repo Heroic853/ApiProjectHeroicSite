@@ -1,3 +1,4 @@
+using Microsoft.JSInterop;
 using SharedLibrary.Dto;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -27,6 +28,9 @@ namespace Client.Pages
         private readonly HashSet<int> operazioneInCorso = new();
 
         private readonly Dictionary<int, string> erroreRiga = new();
+
+        /// <summary>Id del ticket il cui link e' appena stato copiato, per il "Copied!" temporaneo.</summary>
+        private int? linkCopiato;
 
         private PeriodicTimer? _timerAggiornamento;
         private CancellationTokenSource? _ctsAggiornamento;
@@ -151,6 +155,40 @@ namespace Client.Pages
             finally
             {
                 operazioneInCorso.Remove(id);
+            }
+        }
+
+        /// <summary>
+        /// Copia negli appunti il link diretto al ticket anonimo, da mandare
+        /// a mano a chi te lo chiede (Discord, di persona...) dopo aver
+        /// perso l'accesso cambiando dispositivo. Aprendolo, il Client salva
+        /// da solo il biglietto e mostra il ticket — vedi
+        /// ApplicaLinkRecuperoDaUrlAsync in MhxrFeedback.razor.cs.
+        /// </summary>
+        private async Task CopiaLinkRecupero(MhxrTicketDto t)
+        {
+            if (string.IsNullOrEmpty(t.LookupToken))
+                return;
+
+            var link = $"https://heroic853.github.io/Heroic853SiteV1/mhxr-feedback?ticket={t.Id}&token={t.LookupToken}";
+
+            try
+            {
+                await JS.InvokeVoidAsync("navigator.clipboard.writeText", link);
+                linkCopiato = t.Id;
+                StateHasChanged();
+
+                await Task.Delay(1800);
+                if (linkCopiato == t.Id)
+                {
+                    linkCopiato = null;
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                erroreRiga[t.Id] = "Could not copy the link — copy it manually from the browser console.";
+                Console.WriteLine($"[mhxr-admin] link di recupero per #{t.Id}: {link} ({ex.Message})");
             }
         }
 
