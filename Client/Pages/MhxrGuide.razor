@@ -1,0 +1,440 @@
+@page "/mhxr-guide"
+
+<PageTitle>Play MHXR — Heroic853</PageTitle>
+
+<style>
+    body {
+        background-image: url('images/NefGamaldWallpaper.jpeg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-attachment: fixed;
+        background-color: #0d0500;
+        min-height: 100vh;
+    }
+
+    .mhxrguide-wrap {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 40px 18px 70px;
+    }
+
+    .mhxrguide-hero {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .mhxrguide-kicker {
+        display: inline-block;
+        padding: 5px 14px;
+        margin-bottom: 14px;
+        background: rgba(139, 0, 0, 0.7);
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        border-radius: 20px;
+        color: #d4af37;
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+    }
+
+    .mhxrguide-title {
+        margin: 0 0 12px;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 2.3rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-shadow: 0 0 28px rgba(255, 215, 0, 0.35), 0 2px 10px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.95);
+    }
+
+    .mhxrguide-sub {
+        margin: 0 auto;
+        max-width: 560px;
+        color: #d8d8d8;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95), 0 0 4px rgba(0, 0, 0, 0.95);
+    }
+
+    .mhxrguide-card {
+        margin-bottom: 22px;
+        background: rgba(10, 4, 0, 0.96);
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        border-radius: 14px;
+        padding: 26px 26px;
+        box-shadow: 0 14px 46px rgba(0, 0, 0, 0.65);
+    }
+
+    .mhxrguide-step-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 12px;
+    }
+
+    .mhxrguide-step-num {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(139, 0, 0, 0.5);
+        border: 1px solid #ffd700;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+    }
+
+    .mhxrguide-step-title {
+        margin: 0;
+        color: #ffd700;
+        font-family: 'Cinzel', serif;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .mhxrguide-card p {
+        color: #c0c0c0;
+        font-size: 0.9rem;
+        line-height: 1.65;
+        margin: 0 0 14px;
+    }
+
+    .mhxrguide-card p:last-child {
+        margin-bottom: 0;
+    }
+
+    .mhxrguide-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 46px;
+        padding: 0 22px;
+        margin: 4px 8px 4px 0;
+        background: #ffd700;
+        border: 1px solid #ffd700;
+        border-radius: 8px;
+        color: #2a1500 !important;
+        font-family: 'Cinzel', serif;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        text-decoration: none !important;
+        transition: all 0.2s;
+    }
+
+    .mhxrguide-btn:hover {
+        background: #fff0a0;
+        box-shadow: 0 0 22px rgba(255, 215, 0, 0.45);
+        transform: translateY(-1px);
+    }
+
+    .mhxrguide-btn-alt {
+        background: transparent;
+        border: 1px solid #ffd700;
+        color: #ffd700 !important;
+    }
+
+    .mhxrguide-btn-alt:hover {
+        background: rgba(255, 215, 0, 0.15);
+    }
+
+    .mhxrguide-warn {
+        margin: 4px 0 14px;
+        padding: 12px 15px;
+        background: rgba(139, 0, 0, 0.28);
+        border: 1px solid rgba(200, 60, 60, 0.6);
+        border-radius: 8px;
+        color: #ff9c9c;
+        font-size: 0.85rem;
+        line-height: 1.55;
+    }
+
+    .mhxrguide-warn strong {
+        color: #ffbcbc;
+    }
+
+    .mhxrguide-note {
+        margin: 4px 0 14px;
+        padding: 12px 15px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        border-radius: 8px;
+        color: #f0e0b0;
+        font-size: 0.85rem;
+        line-height: 1.55;
+    }
+
+    .mhxrguide-screenshot {
+        display: block;
+        width: 100%;
+        max-width: 460px;
+        margin: 4px auto 16px;
+        border-radius: 10px;
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .mhxrguide-list {
+        margin: 0 0 4px;
+        padding-left: 20px;
+        color: #c0c0c0;
+        font-size: 0.9rem;
+        line-height: 1.75;
+    }
+
+    .mhxrguide-list li {
+        margin-bottom: 4px;
+    }
+
+    .mhxrguide-faq-item {
+        border-top: 1px solid rgba(212, 175, 55, 0.18);
+        padding: 14px 0;
+    }
+
+    .mhxrguide-faq-item:first-child {
+        border-top: none;
+        padding-top: 4px;
+    }
+
+    .mhxrguide-faq-q {
+        margin: 0 0 6px;
+        color: #ffd700;
+        font-size: 0.92rem;
+        font-weight: 700;
+    }
+
+    .mhxrguide-faq-a {
+        margin: 0;
+        color: #b0b0b0;
+        font-size: 0.87rem;
+        line-height: 1.6;
+    }
+
+    .mhxrguide-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .mhxrguide-cta {
+        text-align: center;
+        margin-top: 6px;
+    }
+
+    @@media (max-width: 600px) {
+        .mhxrguide-wrap {
+            padding: 28px 14px 50px;
+        }
+
+        .mhxrguide-title {
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+        }
+
+        .mhxrguide-card {
+            padding: 20px 17px;
+            border-radius: 11px;
+        }
+
+        .mhxrguide-btn {
+            width: 100%;
+            justify-content: center;
+            margin: 4px 0;
+        }
+    }
+</style>
+
+<div class="mhxrguide-wrap">
+
+    <div class="mhxrguide-hero">
+        <span class="mhxrguide-kicker">Private Server</span>
+        <h1 class="mhxrguide-title">How to Play</h1>
+        <p class="mhxrguide-sub">
+            Monster Hunter Explore's official servers were shut down by Capcom in 2020. This is a
+            private, non-commercial restoration server so the game can still be played — here is
+            everything you need to get connected.
+        </p>
+    </div>
+
+    @* ---- Step 1: il gioco ---- *@
+    <div class="mhxrguide-card">
+        <div class="mhxrguide-step-head">
+            <span class="mhxrguide-step-num">1</span>
+            <h2 class="mhxrguide-step-title">Get the game</h2>
+        </div>
+        <p>
+            You need your own copy of Monster Hunter Explore (.apk). This tool does not contain or
+            download the game for you.
+        </p>
+        <div class="mhxrguide-warn">
+            <strong>Japanese version only.</strong> The Taiwan build has an anti-tampering check
+            (AppGuard) that blocks any APK re-signed with a different key — which is exactly what
+            patching does. With the Taiwan version the game opens and closes immediately, with no
+            error, no matter what you try. It is not a bug in the patcher, it is that check. The
+            Japanese version does not have it and works normally.
+        </div>
+        <p>The link below is the one that worked for me:</p>
+        <a class="mhxrguide-btn"
+           href="https://apkpure.com/%E3%83%A2%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%8F%E3%83%B3%E3%82%BF%E3%83%BC-%E3%82%A8%E3%82%AF%E3%82%B9%E3%83%97%E3%83%AD%E3%82%A2/jp.co.capcom.android.explore/download"
+           target="_blank"
+           rel="noopener">
+            📥 Download the APK (Japanese)
+        </a>
+    </div>
+
+    @* ---- Step 2: Java ---- *@
+    <div class="mhxrguide-card">
+        <div class="mhxrguide-step-head">
+            <span class="mhxrguide-step-num">2</span>
+            <h2 class="mhxrguide-step-title">Install Java (JDK, not JRE)</h2>
+        </div>
+        <p>
+            The patcher uses <code>keytool</code>, which only exists in the JDK. This is the most
+            common thing people get wrong: searching "Java download" usually gets you the JRE, and
+            the patcher will say Java is missing even though you can see it installed.
+        </p>
+        <p>Get <strong>Eclipse Temurin JDK 17</strong> (free) and pick "JDK", not "JRE", on the page.</p>
+        <a class="mhxrguide-btn mhxrguide-btn-alt" href="https://adoptium.net" target="_blank" rel="noopener">
+            ☕ Get the JDK
+        </a>
+    </div>
+
+    @* ---- Step 3: prima di disinstallare ---- *@
+    <div class="mhxrguide-card">
+        <div class="mhxrguide-step-head">
+            <span class="mhxrguide-step-num">3</span>
+            <h2 class="mhxrguide-step-title">Before you do anything else — read this</h2>
+        </div>
+        <p>
+            A patched APK has a different signature, and Android will not install it over the game
+            you already have — you will need to <strong>uninstall</strong> it first. Uninstalling
+            also wipes the app's local storage, which is where the game keeps your "ID card".
+            Reinstalling without it means the server does not recognize you and you start over.
+        </p>
+        <div class="mhxrguide-warn">
+            Your character is <strong>not</strong> lost — it lives in the server's database, not on
+            your phone. But you need the <strong>transfer code</strong> to reclaim it, and it has to
+            be set up <strong>before</strong> you uninstall.
+        </div>
+        <ol class="mhxrguide-list">
+            <li>Open the game you have right now</li>
+            <li>Set up account transfer and write down the code and password</li>
+            <li>Save them somewhere that is <strong>not</strong> your phone</li>
+            <li>Only then uninstall</li>
+        </ol>
+        <p>
+            Skip this and your character stays in the database with no way to reconnect it — I can
+            fix that from my side, but you can't do it yourself, so it's much simpler to just save
+            the code first.
+        </p>
+    </div>
+
+    @* ---- Step 4: il patcher ---- *@
+    <div class="mhxrguide-card">
+        <div class="mhxrguide-step-head">
+            <span class="mhxrguide-step-num">4</span>
+            <h2 class="mhxrguide-step-title">Download and run MHXR Patcher</h2>
+        </div>
+        <p>
+            My own tool: it takes your APK and changes two things — the server address, so the game
+            points here instead of Capcom's dead servers, and optionally the text language.
+        </p>
+        <a class="mhxrguide-btn" href="https://github.com/Heroic853/MHXR_Patcher_Heroic853" target="_blank" rel="noopener">
+            📥 Download MHXR Patcher
+        </a>
+        <p>Full instructions and source are on that page.</p>
+
+        <div class="mhxrguide-note">
+            <strong>"Windows protected your PC"</strong> — normal, it happens to any program that
+            isn't signed with a paid certificate. Click "More info", then "Run anyway".<br />
+            <strong>Antivirus flags it / quarantines it</strong> — also a false positive: a tool
+            that rewrites APK files looks suspicious to automatic antivirus rules. Add an exclusion
+            for the folder you put it in if this happens.
+        </div>
+
+        <img src="images/MhxrPatcherScreenshot.png" alt="MHXR Patcher application window" class="mhxrguide-screenshot" />
+
+        <ol class="mhxrguide-list">
+            <li><strong>Browse</strong> — pick your game's .apk file</li>
+            <li><strong>Server address</strong> — the address I gave you, max 47 characters (that's the physical space inside the game, not a choice I made)</li>
+            <li><strong>Switch the game to English</strong> — optional, and partial: monster names and common menus/errors are translated, quest text and most weapon/armor names stay Japanese</li>
+            <li><strong>Create and save the APK</strong> — pick where to save it on your PC</li>
+        </ol>
+    </div>
+
+    @* ---- Step 5: installazione ---- *@
+    <div class="mhxrguide-card">
+        <div class="mhxrguide-step-head">
+            <span class="mhxrguide-step-num">5</span>
+            <h2 class="mhxrguide-step-title">Install and connect</h2>
+        </div>
+        <ol class="mhxrguide-list">
+            <li>Copy the patched APK to your phone and install it — you'll need to allow installs from unknown sources, since it isn't from the Play Store</li>
+            <li>Open the game and use account transfer with the code and password from step 3</li>
+        </ol>
+        <p>That's it — you should be in.</p>
+    </div>
+
+    @* ---- Troubleshooting ---- *@
+    <div class="mhxrguide-card">
+        <h2 class="mhxrguide-step-title" style="margin-bottom: 14px;">If something goes wrong</h2>
+
+        <div class="mhxrguide-faq-item">
+            <p class="mhxrguide-faq-q">"java not found" / "keytool not found"</p>
+            <p class="mhxrguide-faq-a">You installed the JRE instead of the JDK — see step 2. If you're sure you have the JDK, restart your PC: the install adds Java system-wide, but programs already open don't notice.</p>
+        </div>
+        <div class="mhxrguide-faq-item">
+            <p class="mhxrguide-faq-q">"The address is N characters long but the slot only fits 47"</p>
+            <p class="mhxrguide-faq-a">The address is too long — ask me if I have a shorter one.</p>
+        </div>
+        <div class="mhxrguide-faq-item">
+            <p class="mhxrguide-faq-q">"no address found"</p>
+            <p class="mhxrguide-faq-a">The file you picked isn't the game's APK, or it's a version the patcher doesn't recognize.</p>
+        </div>
+        <div class="mhxrguide-faq-item">
+            <p class="mhxrguide-faq-q">The APK won't install</p>
+            <p class="mhxrguide-faq-a">Almost always the old game is still installed — uninstall it first (but only after saving your transfer code, see step 3).</p>
+        </div>
+        <div class="mhxrguide-faq-item">
+            <p class="mhxrguide-faq-q">The game opens and closes immediately, no error</p>
+            <p class="mhxrguide-faq-a">You used the Taiwan version. Only the Japanese version works — see the warning in step 1.</p>
+        </div>
+        <div class="mhxrguide-faq-item">
+            <p class="mhxrguide-faq-q">The game opens but won't connect</p>
+            <p class="mhxrguide-faq-a">The server address is wrong, or the server is down — message me to check.</p>
+        </div>
+    </div>
+
+    @* ---- Il progetto ---- *@
+    <div class="mhxrguide-card">
+        <h2 class="mhxrguide-step-title" style="margin-bottom: 12px;">About this project</h2>
+        <p>
+            A private, non-commercial restoration server for Monster Hunter Explore, built on top of
+            the community's original <em>apypos-server</em> project. Not affiliated with Capcom —
+            this exists only because the official servers are gone and the game would otherwise be
+            unplayable.
+        </p>
+        <div class="mhxrguide-links">
+            <a class="mhxrguide-btn mhxrguide-btn-alt" href="https://github.com/Heroic853/MHXR-ServerHeroic" target="_blank" rel="noopener">
+                🖥️ Server source
+            </a>
+            <a class="mhxrguide-btn mhxrguide-btn-alt" href="https://github.com/Heroic853/MHXR_Patcher_Heroic853" target="_blank" rel="noopener">
+                🛠️ Patcher source
+            </a>
+        </div>
+    </div>
+
+    <div class="mhxrguide-cta">
+        <p style="margin-bottom: 14px;">Something not working, or found a bug in-game?</p>
+        <a class="mhxrguide-btn" href="mhxr-feedback">
+            🎫 Open a ticket
+        </a>
+    </div>
+
+</div>

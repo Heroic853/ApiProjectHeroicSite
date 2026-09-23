@@ -18,11 +18,12 @@ namespace SharedLibrary.Dto
         public const string Crash = "Crash";
         public const string Multiplayer = "Multiplayer";
         public const string LanguagePatch = "Language patch bug";
+        public const string ApkPatcher = "APK / Patcher problem";
         public const string Other = "Other";
 
         public static readonly string[] Tutte =
         {
-            Bug, WrongMonster, Crash, Multiplayer, LanguagePatch, Other
+            Bug, WrongMonster, Crash, Multiplayer, LanguagePatch, ApkPatcher, Other
         };
 
         public static bool EValida(string? categoria) =>
