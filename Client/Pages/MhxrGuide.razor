@@ -257,8 +257,7 @@
         <h1 class="mhxrguide-title">How to Play</h1>
         <p class="mhxrguide-sub">
             Monster Hunter Explore's official servers were shut down by Capcom in 2020. This is a
-            private, non-commercial restoration server so the game can still be played — here is
-            everything you need to get connected.
+            private, non-commercial restoration private server of the game can still be played.
         </p>
     </div>
 
@@ -274,10 +273,8 @@
         </p>
         <div class="mhxrguide-warn">
             <strong>Japanese version only.</strong> The Taiwan build has an anti-tampering check
-            (AppGuard) that blocks any APK re-signed with a different key — which is exactly what
-            patching does. With the Taiwan version the game opens and closes immediately, with no
-            error, no matter what you try. The
-            Japanese version does not have it and works normally.
+            (AppGuard) that blocks any APK re-signed with a different key which is exactly what
+            patching does.
         </div>
         <p>The link below is the one that worked for me:</p>
         <a class="mhxrguide-btn"
@@ -305,56 +302,24 @@
         </a>
     </div>
 
-    @* ---- Step 3: prima di disinstallare ---- *@
+    @* ---- Step 3: il patcher ---- *@
     <div class="mhxrguide-card">
         <div class="mhxrguide-step-head">
             <span class="mhxrguide-step-num">3</span>
-            <h2 class="mhxrguide-step-title">Before you do anything else — read this</h2>
-        </div>
-        <p>
-            A patched APK has a different signature, and Android will not install it over the game
-            you already have — you will need to <strong>uninstall</strong> it first. Uninstalling
-            also wipes the app's local storage, which is where the game keeps your "ID card".
-            Reinstalling without it means the server does not recognize you and you start over.
-        </p>
-        <div class="mhxrguide-warn">
-            Your character is <strong>not</strong> lost — it lives in the server's database, not on
-            your phone. But you need the <strong>transfer code</strong> to reclaim it, and it has to
-            be set up <strong>before</strong> you uninstall.
-        </div>
-        <ol class="mhxrguide-list">
-            <li>Open the game you have right now</li>
-            <li>Set up account transfer and write down the code and password</li>
-            <li>Save them somewhere that is <strong>not</strong> your phone</li>
-            <li>Only then uninstall</li>
-        </ol>
-        <p>
-            Skip this and your character stays in the database with no way to reconnect it — I can
-            fix that from my side, but you can't do it yourself, so it's much simpler to just save
-            the code first.
-        </p>
-    </div>
-
-    @* ---- Step 4: il patcher ---- *@
-    <div class="mhxrguide-card">
-        <div class="mhxrguide-step-head">
-            <span class="mhxrguide-step-num">4</span>
             <h2 class="mhxrguide-step-title">Download and run MHXR Patcher</h2>
         </div>
         <p>
-            My own tool: it takes your APK and changes two things — the server address, so the game
-            points here instead of Capcom's dead servers, and optionally the text language.
+            My own tool: it takes your APK and changes two things= the server address, 
+            where the game was pointing to Capcom's server IP, and optionally the text language.
         </p>
-        <a class="mhxrguide-btn" href="https://github.com/Heroic853/MHXR_Patcher_Heroic853" target="_blank" rel="noopener">
+        <a class="mhxrguide-btn" href="https://github.com/Heroic853/MHXR_Patcher_Heroic853/releases/tag/latest" target="_blank" rel="noopener">
             📥 Download MHXR Patcher
         </a>
-        <p>Full instructions and source are on that page.</p>
 
         <div class="mhxrguide-note">
-            <strong>"Windows protected your PC"</strong> — normal, it happens to any program that
-            isn't signed with a paid certificate. Click "More info", then "Run anyway".<br />
-            <strong>Antivirus flags it? Add an exclusion to Windows Defender</strong>
-            for the folder you put it in if this happens.
+            <strong>Note, when you download the .exe the browser will tell you that it is not 
+                a commonly downloaded file, you click on ... 
+                Keep -> Delete v -> Keep Anyway</strong>
         </div>
 
         <img src="images/MhxrPatcherScreenshot.png" alt="MHXR Patcher application window" class="mhxrguide-screenshot" />
@@ -367,25 +332,61 @@
         </ol>
     </div>
 
-    @* ---- Step 5: installazione ---- *@
+    @* ---- Step 4: installazione ---- *@
     <div class="mhxrguide-card">
         <div class="mhxrguide-step-head">
-            <span class="mhxrguide-step-num">5</span>
-            <h2 class="mhxrguide-step-title">Install and connect</h2>
+            <span class="mhxrguide-step-num">4</span>
+            <h2 class="mhxrguide-step-title">Install the Patched .APK</h2>
         </div>
+        <ol class="mhxrguide-list">
+            <li>Copy the patched APK to your phone / android emulator and install it, you'll need to allow installs from unknown sources, since it isn't from the Play Store</li>
+           
+            <li> Open the game and play!!!</li>
+                
+            <strong>If you have already play to my server open the game and use account transfer with the code and password.
+                To know how read from step 5
+            </strong>
+           
+
+        </ol>
         <div class="mhxrguide-note">
             <strong>Want to play from your PC instead of your phone?</strong> Install BlueStacks
-            first — it's an Android emulator, it lets the patched APK run on Windows just like it
+            first, it's an Android emulator, it lets the patched APK run on Windows just like it
             would on a phone. Get it before installing the APK below.
         </div>
         <a class="mhxrguide-btn mhxrguide-btn-alt" href="https://www.bluestacks.com/" target="_blank" rel="noopener">
             🖥️ Get BlueStacks
         </a>
+    </div>
+
+
+    @* ---- Step 5: prima di disinstallare ---- *@
+    <div class="mhxrguide-card">
+        <div class="mhxrguide-step-head">
+            <span class="mhxrguide-step-num">5</span>
+            <h2 class="mhxrguide-step-title">User Recovery</h2>
+        </div>
+        <p>
+            A patched APK has a different signature, and Android will not install it over the game
+            you already have you will need to <strong>uninstall</strong> it first. Uninstalling
+            also wipes the app's local storage, which is where the game keeps your "ID card".
+            Reinstalling without it means the server does not recognize you and you start over.
+        </p>
+        <div class="mhxrguide-warn">
+            Your character is <strong>not</strong> lost it lives in my server database,
+            But you need the <strong>transfer code</strong> to reclaim it, and it has to
+            be set up <strong>before</strong> you uninstall.
+        </div>
         <ol class="mhxrguide-list">
-            <li>Copy the patched APK to your phone / android emulator and install it — you'll need to allow installs from unknown sources, since it isn't from the Play Store</li>
-            <li>Open the game and use account transfer with the code and password from step 3</li>
+            <li>Open the game you have right now</li>
+            <li>Set up account transfer and write down the code and password</li>
+            <li>Save them somewhere that is <strong>not</strong> your phone</li>
+            <li>Only then uninstall</li>
         </ol>
-        <p>That's it — you should be in.</p>
+        <p>
+            Skip this and your character stays in the database with no way to reconnect it.
+            I can fix that from my side, but you can't do it yourself
+        </p>
     </div>
 
     @* ---- Troubleshooting ---- *@
@@ -406,7 +407,7 @@
         </div>
         <div class="mhxrguide-faq-item">
             <p class="mhxrguide-faq-q">The APK won't install</p>
-            <p class="mhxrguide-faq-a">Almost always the old game is still installed — uninstall it first (but only after saving your transfer code, see step 3).</p>
+            <p class="mhxrguide-faq-a">Almost always the old game is still installed — uninstall it first (but only after saving your transfer code, see step 5).</p>
         </div>
         <div class="mhxrguide-faq-item">
             <p class="mhxrguide-faq-q">The game opens and closes immediately, no error</p>
@@ -429,19 +430,18 @@
         </p>
         <div class="mhxrguide-links">
             <a class="mhxrguide-btn mhxrguide-btn-alt" href="https://github.com/Heroic853/MHXR-ServerHeroic" target="_blank" rel="noopener">
-                🖥️ Server source
+                🖥️ Server Code Source
             </a>
             <a class="mhxrguide-btn mhxrguide-btn-alt" href="https://github.com/Heroic853/MHXR_Patcher_Heroic853" target="_blank" rel="noopener">
-                🛠️ Patcher source
+                🛠️ Patcher Code Source
             </a>
         </div>
     </div>
-
-    <div class="mhxrguide-cta">
-        <p style="margin-bottom: 14px;">Something not working, or found a bug in-game?</p>
+     
+    <div class="mhxrguide-hero">
+        <span class="mhxrguide-sub">Something not working, or found a bug in game?</span>
         <a class="mhxrguide-btn" href="mhxr-feedback">
             🎫 Open a ticket
         </a>
     </div>
-
 </div>
