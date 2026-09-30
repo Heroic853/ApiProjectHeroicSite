@@ -686,13 +686,13 @@
                             </ul>
                         </li>
                         <li><NavLink href="forbiddenMonsters">Forbidden Monsters</NavLink></li>
-                        <li><NavLink href="mhxr-guide">MHXR Guide</NavLink></li>
-                        <li><NavLink href="mhxr-feedback">MHXR Feedback</NavLink></li>
+                   @*      <li><NavLink href="mhxr-guide">MHXR Guide</NavLink></li>
+                        <li><NavLink href="mhxr-feedback">MHXR Feedback</NavLink></li> *@
                         <li><NavLink href="dragonList">Monster Choice</NavLink></li>
                         @if (context.User.IsInRole("Admin"))
                         {
                             <li><NavLink href="aniversarytable">⚙ Admin</NavLink></li>
-                            <li><NavLink href="admin/mhxr-tickets">🎫 Tickets</NavLink></li>
+                          @*   <li><NavLink href="admin/mhxr-tickets">🎫 Tickets</NavLink></li> *@
                         }
                     </ul>
                 </Authorized>
@@ -709,8 +709,8 @@
                             </ul>
                         </li>
                         <li><NavLink href="forbiddenMonsters">Forbidden Monsters</NavLink></li>
-                        <li><NavLink href="mhxr-guide">MHXR Guide</NavLink></li>
-                        <li><NavLink href="mhxr-feedback">MHXR Feedback</NavLink></li>
+                    @*     <li><NavLink href="mhxr-guide">MHXR Guide</NavLink></li>
+                        <li><NavLink href="mhxr-feedback">MHXR Feedback</NavLink></li> *@
                     </ul>
                 </NotAuthorized>
             </AuthorizeView>
@@ -759,11 +759,11 @@
                                                  @onclick="ChiudiMenuUtente">
                                             <span>📊</span><span>Admin</span>
                                         </NavLink>
-                                        <NavLink href="admin/mhxr-tickets"
+                                        @* <NavLink href="admin/mhxr-tickets"
                                                  class="user-menu-item"
                                                  @onclick="ChiudiMenuUtente">
                                             <span>🎫</span><span>MHXR Tickets</span>
-                                        </NavLink>
+                                        </NavLink> *@
                                     }
 
                                     <div class="user-menu-sep"></div>
@@ -825,11 +825,11 @@
                                              @onclick="ChiudiMenuEDrawer">
                                         <span>📊</span><span>Admin</span>
                                     </NavLink>
-                                    <NavLink href="admin/mhxr-tickets"
+                                   @*  <NavLink href="admin/mhxr-tickets"
                                              class="user-menu-item"
                                              @onclick="ChiudiMenuEDrawer">
                                         <span>🎫</span><span>MHXR Tickets</span>
-                                    </NavLink>
+                                    </NavLink> *@
                                 }
 
                                 <div class="user-menu-sep"></div>
@@ -848,13 +848,13 @@
                             <li><NavLink href="videopage" @onclick="CloseMenu">Special Videos</NavLink></li>
                             <li><NavLink href="musicproj" @onclick="CloseMenu">Soundtrack</NavLink></li>
                             <li><NavLink href="forbiddenMonsters" @onclick="CloseMenu">Forbidden Monsters</NavLink></li>
-                            <li><NavLink href="mhxr-guide" @onclick="CloseMenu">MHXR Guide</NavLink></li>
-                            <li><NavLink href="mhxr-feedback" @onclick="CloseMenu">MHXR Feedback</NavLink></li>
+                           @*  <li><NavLink href="mhxr-guide" @onclick="CloseMenu">MHXR Guide</NavLink></li>
+                            <li><NavLink href="mhxr-feedback" @onclick="CloseMenu">MHXR Feedback</NavLink></li> *@
                             <li><NavLink href="dragonList" @onclick="CloseMenu">Monster Choice</NavLink></li>
                             @if (context.User.IsInRole("Admin"))
                             {
                                 <li><NavLink href="aniversarytable" @onclick="CloseMenu">⚙ Admin</NavLink></li>
-                                <li><NavLink href="admin/mhxr-tickets" @onclick="CloseMenu">🎫 Tickets</NavLink></li>
+                             @*    <li><NavLink href="admin/mhxr-tickets" @onclick="CloseMenu">🎫 Tickets</NavLink></li> *@
                             }
                         </ul>
                         @* Settings e Sign Out sono nella tendina sotto il nome,
@@ -869,8 +869,8 @@
                             <li><NavLink href="videopage" @onclick="CloseMenu">Special Videos</NavLink></li>
                             <li><NavLink href="musicproj" @onclick="CloseMenu">Soundtrack</NavLink></li>
                             <li><NavLink href="forbiddenMonsters" @onclick="CloseMenu">Forbidden Monsters</NavLink></li>
-                            <li><NavLink href="mhxr-guide" @onclick="CloseMenu">MHXR Guide</NavLink></li>
-                            <li><NavLink href="mhxr-feedback" @onclick="CloseMenu">MHXR Feedback</NavLink></li>
+                  @*           <li><NavLink href="mhxr-guide" @onclick="CloseMenu">MHXR Guide</NavLink></li>
+                            <li><NavLink href="mhxr-feedback" @onclick="CloseMenu">MHXR Feedback</NavLink></li> *@
                         </ul>
                     </NotAuthorized>
                 </AuthorizeView>
