@@ -305,8 +305,7 @@ if (app.Environment.IsDevelopment())
 // TCP vera che l'app vede e' quella del proxy, non del visitatore. L'IP
 // reale arriva nell'header "X-Forwarded-For", che questo middleware legge
 // e usa per RISCRIVERE RemoteIpAddress — da qui in poi tutto il resto
-// (incluso MhxrTicketController, che lo usa per "un ticket alla volta" e
-// per il freno anti-abuso) vede l'IP giusto senza saperlo.
+// vede l'IP giusto senza saperlo.
 //
 // ForwardLimit=1 + KnownNetworks/KnownProxies vuoti: si fida di UN solo
 // proxy davanti a se', chiunque esso sia (non si conosce in anticipo
