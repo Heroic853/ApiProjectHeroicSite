@@ -597,8 +597,8 @@ namespace WebApi.Controllers
                     // {CHECKOUT_SESSION_ID} lo sostituisce Stripe al redirect.
                     // Senza questo la pagina di conferma non sapeva quale
                     // pagamento mostrare e finiva sempre in errore.
-                    SuccessUrl = "https://heroic853.github.io/Heroic853SiteV1/payment-success?session_id={CHECKOUT_SESSION_ID}",
-                    CancelUrl = "https://heroic853.github.io/Heroic853SiteV1/commissions"
+                    //SuccessUrl = "https://heroic853.github.io/Heroic853SiteV1/payment-success?session_id={CHECKOUT_SESSION_ID}",
+                    //CancelUrl = "https://heroic853.github.io/Heroic853SiteV1/commissions"
                 };
 
                 var session = await new SessionService().CreateAsync(options);

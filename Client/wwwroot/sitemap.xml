@@ -27,11 +27,11 @@
     <priority>0.8</priority>
   </url>
 
-  <url>
+  <!--<url>
     <loc>https://heroic853.github.io/Heroic853SiteV1/commissions</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-  </url>
+  </url>-->
 
   <url>
     <loc>https://heroic853.github.io/Heroic853SiteV1/MessageOfGratitude</loc>
